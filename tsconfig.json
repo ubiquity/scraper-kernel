@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "incremental": true,
+    "target": "ES2020",
+    "outDir": "dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "forceConsistentCasingInFileNames": true
+  },
+}
