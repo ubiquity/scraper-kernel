@@ -4,6 +4,8 @@ export default async (page: puppeteer.Page) => {
   // await page.setViewport({ width: 1918, height: 1592 });
   await navigationPromise;
 
+  console.trace("ok");
+
   const list = await page.$(`ul.content`);
   if (!list) {
     throw new Error(`No list found`);

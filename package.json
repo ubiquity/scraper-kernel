@@ -2,7 +2,8 @@
   "name": "@ubiquity/cmc-scraper",
   "license": "MIT",
   "scripts": {
-    "scrape": "node dist https://coinmarketcap.com/cryptocurrency-category/",
+    "scrape:category": "node dist https://coinmarketcap.com/cryptocurrency-category/",
+    "scrape:dao": "node dist https://coinmarketcap.com/view/dao/",
     "_cdroot": "./build-scripts/cd-to-project-root.sh",
     "format": "run-s format:*",
     "format:prettier": "prettier --write .",
