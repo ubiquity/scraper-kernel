@@ -1,5 +1,4 @@
-/contracts
-/node_modules
-/fixtures
-/.next
-/pages/styles/tailwind.css
+node_modules
+dist
+.ignore
+.vscode
