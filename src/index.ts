@@ -44,7 +44,8 @@ async function browserSetup() {
 
 // This should execute the routine needed based on the page url.
 function globalTargetChangedHandler(target: puppeteer.Target) {
-  const url = target.url(); // https://coinmarketcap.com/cryptocurrency-category/
+  const url = target.url();
+  console.log(url);
   const logic = importLogic(url);
   return logic;
 }
@@ -56,7 +57,10 @@ function importLogic(url: string) {
   }
 
   const pathTo = path.join(process.cwd(), "dist", "pages", selection);
-  return import(pathTo);
+  const logic = import(pathTo).catch((err) => {
+    throw new Error(`Page logic not found for ${selection}`);
+  });
+  return logic;
 }
 
 //
