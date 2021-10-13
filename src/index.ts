@@ -6,20 +6,29 @@ dotenv.config();
 import puppeteer from "puppeteer";
 import settings from "./config";
 
-async function scraper(args: typeof process.argv) {
-  const { page, browser } = await browserSetup();
+(async function scraper(args: typeof process.argv) {
+  const { browser, page } = await browserSetup();
   const destination = new URL(args[2]);
-  await page.goto(destination.href);
-  await page.close();
+  if (!destination) {
+    throw new Error("No destination URL specified");
+  } else {
+    await page.goto(destination.href);
+  }
+
   await browser.close();
   process.exit(0);
-}
-
-scraper(process.argv);
+})(process.argv); // async wrapper and pass in cli args
 
 async function browserSetup() {
   const browser = await puppeteer.launch(settings);
   const context = browser.defaultBrowserContext();
   const page: puppeteer.Page = await context.newPage();
-  return { page, browser };
+  browser.on("targetchanged", globalTargetChangedHandler);
+  return { browser, page };
+}
+
+// This should execute the routine needed based on the page url.
+function globalTargetChangedHandler(target: puppeteer.Target) {
+  const url = target.url(); // https://coinmarketcap.com/cryptocurrency-category/
+  console.log(url);
 }
