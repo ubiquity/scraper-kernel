@@ -16,8 +16,8 @@ import path from "path";
     await page.goto(destination.href);
   }
 
-  await browser.close();
-  process.exit(0);
+  // await browser.close();
+  // process.exit(0);
 })(process.argv); // async wrapper and pass in cli args
 
 async function browserSetup() {
@@ -35,7 +35,10 @@ async function browserSetup() {
 
   waitForEventWithTimeout(browser, "targetchanged", 10000)
     .then(accepted, rejected)
-    .then((importedLogic) => importedLogic.default(page));
+    .then(async (_module) => await _module.default(page))
+    // .then(async () => await page.close())
+    .then(() => console.trace("Scrape logic completed"));
+
   return { browser, page };
 }
 
@@ -44,8 +47,8 @@ function globalTargetChangedHandler(target: puppeteer.Target) {
   const url = target.url(); // https://coinmarketcap.com/cryptocurrency-category/
   const logic = importLogic(url);
   return logic;
-  // console.log({ url, logic });
 }
+
 function importLogic(url: string) {
   const selection = url.split("://").pop();
   if (!selection) {
