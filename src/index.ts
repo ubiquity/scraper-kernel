@@ -6,6 +6,7 @@ dotenv.config();
 import puppeteer from "puppeteer";
 import settings from "./config";
 import path from "path";
+import fs from "fs";
 
 (async function scraper(args: typeof process.argv) {
   const { browser, page } = await browserSetup();
@@ -41,7 +42,10 @@ async function browserSetup() {
       return await _module.default(page, pageLoad);
     })
     // .then(async () => await page.close())
-    .then(() => console.trace("Scrape logic completed"));
+    .then((results) => {
+      fs.writeFileSync(path.join(process.cwd(), "dist", "results.json"), JSON.stringify(results));
+      console.trace(results);
+    });
 
   return { browser, page };
 }
