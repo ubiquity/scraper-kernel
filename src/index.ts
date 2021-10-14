@@ -10,53 +10,27 @@ import fs from "fs";
 
 (async function scraper(args: typeof process.argv) {
   const { browser, page } = await browserSetup();
+
+  // @FIXME: TYPING HACK
+  const accepted = async (target: puppeteer.Target | any) => globalTargetChangedHandler(target);
+
+  const rejected = (reason: Error) => {
+    throw reason;
+  };
+
+  waitForEventWithTimeout(browser, "targetchanged", 10000)
+    .then(accepted, rejected)
+    .then(loadLogicForPage(page))
+    .then(saveResultsToDisk)
+    .finally(tearDown(page, browser));
+
   const destination = new URL(args[2]);
   if (!destination) {
     throw new Error("No destination URL specified");
   } else {
     await page.goto(destination.href);
   }
-
-  // await browser.close();
-  // process.exit(0);
 })(process.argv); // async wrapper and pass in cli args
-
-async function browserSetup() {
-  const browser = await puppeteer.launch(settings);
-  const context = browser.defaultBrowserContext();
-  const page: puppeteer.Page = await context.newPage();
-  // browser.on("targetchanged", globalTargetChangedHandler);
-
-  // @FIXME: TYPING HACK
-  const accepted = async (target: puppeteer.Target | any) => globalTargetChangedHandler(target);
-
-  const rejected = () => {
-    throw new Error("Scrape logic selection timed out");
-  };
-
-  waitForEventWithTimeout(browser, "targetchanged", 10000)
-    .then(accepted, rejected)
-    .then(async (_module) => {
-      const pageLoad = page.waitForNavigation({ waitUntil: "networkidle2" });
-      await pageLoad;
-      return await _module.default(page, pageLoad);
-    })
-    // .then(async () => await page.close())
-    .then((results) => {
-      fs.writeFileSync(path.join(process.cwd(), "dist", "results.json"), JSON.stringify(results));
-      console.trace(results);
-    });
-
-  return { browser, page };
-}
-
-// This should execute the routine needed based on the page url.
-function globalTargetChangedHandler(target: puppeteer.Target) {
-  const url = target.url();
-  console.log(url);
-  const logic = importLogic(url);
-  return logic;
-}
 
 function importLogic(url: string) {
   const selection = url.split("://").pop();
@@ -71,15 +45,12 @@ function importLogic(url: string) {
   return logic;
 }
 
-//
-//
-//
 function waitForEventWithTimeout(eventEmitter: puppeteer.Browser, event: string, timeout: number) {
   return new Promise(function (resolve, reject) {
     eventEmitter.on(event, listener);
     const timer = setTimeout(function () {
       eventEmitter.off(event, listener);
-      reject(new Error("timeout"));
+      reject(new Error("Scrape logic selection timed out"));
     }, timeout);
 
     function listener(browser: puppeteer.Browser) {
@@ -88,4 +59,40 @@ function waitForEventWithTimeout(eventEmitter: puppeteer.Browser, event: string,
       resolve(browser);
     }
   });
+}
+
+async function browserSetup() {
+  const browser = await puppeteer.launch(settings);
+  const context = browser.defaultBrowserContext();
+  const page: puppeteer.Page = await context.newPage();
+  return { browser, page };
+}
+
+function loadLogicForPage(page: puppeteer.Page): ((value: any) => any) | null | undefined {
+  return async (_module) => {
+    const pageLoad = page.waitForNavigation({ waitUntil: "networkidle2" });
+    await pageLoad;
+    return await _module.default(page, pageLoad);
+  };
+}
+
+function saveResultsToDisk(results: any) {
+  fs.writeFileSync(path.join(process.cwd(), "dist", "results.json"), JSON.stringify(results));
+  console.trace(results);
+}
+
+function tearDown(page: puppeteer.Page, browser: puppeteer.Browser): (() => void) | null | undefined {
+  return async () => {
+    await page.close();
+    await browser.close();
+    process.exit(0);
+  };
+}
+
+// This should execute the routine needed based on the page url.
+function globalTargetChangedHandler(target: puppeteer.Target) {
+  const url = target.url();
+  console.log(url);
+  const logic = importLogic(url);
+  return logic;
 }
