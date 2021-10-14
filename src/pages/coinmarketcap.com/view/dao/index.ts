@@ -6,24 +6,27 @@ import { extractURLs, getMarketCap, getProperty, scrollToBottom } from "../../..
 export default async (page: puppeteer.Page, pageLoad: Promise<puppeteer.HTTPResponse | null>) => {
   await scrollToBottom(page);
   const urls = await getCmcPageURLs(page);
-  // console.log({ urls });
+  const tokens = [] as ScrapedProject[];
 
-  await page.goto(urls[0]);
-  await pageLoad;
-  const propsHandler = (await page.$(`script#__NEXT_DATA__[type="application/json"]`)) as ElementHandle<Element>;
-  const propsRawString = await getProperty(propsHandler, "textContent");
-  const { props } = JSON.parse(propsRawString) as PageProps;
-  // console.log(props);
-  // console.log(props.initialProps);
-  const token = props.initialProps.pageProps.info;
-  delete token.platforms;
-  delete token.relatedCoins;
-  delete token.relatedExchanges;
-  delete token.wallets;
-  delete token.holders;
-  console.log(JSON.stringify(token as ScrapedProject));
-  // const marketCaps = await getMarketCaps(page);
-  // console.log({ marketCaps });
+  for (const url of urls) {
+    await page.goto(url);
+    await pageLoad;
+    const propsHandler = (await page.$(`script#__NEXT_DATA__[type="application/json"]`)) as ElementHandle<Element>;
+    const propsRawString = await getProperty(propsHandler, "textContent");
+    const { props } = JSON.parse(propsRawString) as PageProps;
+    // console.log(props);
+    // console.log(props.initialProps);
+    const token = props.initialProps.pageProps.info;
+    delete token.platforms;
+    delete token.relatedCoins;
+    delete token.relatedExchanges;
+    delete token.wallets;
+    delete token.holders;
+    tokens.push(token); //  as ScrapedProject
+    console.log(`got ${token.name}`);
+    // return tokens;
+  }
+  return tokens;
 };
 
 async function getCmcPageURLs(page: puppeteer.Page) {
