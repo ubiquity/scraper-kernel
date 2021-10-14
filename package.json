@@ -20,6 +20,7 @@
   },
   "nodemonConfig": {
     "ignore": [
+      "dist/*.json",
       "**/*/cache/",
       "**/*/artifacts/",
       "**/*/node_modules/**/*"

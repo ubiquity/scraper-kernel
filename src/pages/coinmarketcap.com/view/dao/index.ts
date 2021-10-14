@@ -9,25 +9,33 @@ export default async (page: puppeteer.Page, pageLoad: Promise<puppeteer.HTTPResp
   const tokens = [] as ScrapedProject[];
 
   for (const url of urls) {
-    await page.goto(url);
-    await pageLoad;
-    const propsHandler = (await page.$(`script#__NEXT_DATA__[type="application/json"]`)) as ElementHandle<Element>;
-    const propsRawString = await getProperty(propsHandler, "textContent");
-    const { props } = JSON.parse(propsRawString) as PageProps;
-    // console.log(props);
-    // console.log(props.initialProps);
-    const token = props.initialProps.pageProps.info;
-    delete token.platforms;
-    delete token.relatedCoins;
-    delete token.relatedExchanges;
-    delete token.wallets;
-    delete token.holders;
-    tokens.push(token); //  as ScrapedProject
-    console.log(`got ${token.name}`);
-    // return tokens;
+    try {
+      await scrapeProject(page, url, pageLoad, tokens);
+    } catch (e) {
+      console.error(e);
+      console.warn(`Caught error scraping "${url}"`);
+    }
   }
   return tokens;
 };
+
+async function scrapeProject(page: puppeteer.Page, url: string, pageLoad: Promise<puppeteer.HTTPResponse | null>, tokens: ScrapedProject[]) {
+  await page.goto(url);
+  await pageLoad;
+  const propsHandler = (await page.$(`script#__NEXT_DATA__[type="application/json"]`)) as ElementHandle<Element>;
+  const propsRawString = await getProperty(propsHandler, "textContent");
+  const { props } = JSON.parse(propsRawString) as PageProps;
+  // console.log(props);
+  // console.log(props.initialProps);
+  const token = props.initialProps.pageProps.info;
+  delete token.platforms;
+  delete token.relatedCoins;
+  delete token.relatedExchanges;
+  delete token.wallets;
+  delete token.holders;
+  tokens.push(token); //  as ScrapedProject
+  console.log(`got ${token.name}`);
+}
 
 async function getCmcPageURLs(page: puppeteer.Page) {
   const currencies = await page.$$(`td:nth-child(3) a[href^="/currencies/"]`);
