@@ -1,6 +1,7 @@
 import Puppeteer from "puppeteer";
 
 export default {
+  // slowMo: 10,
   devtools: false,
   headless: true,
   defaultViewport: null,

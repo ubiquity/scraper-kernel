@@ -35,7 +35,11 @@ async function browserSetup() {
 
   waitForEventWithTimeout(browser, "targetchanged", 10000)
     .then(accepted, rejected)
-    .then(async (_module) => await _module.default(page))
+    .then(async (_module) => {
+      const pageLoad = page.waitForNavigation({ waitUntil: "networkidle2" });
+      await pageLoad;
+      return await _module.default(page, pageLoad);
+    })
     // .then(async () => await page.close())
     .then(() => console.trace("Scrape logic completed"));
 
