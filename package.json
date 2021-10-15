@@ -1,9 +1,10 @@
 {
-  "name": "@ubiquity/cmc-scraper",
+  "name": "@ubiquity/scraper",
   "license": "MIT",
   "scripts": {
-    "scrape:category": "node dist https://coinmarketcap.com/cryptocurrency-category/",
+    "watch:scrape:dao": "nodemon dist https://coinmarketcap.com/view/dao/",
     "scrape:dao": "node dist https://coinmarketcap.com/view/dao/",
+    "scrape:category": "node dist https://coinmarketcap.com/cryptocurrency-category/",
     "prepare": "husky install",
     "prebuild": "run-s clean",
     "build": "tsc --watch",
@@ -22,6 +23,7 @@
     "*.{ts,tsx}": "eslint --cache --fix --plugin tsc --rule 'tsc/config: [2, {configFile: \"./tsconfig.json\"}]'"
   },
   "nodemonConfig": {
+    "watch": "tsconfig.tsbuildinfo",
     "ignore": [
       "dist/*.json",
       "**/*/cache/",
