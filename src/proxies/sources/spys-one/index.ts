@@ -1,13 +1,10 @@
 import fetchSpysOne from "./fetch-spys-one";
-export default async () => {
-  const response = await fetchSpysOne();
 
-  //   .then((response) => {
+export async function spysOneIps() {
+  const response = await fetchSpysOne();
   const ips = getIpAddressesWithPortNumber(response);
   return ips;
-  //   console.log(ips);
-  //   });
-};
+}
 
 function getIpAddressesWithPortNumber(response: string) {
   const ipRegex = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}/g;

@@ -1,12 +1,14 @@
-import "source-map-support/register";
 import dotenv from "dotenv";
+import fs from "fs";
+import path from "path";
+import puppeteer from "puppeteer";
+import "source-map-support/register";
+import settings from "./config";
 
 dotenv.config();
 
-import puppeteer from "puppeteer";
-import settings from "./config";
-import path from "path";
-import fs from "fs";
+// const proxyHandler = await proxies();
+// console.log(proxyHandler.storage.flattened);
 
 (async function scraper(args: typeof process.argv) {
   const { browser, page } = await browserSetup();
