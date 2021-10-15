@@ -7,32 +7,42 @@ import settings from "./config";
 
 dotenv.config();
 
-// const proxyHandler = await proxies();
-// console.log(proxyHandler.storage.flattened);
-
-(async function scraper(args: typeof process.argv) {
+(async function scraper() {
   const { browser, page } = await browserSetup();
+  scraperEventLoop(browser, page);
+  await scraperBootload(page);
+});
 
-  // @FIXME: TYPING HACK
-  const loadPageLogic = async (target: puppeteer.Target | any) => globalTargetChangedHandler(target);
+async function browserSetup() {
+  const browser = await puppeteer.launch(settings);
+  const context = browser.defaultBrowserContext();
+  // TODO insert proxies here?
+  // const proxyHandler = await proxies();
+  // console.log(proxyHandler.storage.flattened);
+  const page: puppeteer.Page = await context.newPage();
+  return { browser, page };
+}
 
+async function scraperBootload(page: puppeteer.Page) {
+  const destination = new URL(process.argv[2]);
+  if (!destination) {
+    throw new Error("No destination URL specified");
+  } else {
+    await page.goto(destination.href);
+  }
+}
+
+function scraperEventLoop(browser: puppeteer.Browser, page: puppeteer.Page) {
   waitForEvent(browser, "targetchanged") //
-    .then(loadPageLogic) //
-    .then(runPageLogic(page)) //
+    .then((target) => globalTargetChangedHandler(target)) //
+    .then(runLogic(page)) //
     .then(saveResultsToDisk) //
     .catch((err) => {
       console.error(err);
       process.exit(1);
     })
     .finally(tearDown(page, browser));
-
-  const destination = new URL(args[2]);
-  if (!destination) {
-    throw new Error("No destination URL specified");
-  } else {
-    await page.goto(destination.href);
-  }
-})(process.argv); // async wrapper and pass in cli args
+}
 
 function importLogic(url: string) {
   const selection = url.split("://").pop();
@@ -47,11 +57,12 @@ function importLogic(url: string) {
   return logic;
 }
 
-function waitForEvent(eventEmitter: puppeteer.Browser, event: string) {
+function waitForEvent(eventEmitter: puppeteer.Browser, event: string): Promise<puppeteer.Target> {
   return new Promise(function (resolve) {
     eventEmitter.on(event, function listener(browser: puppeteer.Browser) {
       eventEmitter.off(event, listener);
-      resolve(browser);
+      // FIXME no idea why browser seemingly converts to target here but it works
+      resolve(browser as unknown as puppeteer.Target);
     });
   });
 }
@@ -71,14 +82,7 @@ function waitForEventWithTimeout(eventEmitter: puppeteer.Browser, event: string,
   });
 }
 
-async function browserSetup() {
-  const browser = await puppeteer.launch(settings);
-  const context = browser.defaultBrowserContext();
-  const page: puppeteer.Page = await context.newPage();
-  return { browser, page };
-}
-
-function runPageLogic(page: puppeteer.Page): ((value: any) => any) | null | undefined {
+function runLogic(page: puppeteer.Page): ((value: any) => any) | null | undefined {
   return async (_module) => {
     const pageLoad = page.waitForNavigation({ waitUntil: "networkidle2" });
     await pageLoad;
@@ -100,9 +104,8 @@ function tearDown(page: puppeteer.Page, browser: puppeteer.Browser): (() => void
 }
 
 // This should execute the routine needed based on the page url.
-function globalTargetChangedHandler(target: puppeteer.Target) {
+async function globalTargetChangedHandler(target: puppeteer.Target) {
   const url = target.url();
-  console.log(url);
   const logic = importLogic(url);
   return logic;
 }
