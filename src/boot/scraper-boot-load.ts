@@ -1,13 +1,10 @@
 import puppeteer from "puppeteer";
 
-export default function scraperBootload(target: Promise<puppeteer.Target>) {
-  const destination = new URL(process.argv[2]);
+export default function newTabToURL(browser: puppeteer.Browser, url: string) {
+  const destination = new URL(url);
   if (!destination) {
     throw new Error("No destination URL specified");
   } else {
-    target
-
-      .then((target) => target.page()) // .browserContext().newPage();
-      .then((page) => page?.goto(destination.href, { waitUntil: "networkidle2" }));
+    browser.newPage().then((page) => page.goto(destination.href, { waitUntil: "networkidle2" }));
   }
 }
