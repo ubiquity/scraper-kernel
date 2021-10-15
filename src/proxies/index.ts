@@ -1,4 +1,8 @@
 import ProxyHandler from "./proxy-handler";
-export default function proxies() {
+import spysOne from "./sources/spys-one";
+export default async function proxies() {
+  const ips = await spysOne();
   const handler = new ProxyHandler();
+  handler.storage.flattened = ips as string[];
+  return handler;
 }

@@ -15,15 +15,13 @@ export class ProxyHandlerDataStore {
   private _proxies = [] as ProxySingle[];
 
   private _flatten = function flattened(proxies: ProxySingle[]) {
-    let flat = [] as ProxySingle[];
+    let flat = [] as string[];
     if (Array.isArray(proxies)) {
       let x = proxies.length;
       while (x--) {
-        if (proxies[x].id) {
-          if (proxies[x].id.href) {
-            flat.push(proxies[x].id.href);
-          } else throw new Error(`No "href" property found on ${proxies[x].id}`);
-        } else throw new Error(`No "id" property found on ${proxies[x]}`);
+        if (proxies[x].ip) {
+          flat.push(proxies[x].ip);
+        } else throw new Error(`No "ip" property found on ${proxies[x]}`);
       }
     } else flat = proxies;
     return flat;
@@ -101,8 +99,16 @@ export class ProxyHandlerDataStore {
     this._persist = persistence;
   }
 
-  get proxies() {
+  get flattened() {
     return this._flatten(this._proxies);
+  }
+
+  set flattened(flat: string[]) {
+    this._proxies = flat.map((ip) => ({ ip }));
+  }
+
+  get proxies() {
+    return this._proxies;
   }
 
   set proxies(input: any) {

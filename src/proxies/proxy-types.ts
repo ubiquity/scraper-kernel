@@ -15,8 +15,9 @@ export interface ProxyPerformance {
 
 export interface ProxySingle {
   //	successes.json[x]
-  id: any; // IParsedURL;
-  details: any;
+  // id: any; // IParsedURL;
+  // details: any;
+  ip: string;
   origin?: string;
   performance?: ProxyPerformance;
 }
