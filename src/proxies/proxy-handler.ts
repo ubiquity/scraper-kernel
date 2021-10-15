@@ -21,7 +21,7 @@ export interface IProxy {
   performance?: IPerformance;
 }
 
-export type IProxyList = Array<IProxy> //	successes.json
+export type IProxyList = Array<IProxy>; //	successes.json
 
 function flatten(this: any) {
   let flat: any = [];
