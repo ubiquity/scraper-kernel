@@ -5,6 +5,9 @@
     "scrape:category": "node dist https://coinmarketcap.com/cryptocurrency-category/",
     "scrape:dao": "node dist https://coinmarketcap.com/view/dao/",
     "prepare": "husky install",
+    "prebuild": "run-s clean",
+    "build": "tsc --watch",
+    "clean": "rimraf dist tsconfig.tsbuildinfo",
     "format": "run-s format:*",
     "format:prettier": "prettier --write .",
     "format:eslint": "eslint . --ext .ts,.tsx --cache --fix --plugin tsc --rule 'tsc/config: [2, {configFile: \"./tsconfig.json\"}]'"
