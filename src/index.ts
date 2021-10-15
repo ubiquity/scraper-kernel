@@ -14,16 +14,16 @@ dotenv.config();
   const { browser, page } = await browserSetup();
 
   // @FIXME: TYPING HACK
-  const accepted = async (target: puppeteer.Target | any) => globalTargetChangedHandler(target);
+  const loadPageLogic = async (target: puppeteer.Target | any) => globalTargetChangedHandler(target);
 
-  const rejected = (reason: Error) => {
-    throw reason;
-  };
-
-  waitForEventWithTimeout(browser, "targetchanged", 10000)
-    .then(accepted, rejected)
-    .then(loadLogicForPage(page))
-    .then(saveResultsToDisk)
+  waitForEvent(browser, "targetchanged") //
+    .then(loadPageLogic) //
+    .then(runPageLogic(page)) //
+    .then(saveResultsToDisk) //
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    })
     .finally(tearDown(page, browser));
 
   const destination = new URL(args[2]);
@@ -47,6 +47,14 @@ function importLogic(url: string) {
   return logic;
 }
 
+function waitForEvent(eventEmitter: puppeteer.Browser, event: string) {
+  return new Promise(function (resolve) {
+    eventEmitter.on(event, function listener(browser: puppeteer.Browser) {
+      eventEmitter.off(event, listener);
+      resolve(browser);
+    });
+  });
+}
 function waitForEventWithTimeout(eventEmitter: puppeteer.Browser, event: string, timeout: number) {
   return new Promise(function (resolve, reject) {
     eventEmitter.on(event, listener);
@@ -70,7 +78,7 @@ async function browserSetup() {
   return { browser, page };
 }
 
-function loadLogicForPage(page: puppeteer.Page): ((value: any) => any) | null | undefined {
+function runPageLogic(page: puppeteer.Page): ((value: any) => any) | null | undefined {
   return async (_module) => {
     const pageLoad = page.waitForNavigation({ waitUntil: "networkidle2" });
     await pageLoad;
