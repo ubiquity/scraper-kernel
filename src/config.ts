@@ -1,4 +1,4 @@
-import Puppeteer from "puppeteer";
+import { BrowserConnectOptions } from "puppeteer";
 
 export default {
   // slowMo: 10,
@@ -6,4 +6,4 @@ export default {
   headless: true,
   defaultViewport: null,
   args: ["--lang=en-US,en;q=0.9"] as string[],
-} as Puppeteer.BrowserConnectOptions;
+} as BrowserConnectOptions;
