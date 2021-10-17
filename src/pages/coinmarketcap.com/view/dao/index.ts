@@ -2,7 +2,7 @@ import puppeteer, { ElementHandle } from "puppeteer";
 import useProxy from "puppeteer-page-proxy";
 import PageProps from "../../../../@types/page-props";
 import ScrapedProject from "../../../../@types/scraped-project";
-import { extractURLs, getMarketCap, getProperty, scrollToBottom } from "../../../../common";
+import { extractURLs, getAttributeValueFromElements, getProperty, scrollToBottom } from "../../../../common";
 import Proxies from "../../../../proxies";
 
 const proxyHandler = Proxies();
@@ -26,8 +26,21 @@ export default async function cmcDao(browser: puppeteer.Browser) {
   for (const url of urls) {
     try {
       const proxy = proxyList.shift();
+
       if (proxy) {
-        await scrapeProject(browser, proxy, url, tokens);
+        const timeout = 5000;
+        console.log(`Connecting to "${url}" via "${proxy}"... timeout in ${timeout / 1000} seconds`);
+
+        // test if the proxy is any good by allowing a 5 second timeout.
+        // if it times out, it's probably not a good proxy.
+
+        const timer = setTimeout(async () => {
+          await page.close();
+        }, timeout);
+
+        scrapeProject(browser, proxy, url, tokens);
+
+        clearTimeout(timer);
       } else {
         throw new Error("No proxy available");
       }
@@ -41,11 +54,8 @@ export default async function cmcDao(browser: puppeteer.Browser) {
 
 async function scrapeProject(browser: puppeteer.Browser, proxy: string, url: string, tokens: ScrapedProject[]) {
   const page = await browser.newPage();
-  console.log(`Connecting to "${url}" via "${proxy}"...`);
-  useProxy(page as object, `http://${proxy}`);
 
-  // .then(() => events.emit("logicloaded", defaultExport))
-  // .catch(() => page.waitForNavigation({ waitUntil: "networkidle2" }).then(() => events.emit("logicloaded", defaultExport)));
+  useProxy(page as object, `http://${proxy}`);
 
   await page.goto(url);
   await page.waitForNavigation({ waitUntil: "networkidle2" });
@@ -61,6 +71,7 @@ async function scrapeProject(browser: puppeteer.Browser, proxy: string, url: str
   delete token.holders;
   tokens.push(token); //  as ScrapedProject
   console.log(`got ${token.name}`);
+  return tokens;
 }
 
 async function getCmcPageURLs(page: puppeteer.Page) {
@@ -78,7 +89,7 @@ async function getMarketCaps(page: puppeteer.Page) {
   if (!marketCaps) {
     throw new Error(`No market caps found`);
   } else {
-    const mcaps = await getMarketCap(marketCaps);
+    const mcaps = await getAttributeValueFromElements(marketCaps, "textContent");
     return mcaps;
   }
 }

@@ -21,8 +21,3 @@ browserSetup(config) // Setup browser and listen for events
 //       process.exit(1);
 //     })
 //     .finally(tearDown(browser));
-
-// function saveResultsToDisk(results: any) {
-//   fs.writeFileSync(path.join(process.cwd(), "dist", "results.json"), JSON.stringify(results));
-//   console.trace(results);
-// }

@@ -5,18 +5,19 @@ import { events } from "./browser-setup";
 
 type PageLogic = (browser: Browser) => Promise<unknown[]>;
 
-export const handlers = {
-  // logicFailed: function logicFailedHandler(): (...args: any[]) => void {
-  //   return async (url: string) => {
-  //     console.error(`page logic load error at ${url}`);
-  //   };
-  // },
+export default eventHandlers;
+export const eventHandlers = {
   logicLoaded: function logicLoadedHandler(browser: Browser): (...args: any[]) => void {
     return async (logic: PageLogic) => {
       await logic(browser);
     };
   },
 
+  /**
+   * This is the main handler that will be called when the browser navigates to any new page.
+   * It will load the logic for the page and then call the logic.
+   * @param browser the browser instance
+   */
   browserOnTargetChanged: function browserOnTargetChangedHandler(browser: Browser): Handler<any> {
     return async (target: Target) => {
       const url = target.url();
@@ -34,10 +35,6 @@ export const handlers = {
       const page = await target.page();
       if (page) {
         page.waitForNavigation({ waitUntil: "networkidle2" }).then(() => events.emit("logicloaded", defaultExport));
-
-        // useProxy(page as object, `http://${proxy}`)
-        // .then(() => events.emit("logicloaded", defaultExport))
-        // .catch(() => page.waitForNavigation({ waitUntil: "networkidle2" }).then(() => events.emit("logicloaded", defaultExport)));
       } else {
         console.error(`No page found for ${url}`);
         return;
