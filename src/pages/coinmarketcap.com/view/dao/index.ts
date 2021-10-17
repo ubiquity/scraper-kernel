@@ -1,7 +1,11 @@
 import puppeteer, { ElementHandle } from "puppeteer";
+import useProxy from "puppeteer-page-proxy";
 import PageProps from "../../../../@types/page-props";
 import ScrapedProject from "../../../../@types/scraped-project";
 import { extractURLs, getMarketCap, getProperty, scrollToBottom } from "../../../../common";
+import Proxies from "../../../../proxies";
+
+const proxyHandler = Proxies();
 
 export default async function cmcDao(browser: puppeteer.Browser) {
   // const activeTarget = browser.targets()[browser.targets().length - 1];
@@ -16,9 +20,17 @@ export default async function cmcDao(browser: puppeteer.Browser) {
   const urls = await getCmcPageURLs(page);
   const tokens = [] as ScrapedProject[];
 
+  const proxies = await proxyHandler;
+  const proxyList = proxies.storage.flattened;
+
   for (const url of urls) {
     try {
-      await scrapeProject(browser, url, tokens);
+      const proxy = proxyList.shift();
+      if (proxy) {
+        await scrapeProject(browser, proxy, url, tokens);
+      } else {
+        throw new Error("No proxy available");
+      }
     } catch (e) {
       console.error(e);
       console.warn(`Caught error scraping "${url}"`);
@@ -27,8 +39,14 @@ export default async function cmcDao(browser: puppeteer.Browser) {
   return tokens;
 }
 
-async function scrapeProject(browser: puppeteer.Browser, url: string, tokens: ScrapedProject[]) {
+async function scrapeProject(browser: puppeteer.Browser, proxy: string, url: string, tokens: ScrapedProject[]) {
   const page = await browser.newPage();
+  console.log(`Connecting to "${url}" via "${proxy}"...`);
+  useProxy(page as object, `http://${proxy}`);
+
+  // .then(() => events.emit("logicloaded", defaultExport))
+  // .catch(() => page.waitForNavigation({ waitUntil: "networkidle2" }).then(() => events.emit("logicloaded", defaultExport)));
+
   await page.goto(url);
   await page.waitForNavigation({ waitUntil: "networkidle2" });
 
