@@ -2,13 +2,8 @@ import fs from "fs";
 import path from "path";
 import { Browser, Handler, Target } from "puppeteer";
 import { events } from "./browser-setup";
-import useProxy from "puppeteer-page-proxy";
 
 type PageLogic = (browser: Browser) => Promise<unknown[]>;
-
-import Proxies from "../proxies";
-
-const proxyHandler = Proxies();
 
 export const handlers = {
   // logicFailed: function logicFailedHandler(): (...args: any[]) => void {
@@ -36,16 +31,13 @@ export const handlers = {
         return;
       }
 
-      const proxies = await proxyHandler;
-      const proxyList = proxies.storage.flattened;
-
       const page = await target.page();
       if (page) {
-        const proxy = proxyList.shift();
-        console.log(`Connected to ${url} via ${proxy}`);
-        useProxy(page as object, `http://${proxy}`)
-          .then(() => events.emit("logicloaded", defaultExport))
-          .catch(() => page.waitForNavigation({ waitUntil: "networkidle2" }).then(() => events.emit("logicloaded", defaultExport)));
+        page.waitForNavigation({ waitUntil: "networkidle2" }).then(() => events.emit("logicloaded", defaultExport));
+
+        // useProxy(page as object, `http://${proxy}`)
+        // .then(() => events.emit("logicloaded", defaultExport))
+        // .catch(() => page.waitForNavigation({ waitUntil: "networkidle2" }).then(() => events.emit("logicloaded", defaultExport)));
       } else {
         console.error(`No page found for ${url}`);
         return;
