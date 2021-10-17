@@ -2,8 +2,13 @@ import fs from "fs";
 import path from "path";
 import { Browser, Handler, Target } from "puppeteer";
 import { events } from "./browser-setup";
+import useProxy from "puppeteer-page-proxy";
 
 type PageLogic = (browser: Browser) => Promise<unknown[]>;
+
+import Proxies from "../proxies";
+
+const proxyHandler = Proxies();
 
 export const handlers = {
   // logicFailed: function logicFailedHandler(): (...args: any[]) => void {
@@ -16,23 +21,31 @@ export const handlers = {
       await logic(browser);
     };
   },
+
   browserOnTargetChanged: function browserOnTargetChangedHandler(browser: Browser): Handler<any> {
     return async (target: Target) => {
       const url = target.url();
-      console.log(`Target changed to ${url}`);
 
       const logic = importLogic(url);
       const defaultExport = (await logic)?.default as PageLogic | undefined;
 
       if (!defaultExport) {
-        console.log(`...No logic found`);
+        console.log(`\t...No logic found`);
+        // target.page().then((page) => page?.close());
         // events.emit("logicfailed", url);
         return;
       }
 
+      const proxies = await proxyHandler;
+      const proxyList = proxies.storage.flattened;
+
       const page = await target.page();
       if (page) {
-        page.waitForNavigation({ waitUntil: "networkidle2" }).then(() => events.emit("logicloaded", defaultExport));
+        const proxy = proxyList.shift();
+        console.log(`Connected to ${url} via ${proxy}`);
+        useProxy(page as object, `http://${proxy}`)
+          .then(() => events.emit("logicloaded", defaultExport))
+          .catch(() => page.waitForNavigation({ waitUntil: "networkidle2" }).then(() => events.emit("logicloaded", defaultExport)));
       } else {
         console.error(`No page found for ${url}`);
         return;
