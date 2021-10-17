@@ -5,8 +5,10 @@ import { extractURLs, getMarketCap, getProperty, scrollToBottom } from "../../..
 
 export default async (browser: puppeteer.Browser) => {
   const activeTarget = browser.targets()[browser.targets().length - 1];
-  const pages = await activeTarget.pages();
-  const page = pages[0];
+  const page = await activeTarget.page();
+  if (!page) {
+    throw new Error("No page found");
+  }
   await page.bringToFront();
   await scrollToBottom(page);
 

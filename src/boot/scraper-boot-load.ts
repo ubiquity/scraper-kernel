@@ -1,10 +1,12 @@
 import puppeteer from "puppeteer";
 
-export default function newTabToURL(browser: puppeteer.Browser, url: string) {
+export default async function newTabToURL(browser: puppeteer.Browser, url: string) {
   const destination = new URL(url);
   if (!destination) {
     throw new Error("No destination URL specified");
   } else {
-    browser.newPage().then((page) => page.goto(destination.href, { waitUntil: "networkidle2" }));
+    const page = await browser.newPage();
+    await page.goto(destination.href, { waitUntil: "networkidle2" });
   }
+  return browser;
 }

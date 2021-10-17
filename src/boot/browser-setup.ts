@@ -1,39 +1,43 @@
+import { EventEmitter } from "events";
 import path from "path";
 import puppeteer from "puppeteer";
-import { EventEmitter } from "events";
+interface Module {
+  default?: Function;
+}
 
-type PageLogic = (browser: puppeteer.Browser) => Promise<unknown>;
+export type PageLogic = (browser: puppeteer.Browser) => Promise<unknown[]>;
+const logicLoadedEvent = new EventEmitter();
 
 export default async function browserSetup(config: puppeteer.BrowserConnectOptions) {
   const browser = await puppeteer.launch(config);
 
-  browser.on("targetchanged", browserOnTargetChangedHandler());
+  logicLoadedEvent.on("logicloaded", async (logic: PageLogic) => {
+    console.log(`Loading "${logic}"`);
+    return await logic(browser);
+  });
 
+  browser.on("targetchanged", browserOnTargetChangedHandler());
   return browser;
 }
 
 function browserOnTargetChangedHandler(): puppeteer.Handler<any> {
-  return async (browser) => {
-    // I cant find the typing for Target, which also has URL, unlike puppeteer.Browser
+  return async (browser: puppeteer.Target) => {
     const url = browser.url();
+    console.log(`Target changed to ${url}`);
     const logic = importLogic(url);
-    const defaultExport = (await logic).default as PageLogic;
-    const logicLoadedEvent = new EventEmitter();
+    const defaultExport = (await logic)?.default as PageLogic | undefined;
+    if (!defaultExport) {
+      logicLoadedEvent.emit("logicfailed", url);
+      console.error(`No logic found for ${url}`);
+    }
+
+    // emitter().emit("logicloaded", defaultExport);
     logicLoadedEvent.emit("logicloaded", defaultExport);
+
     return defaultExport;
   };
 }
 
-// function waitForEvent(eventEmittingObject: puppeteer.Browser, event: string): Promise<puppeteer.Target> {
-//   return new Promise((resolve) => {
-//     eventEmittingObject.on(event, function listener(target: puppeteer.Target) {
-//       eventEmittingObject.off(event, listener);
-//       // TODO seems that anything under the browser object
-//       // can emit events but this is only designed for the target object.
-//       resolve(target);
-//     });
-//   });
-// }
 export function importLogic(url: string) {
   const selection = url.split("://").pop();
   if (!selection) {
@@ -41,7 +45,8 @@ export function importLogic(url: string) {
   }
   const pathTo = path.join(process.cwd(), "dist", "pages", selection);
   const logic = import(pathTo).catch(() => {
-    throw new Error(`Import page logic error for ${selection}`);
+    console.error(`Import page logic error for ${selection}`);
   });
-  return logic;
+
+  return logic as Promise<Module>;
 }
