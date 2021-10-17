@@ -15,7 +15,6 @@ export async function getProperty(element: ElementHandle, query: string) {
 }
 
 export const getSourcedDate = () => new Date().toLocaleDateString();
-// export const getGithub = () => {};
 export const getMarketCap = async (elements: ElementHandle<Element>[]) => {
   const mcaps = [] as string[];
   for (const element of elements) {
@@ -24,9 +23,5 @@ export const getMarketCap = async (elements: ElementHandle<Element>[]) => {
   }
   return mcaps;
 };
-// export const getMedium = () => {};
-// export const getName = () => {};
-// export // const getIndustry = () => {};
-// export const getWebsite = () => {};
 
 export const scrollToBottom = async (page: Page) => await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
