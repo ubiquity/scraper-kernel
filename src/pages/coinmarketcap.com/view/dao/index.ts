@@ -3,9 +3,10 @@ import PageProps from "../../../../@types/page-props";
 import ScrapedProject from "../../../../@types/scraped-project";
 import { extractURLs, getMarketCap, getProperty, scrollToBottom } from "../../../../common";
 
-export default async (browser: puppeteer.Browser) => {
-  const activeTarget = browser.targets()[browser.targets().length - 1];
-  const page = await activeTarget.page();
+export default async function cmcDao(browser: puppeteer.Browser) {
+  // const activeTarget = browser.targets()[browser.targets().length - 1];
+  const pages = await browser.pages();
+  const page = pages[pages.length - 1];
   if (!page) {
     throw new Error("No page found");
   }
@@ -24,7 +25,7 @@ export default async (browser: puppeteer.Browser) => {
     }
   }
   return tokens;
-};
+}
 
 async function scrapeProject(browser: puppeteer.Browser, url: string, tokens: ScrapedProject[]) {
   const page = await browser.newPage();
