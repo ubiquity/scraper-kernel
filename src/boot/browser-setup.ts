@@ -1,13 +1,13 @@
 import { EventEmitter } from "events";
 import puppeteer from "puppeteer";
-import { handlers } from "../common";
+import { handlers } from "./event-handlers";
 
 export const events = new EventEmitter();
 
 export default async function browserSetup(config: puppeteer.BrowserConnectOptions) {
   const browser = await puppeteer.launch(config);
   events.on("logicloaded", handlers.logicLoaded(browser));
-  events.on("logicfailed", handlers.logicFailed());
-  browser.on("targetchanged", handlers.browserOnTargetChanged());
+  // events.on("logicfailed", handlers.logicFailed());
+  browser.on("targetchanged", handlers.browserOnTargetChanged(browser));
   return browser;
 }
