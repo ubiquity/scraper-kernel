@@ -4,17 +4,15 @@ import PageProps from "../../../../@types/page-props";
 import ScrapedProject from "../../../../@types/scraped-project";
 import { extractURLs, getAttributeValueFromElements, getProperty, scrollToBottom } from "../../../../common";
 import Proxies from "../../../../proxies";
-
 const proxyHandler = Proxies();
 
-export default async function cmcDao(browser: puppeteer.Browser) {
-  // const activeTarget = browser.targets()[browser.targets().length - 1];
+export default async function coinmarketcapViewDao(browser: puppeteer.Browser) {
   const pages = await browser.pages();
   const page = pages[pages.length - 1];
   if (!page) {
     throw new Error("No page found");
   }
-  await page.bringToFront();
+  // await page.bringToFront();
   await scrollToBottom(page);
 
   const urls = await getCmcPageURLs(page);
@@ -23,39 +21,37 @@ export default async function cmcDao(browser: puppeteer.Browser) {
   const proxies = await proxyHandler;
   const proxyList = proxies.storage.flattened;
 
+  const jobs = [] as (() => Promise<ScrapedProject>)[]; // not sure what type this should be
+
   for (const url of urls) {
-    try {
-      const proxy = proxyList.shift();
-
-      if (proxy) {
-        const timeout = 5000;
-        console.log(`Connecting to "${url}" via "${proxy}"... timeout in ${timeout / 1000} seconds`);
-
-        // test if the proxy is any good by allowing a 5 second timeout.
-        // if it times out, it's probably not a good proxy.
-
-        const timer = setTimeout(async () => {
-          await page.close();
-        }, timeout);
-
-        scrapeProject(browser, proxy, url, tokens);
-
-        clearTimeout(timer);
-      } else {
-        throw new Error("No proxy available");
-      }
-    } catch (e) {
-      console.error(e);
-      console.warn(`Caught error scraping "${url}"`);
+    const proxy = proxyList.shift();
+    if (!proxy) {
+      throw new Error("No proxy available");
     }
+    jobs.push(() => scrapeProject(browser, proxy, url)); // writes to jobs
   }
+
+  const concurrency = 4;
+  while (jobs.length) {
+    await Promise.all(jobs.splice(0, concurrency).map((f) => f()));
+  }
+
   return tokens;
 }
 
-async function scrapeProject(browser: puppeteer.Browser, proxy: string, url: string, tokens: ScrapedProject[]) {
+async function scrapeProject(browser: puppeteer.Browser, proxy: string, url: string) {
+  const timeout = 5000;
+  console.log(`Connecting to "${url}" via "${proxy}"... timeout in ${timeout / 1000} seconds`);
   const page = await browser.newPage();
 
   useProxy(page as object, `http://${proxy}`);
+
+  // test if the proxy is any good by allowing a 5 second timeout.
+  // if it times out, it should be removed from the list, and try the next proxy for the same request.
+  const timer = setTimeout(async () => {
+    await page.close();
+  }, timeout);
+  clearTimeout(timer);
 
   await page.goto(url);
   await page.waitForNavigation({ waitUntil: "networkidle2" });
@@ -69,9 +65,9 @@ async function scrapeProject(browser: puppeteer.Browser, proxy: string, url: str
   delete token.relatedExchanges;
   delete token.wallets;
   delete token.holders;
-  tokens.push(token); //  as ScrapedProject
+  // tokens.push(token); //  as ScrapedProject
   console.log(`got ${token.name}`);
-  return tokens;
+  return token;
 }
 
 async function getCmcPageURLs(page: puppeteer.Page) {
