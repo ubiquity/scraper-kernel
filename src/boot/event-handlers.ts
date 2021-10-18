@@ -51,7 +51,8 @@ export function importLogic(url: string) {
   const pathTo = path.join(process.cwd(), "dist", "pages", selection);
   const exists = fs.existsSync(pathTo);
   if (exists) {
-    const logic = import(pathTo).catch(() => {
+    const logic = import(pathTo).catch((error) => {
+      console.error(error);
       console.error(`Import page logic error for ${selection}`);
     });
     return logic as Promise<Module>;
