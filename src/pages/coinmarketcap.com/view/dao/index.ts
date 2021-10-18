@@ -4,58 +4,68 @@ import PageProps from "../../../../@types/page-props";
 import ScrapedProject from "../../../../@types/scraped-project";
 import { extractURLs, getAttributeValueFromElements, getProperty, scrollToBottom } from "../../../../common";
 import Proxies from "../../../../proxies";
+import { events } from "./../../../../boot/browser-setup";
 const proxyHandler = Proxies();
-
 export default async function coinmarketcapViewDao(browser: puppeteer.Browser) {
+  const page = await setupPage(browser);
+  const jobs = [] as (() => Promise<ScrapedProject>)[]; // not sure what type this should be
+  const urls = await getCmcPageURLs(page);
+
+  const proxies = await proxyHandler;
+  const proxyList = proxies.storage.flattened;
+
+  for (const url of urls) {
+    jobs.push(() => delegateRequestsToProxies(browser, url, proxyList));
+  }
+
+  const concurrency = 2;
+  const batchResults = [] as ScrapedProject[][];
+  while (jobs.length) {
+    const batch = jobs.splice(0, concurrency).map((f) => f());
+    batchResults.push(await Promise.all(batch));
+  }
+
+  return [...batchResults].flat();
+}
+
+async function setupPage(browser: puppeteer.Browser) {
   const pages = await browser.pages();
   const page = pages[pages.length - 1];
   if (!page) {
     throw new Error("No page found");
   }
-  // await page.bringToFront();
   await scrollToBottom(page);
-
-  const urls = await getCmcPageURLs(page);
-  const tokens = [] as ScrapedProject[];
-
-  const proxies = await proxyHandler;
-  const proxyList = proxies.storage.flattened;
-
-  const jobs = [] as (() => Promise<ScrapedProject>)[]; // not sure what type this should be
-
-  for (const url of urls) {
-    const proxy = proxyList.shift();
-    if (!proxy) {
-      throw new Error("No proxy available");
-    }
-    jobs.push(() => scrapeProject(browser, proxy, url)); // writes to jobs
-  }
-
-  const concurrency = 4;
-  while (jobs.length) {
-    await Promise.all(jobs.splice(0, concurrency).map((f) => f()));
-  }
-
-  return tokens;
+  return page;
 }
 
-async function scrapeProject(browser: puppeteer.Browser, proxy: string, url: string) {
+async function delegateRequestsToProxies(browser: puppeteer.Browser, url: string, proxyList: string[], _page?: puppeteer.Page) {
+  console.log(`setting up proxies for ${url}`);
+  const proxy = proxyList.shift();
+  if (!proxy) {
+    throw new Error("No proxy available");
+  }
+
   const timeout = 5000;
   console.log(`Connecting to "${url}" via "${proxy}"... timeout in ${timeout / 1000} seconds`);
-  const page = await browser.newPage();
+
+  if (_page) {
+    console.log(`stopping page`);
+    await _page.evaluate(() => stop()); // dont think that does anything, seems to still load
+  }
+  const page = _page || (await browser.newPage());
+
+  const timer = setTimeout(() => events.emit("proxytimeout", () => delegateRequestsToProxies(browser, url, proxyList, page)), timeout);
 
   useProxy(page as object, `http://${proxy}`);
-
-  // test if the proxy is any good by allowing a 5 second timeout.
-  // if it times out, it should be removed from the list, and try the next proxy for the same request.
-  const timer = setTimeout(async () => {
-    await page.close();
-  }, timeout);
-  clearTimeout(timer);
-
   await page.goto(url);
   await page.waitForNavigation({ waitUntil: "networkidle2" });
+  clearTimeout(timer);
 
+  const token = await projectScrape(page);
+  return token;
+}
+
+async function projectScrape(page: puppeteer.Page) {
   const propsHandler = (await page.$(`script#__NEXT_DATA__[type="application/json"]`)) as ElementHandle<Element>;
   const propsRawString = await getProperty(propsHandler, "textContent");
   const { props } = JSON.parse(propsRawString) as PageProps;
@@ -65,7 +75,6 @@ async function scrapeProject(browser: puppeteer.Browser, proxy: string, url: str
   delete token.relatedExchanges;
   delete token.wallets;
   delete token.holders;
-  // tokens.push(token); //  as ScrapedProject
   console.log(`got ${token.name}`);
   return token;
 }

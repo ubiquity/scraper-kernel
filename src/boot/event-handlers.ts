@@ -7,6 +7,11 @@ type PageLogic = (browser: Browser) => Promise<unknown[]>;
 
 export default eventHandlers;
 export const eventHandlers = {
+  proxyTimeout: function proxyTimeoutHandler(browser: Browser): (...args: any[]) => void {
+    return function setupProxies(callback) {
+      callback();
+    };
+  },
   logicLoaded: function logicLoadedHandler(browser: Browser): (...args: any[]) => void {
     return async (logic: PageLogic) => {
       await logic(browser);
