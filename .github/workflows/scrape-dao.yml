@@ -33,5 +33,5 @@ jobs:
       - name: Run a multi-line script
         run: |
           yarn
-          yarn tsc build
+          yarn tsc
           yarn scrape:dao
