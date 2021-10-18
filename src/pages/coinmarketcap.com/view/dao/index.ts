@@ -6,12 +6,14 @@ import { makeJobPerURL } from "./make-job-per-url";
 import { setupPage } from "./setup-page";
 const proxyHandler = Proxies();
 
+export type Job = () => Promise<ScrapedProject>;
+
 export default async function coinmarketcapViewDao(browser: puppeteer.Browser) {
   const proxies = await proxyHandler;
   const proxyList = proxies.storage.flattened;
 
   const page = await setupPage(browser);
-  const jobs = [] as (() => Promise<ScrapedProject>)[];
+  const jobs = [] as Job[];
 
   const urls = await getCurrenciesPageURLs(page);
 
@@ -28,5 +30,5 @@ export default async function coinmarketcapViewDao(browser: puppeteer.Browser) {
     batchResults.push(await Promise.all(batch));
   }
 
-  return [...batchResults].flat();
+  return [...batchResults].flat() as ScrapedProject[];
 }
