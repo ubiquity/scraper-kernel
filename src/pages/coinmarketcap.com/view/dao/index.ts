@@ -23,7 +23,7 @@ export default async function coinmarketcapViewDao(browser: puppeteer.Browser) {
 
   // console.log({ jobs });
 
-  const concurrency = 1;
+  const concurrency = 2;
   const batchResults = [] as ScrapedProject[][];
   while (jobs.length) {
     const batch = jobs.splice(0, concurrency).map((f) => f());
