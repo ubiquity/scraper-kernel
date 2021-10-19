@@ -21,7 +21,7 @@ export default async function coinmarketcapViewDao(browser: puppeteer.Browser) {
     makeJobPerURL(url, browser, proxyList, jobs);
   }
 
-  console.log({ jobs });
+  // console.log({ jobs });
 
   const concurrency = 1;
   const batchResults = [] as ScrapedProject[][];
