@@ -2,9 +2,10 @@ import puppeteer, { ElementHandle } from "puppeteer";
 import PageProps from "../../../../@types/page-props";
 import { getProperty } from "../../../../common";
 
-export async function projectScrape(page: puppeteer.Page) {
+export async function projectScrape(page: puppeteer.Page, timeout: number) {
   const selector = `script#__NEXT_DATA__[type="application/json"]`;
-  await page.waitForSelector(selector);
+  console.log(`...waiting for selector`);
+  await page.waitForSelector(selector, { timeout });
   const propsHandler = (await page.$(selector)) as ElementHandle<Element>;
   const propsRawString = await getProperty(propsHandler, "textContent");
   const { props } = JSON.parse(propsRawString) as PageProps;
