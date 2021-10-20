@@ -1,5 +1,6 @@
 import puppeteer from "puppeteer";
 import { Job } from ".";
+import ScrapedProject from "../../../../@types/scraped-project";
 import { delegateRequestsToProxies } from "./delegate-requests-to-proxies";
 
 export async function makeJobPerURL(url: string, browser: puppeteer.Browser, proxyList: string[], jobs: Job[]) {
@@ -9,11 +10,11 @@ export async function makeJobPerURL(url: string, browser: puppeteer.Browser, pro
     name = "default";
   }
 
-  jobs.push(
-    {
-      [name]: function () {
-        return delegateRequestsToProxies(browser, url, proxyList);
-      },
-    }[name]
-  );
+  const namedJob = {
+    [name]: function () {
+      return delegateRequestsToProxies({ browser, url, proxyList });
+    },
+  }[name];
+
+  jobs.push(namedJob);
 }
