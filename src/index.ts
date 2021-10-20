@@ -1,10 +1,9 @@
 import dotenv from "dotenv";
+dotenv.config();
 import "source-map-support/register";
 import browserSetup from "./boot/browser-setup";
 import newTabToURL from "./boot/new-tab-to-url";
 import config from "./config";
-
-dotenv.config();
 const homePage = process.argv[2];
 
 browserSetup(config) // Setup browser and listen for events
