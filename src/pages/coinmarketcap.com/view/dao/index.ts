@@ -22,8 +22,8 @@ export interface JobParams {
   timeout: number;
 }
 
-const timeout = 60000;
-const concurrency = 8;
+const TIMEOUT = 60000;
+const CONCURRENCY = 8;
 
 export default async function coinmarketcapViewDao(browser: puppeteer.Browser): Promise<ScrapedProject[]> {
   const proxyHandler = await _proxyHandler;
@@ -34,13 +34,13 @@ export default async function coinmarketcapViewDao(browser: puppeteer.Browser): 
   const urls = await getCurrenciesPageURLs(page);
 
   for (const url of urls) {
-    const job = makeJobPerURL({ url, browser, proxies, timeout });
+    const job = makeJobPerURL({ url, browser, proxies, timeout: TIMEOUT });
     jobs.push(job); // TODO create batch all with same URL for Promise.race
   }
 
   const batchResults = [] as JobResult[][];
   while (jobs.length) {
-    const batch = jobs.splice(0, concurrency).map((f) => f());
+    const batch = jobs.splice(0, CONCURRENCY).map((f) => f());
     const batchResult = await Promise.all(batch);
     batchResults.push(batchResult); // TODO Promise.race between same URL ?
   }
