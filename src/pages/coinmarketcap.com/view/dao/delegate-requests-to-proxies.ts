@@ -1,16 +1,9 @@
 import puppeteer from "puppeteer";
 import useProxy from "puppeteer-page-proxy";
 import { events } from "../../../../boot/browser-setup";
-import { JobResult } from "./index";
+import { JobParams, JobResult } from "./index";
 import { projectScrape } from "./project-scrape";
 
-const proxyTimeout = 60000;
-
-interface DelegateRequestsToProxiesOptions {
-  browser: puppeteer.Browser;
-  url: string;
-  proxies: string[];
-}
 interface KillJob {
   timer: NodeJS.Timeout;
   page: puppeteer.Page;
@@ -28,7 +21,7 @@ async function killJob({ timer, page }: KillJob) {
   // return delegateRequestsToProxies({ browser, url, proxies });
 }
 
-export async function delegateRequestsToProxies({ browser, url, proxies }: DelegateRequestsToProxiesOptions): Promise<JobResult> {
+export async function delegateRequestsToProxies({ browser, url, proxies, timeout }: JobParams): Promise<JobResult> {
   let usingProxy = false;
   const proxy = proxies.shift();
   if (proxy) {
@@ -36,13 +29,13 @@ export async function delegateRequestsToProxies({ browser, url, proxies }: Deleg
   }
 
   const usingProxyMessage = usingProxy ? ` via ${proxy}` : "";
-  console.log(`Connecting to "${url}"${usingProxyMessage}... timeout in ${proxyTimeout / 1000} seconds`);
+  console.log(`Connecting to "${url}"${usingProxyMessage}... timeout in ${timeout / 1000} seconds`);
 
   const page = await browser.newPage();
 
   // start the page timeout timer
   // if the page doesn't load within the timeout, we'll try the next proxy
-  const timer = setTimeout(() => events.emit("proxytimeout", () => killJob({ timer, page })), proxyTimeout);
+  const timer = setTimeout(() => events.emit("proxytimeout", () => killJob({ timer, page })), timeout);
 
   // enable the proxy
   if (usingProxy) {
