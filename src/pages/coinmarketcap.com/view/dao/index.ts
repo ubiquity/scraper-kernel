@@ -3,8 +3,8 @@ import ScrapedProject from "../../../../@types/scraped-project";
 import Proxies from "../../../../proxies";
 import { getCurrenciesPageURLs } from "./get-currencies-page-urls";
 import { makeJobPerURL } from "./make-job-per-url";
-import { setupPage } from "./setup-page";
-const proxyHandler = Proxies();
+import { scrollToBottomOfFirstTab } from "./scroll-to-bottom-of-first-tab";
+const _proxyHandler = Proxies();
 
 export type Job = () => Promise<ScrapedProject | void>;
 
@@ -15,17 +15,19 @@ export type Job = () => Promise<ScrapedProject | void>;
  */
 
 export default async function coinmarketcapViewDao(browser: puppeteer.Browser) {
-  const proxies = await proxyHandler;
-  const proxyList = proxies.storage.flattened;
+  const proxyHandler = await _proxyHandler;
+  const proxies = proxyHandler.storage.flattened;
 
-  const page = await setupPage(browser);
+  const page = await scrollToBottomOfFirstTab(browser);
   const jobs = [] as Job[];
 
   const urls = await getCurrenciesPageURLs(page);
 
   for (const url of urls) {
-    makeJobPerURL(url, browser, proxyList, jobs); // TODO create batch all with same URL for Promise.race
+    makeJobPerURL(url, browser, proxies, jobs); // TODO create batch all with same URL for Promise.race
   }
+
+  console.log({ jobs });
 
   const concurrency = 2;
   const batchResults = [] as (ScrapedProject | void)[][];

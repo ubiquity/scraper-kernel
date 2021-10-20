@@ -10,17 +10,19 @@ const totalTimeout = 180000;
 interface DelegateRequestsToProxiesOptions {
   browser: puppeteer.Browser;
   url: string;
-  proxyList: string[];
+  proxies: string[];
   _page?: puppeteer.Page;
 }
 
-export async function delegateRequestsToProxies({ browser, url, proxyList, _page }: DelegateRequestsToProxiesOptions): Promise<ScrapedProject | void> {
-  const proxy = proxyList.shift();
-  if (!proxy) {
-    throw new Error("No proxy available");
+export async function delegateRequestsToProxies({ browser, url, proxies, _page }: DelegateRequestsToProxiesOptions): Promise<ScrapedProject | void> {
+  let usingProxy = false;
+  const proxy = proxies.shift();
+  if (proxy) {
+    usingProxy = true;
   }
 
-  console.log(`Connecting to "${url}" via "${proxy}"... timeout in ${proxyTimeout / 1000} seconds`);
+  const usingProxyMessage = usingProxy ? ` via ${proxy}` : "";
+  console.log(`Connecting to "${url}"${usingProxyMessage}... timeout in ${proxyTimeout / 1000} seconds`);
 
   if (_page) {
     await _page.close();
@@ -29,10 +31,12 @@ export async function delegateRequestsToProxies({ browser, url, proxyList, _page
 
   // start the page timeout timer
   // if the page doesn't load within the timeout, we'll try the next proxy
-  const timer = setTimeout(() => events.emit("proxytimeout", () => restart({ timer, browser, url, proxyList, _page })), proxyTimeout);
+  const timer = setTimeout(() => events.emit("proxytimeout", () => restart({ timer, browser, url, proxies, _page })), proxyTimeout);
 
   // enable the proxy
-  useProxy(page as object, `http://${proxy}`);
+  if (usingProxy) {
+    useProxy(page as object, `http://${proxy}`);
+  }
 
   try {
     // navigate to the page
@@ -41,7 +45,7 @@ export async function delegateRequestsToProxies({ browser, url, proxyList, _page
     await page.waitForNavigation({ waitUntil: "networkidle2", timeout: totalTimeout });
   } catch (e) {
     // page load failed, kill this proxy and try the next one
-    restart({ timer, browser, url, proxyList, _page });
+    restart({ timer, browser, url, proxies, _page });
   }
 
   try {
@@ -53,7 +57,7 @@ export async function delegateRequestsToProxies({ browser, url, proxyList, _page
   } catch (e) {
     // scrape failed, kill this proxy and try the next one
     // TODO this should proceed to the next url instead of just trying again on a new proxy
-    restart({ timer, browser, url, proxyList, _page });
+    restart({ timer, browser, url, proxies, _page });
   }
 }
 
@@ -61,7 +65,7 @@ interface RestartInterface extends DelegateRequestsToProxiesOptions {
   timer: NodeJS.Timeout;
 }
 
-function restart({ timer, browser, url, proxyList, _page }: RestartInterface) {
+function restart({ timer, browser, url, proxies, _page }: RestartInterface) {
   clearTimeout(timer);
-  return delegateRequestsToProxies({ browser, url, proxyList, _page });
+  return delegateRequestsToProxies({ browser, url, proxies, _page });
 }
