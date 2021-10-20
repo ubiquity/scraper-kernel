@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 import useProxy from "puppeteer-page-proxy";
-import ScrapedProject from "../../../../@types/scraped-project";
 import { events } from "../../../../boot/browser-setup";
+import { JobResult } from "./index";
 import { projectScrape } from "./project-scrape";
 
 const proxyTimeout = 60000;
@@ -11,23 +11,24 @@ interface DelegateRequestsToProxiesOptions {
   url: string;
   proxies: string[];
 }
-interface RestartInterface extends DelegateRequestsToProxiesOptions {
+interface KillJob {
   timer: NodeJS.Timeout;
   page: puppeteer.Page;
 }
 
-async function restart({ timer, browser, url, proxies, page }: RestartInterface) {
+async function killJob({ timer, page }: KillJob) {
   clearTimeout(timer);
   if (page) {
     await page.close().catch(() => {
       console.log("closed page");
     });
   }
+  // return false;
   // this may cause a recursive loop reloading pages over and over
   // return delegateRequestsToProxies({ browser, url, proxies });
 }
 
-export async function delegateRequestsToProxies({ browser, url, proxies }: DelegateRequestsToProxiesOptions): Promise<ScrapedProject | void> {
+export async function delegateRequestsToProxies({ browser, url, proxies }: DelegateRequestsToProxiesOptions): Promise<JobResult> {
   let usingProxy = false;
   const proxy = proxies.shift();
   if (proxy) {
@@ -41,7 +42,7 @@ export async function delegateRequestsToProxies({ browser, url, proxies }: Deleg
 
   // start the page timeout timer
   // if the page doesn't load within the timeout, we'll try the next proxy
-  const timer = setTimeout(() => events.emit("proxytimeout", () => restart({ timer, browser, url, proxies, page })), proxyTimeout);
+  const timer = setTimeout(() => events.emit("proxytimeout", () => killJob({ timer, page })), proxyTimeout);
 
   // enable the proxy
   if (usingProxy) {
@@ -57,7 +58,6 @@ export async function delegateRequestsToProxies({ browser, url, proxies }: Deleg
     return token;
   } catch (e) {
     // scrape failed, kill this proxy and try the next one
-    // TODO this should proceed to the next url instead of just trying again on a new proxy
-    return restart({ timer, browser, url, proxies, page });
+    return killJob({ timer, page });
   }
 }
