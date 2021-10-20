@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 import { scrollToBottom } from "../../../../common";
 
-export async function setupPage(browser: puppeteer.Browser) {
+export async function scrollToBottomOfFirstTab(browser: puppeteer.Browser) {
   const pages = await browser.pages();
   const page = pages[pages.length - 1];
   if (!page) {
