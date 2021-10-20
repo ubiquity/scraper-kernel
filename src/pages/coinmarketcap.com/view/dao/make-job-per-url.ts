@@ -1,8 +1,7 @@
 import puppeteer from "puppeteer";
-import { Job } from ".";
 import { delegateRequestsToProxies } from "./delegate-requests-to-proxies";
 
-export async function makeJobPerURL(url: string, browser: puppeteer.Browser, proxies: string[], jobs: Job[]) {
+export function makeJobPerURL(url: string, browser: puppeteer.Browser, proxies: string[]) {
   let name = url.split("/")[url.split("/").length - 2] as string | undefined;
   name = name?.match(/[a-z]+/gim)?.shift();
   if (!name) {
@@ -15,5 +14,5 @@ export async function makeJobPerURL(url: string, browser: puppeteer.Browser, pro
     },
   }[name];
 
-  jobs.push(namedJob);
+  return namedJob;
 }
