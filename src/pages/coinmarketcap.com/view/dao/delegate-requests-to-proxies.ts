@@ -4,8 +4,8 @@ import ScrapedProject from "../../../../@types/scraped-project";
 import { events } from "../../../../boot/browser-setup";
 import { projectScrape } from "./project-scrape";
 
-const proxyTimeout = 15000;
-const totalTimeout = 180000;
+const proxyTimeout = 5000;
+// const totalTimeout = 80000;
 
 interface DelegateRequestsToProxiesOptions {
   browser: puppeteer.Browser;
@@ -14,7 +14,7 @@ interface DelegateRequestsToProxiesOptions {
   _page?: puppeteer.Page;
 }
 
-export async function delegateRequestsToProxies({ browser, url, proxies, _page }: DelegateRequestsToProxiesOptions): Promise<ScrapedProject | void> {
+export async function delegateRequestsToProxies({ browser, url, proxies, _page }: DelegateRequestsToProxiesOptions): Promise<ScrapedProject> {
   let usingProxy = false;
   const proxy = proxies.shift();
   if (proxy) {
@@ -22,9 +22,10 @@ export async function delegateRequestsToProxies({ browser, url, proxies, _page }
   }
 
   const usingProxyMessage = usingProxy ? ` via ${proxy}` : "";
-  console.log(`Connecting to "${url}"${usingProxyMessage}... timeout in ${proxyTimeout / 1000} seconds`);
+  console.trace(`Connecting to "${url}"${usingProxyMessage}... timeout in ${proxyTimeout / 1000} seconds`);
 
   if (_page) {
+    console.log("closing page");
     await _page.close();
   }
   const page = await browser.newPage();
@@ -41,11 +42,9 @@ export async function delegateRequestsToProxies({ browser, url, proxies, _page }
   try {
     // navigate to the page
     await page.goto(url);
-    // wait for the page to load
-    await page.waitForNavigation({ waitUntil: "networkidle2", timeout: totalTimeout });
   } catch (e) {
     // page load failed, kill this proxy and try the next one
-    restart({ timer, browser, url, proxies, _page });
+    return restart({ timer, browser, url, proxies, _page });
   }
 
   try {
@@ -57,7 +56,7 @@ export async function delegateRequestsToProxies({ browser, url, proxies, _page }
   } catch (e) {
     // scrape failed, kill this proxy and try the next one
     // TODO this should proceed to the next url instead of just trying again on a new proxy
-    restart({ timer, browser, url, proxies, _page });
+    return restart({ timer, browser, url, proxies, _page });
   }
 }
 

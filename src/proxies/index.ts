@@ -1,9 +1,9 @@
 import ProxyHandler from "./proxy-handler";
 import { spysOneIps } from "./sources/spys-one";
-// TODO turn into a class
 
 const proxiesDisabled = process.env.DEBUG_DISABLE_PROXIES;
 
+// TODO turn into a class
 export default async function proxies() {
   if (proxiesDisabled) {
     console.trace("Proxies disabled");

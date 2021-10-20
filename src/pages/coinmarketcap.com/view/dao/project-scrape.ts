@@ -3,7 +3,9 @@ import PageProps from "../../../../@types/page-props";
 import { getProperty } from "../../../../common";
 
 export async function projectScrape(page: puppeteer.Page) {
-  const propsHandler = (await page.$(`script#__NEXT_DATA__[type="application/json"]`)) as ElementHandle<Element>;
+  const selector = `script#__NEXT_DATA__[type="application/json"]`;
+  await page.waitForSelector(selector);
+  const propsHandler = (await page.$(selector)) as ElementHandle<Element>;
   const propsRawString = await getProperty(propsHandler, "textContent");
   const { props } = JSON.parse(propsRawString) as PageProps;
   const token = props.initialProps.pageProps.info;

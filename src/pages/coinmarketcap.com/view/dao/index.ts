@@ -6,7 +6,8 @@ import { makeJobPerURL } from "./make-job-per-url";
 import { scrollToBottomOfFirstTab } from "./scroll-to-bottom-of-first-tab";
 const _proxyHandler = Proxies();
 
-export type Job = () => Promise<ScrapedProject | void>;
+type JobResults = ScrapedProject | void;
+export type Job = () => Promise<JobResults>;
 
 /**
  * The optimal proxy strategy is to begin by not using a proxy, and then if we receive a rate limit error,
@@ -27,10 +28,8 @@ export default async function coinmarketcapViewDao(browser: puppeteer.Browser) {
     makeJobPerURL(url, browser, proxies, jobs); // TODO create batch all with same URL for Promise.race
   }
 
-  console.log({ jobs });
-
-  const concurrency = 2;
-  const batchResults = [] as (ScrapedProject | void)[][];
+  const concurrency = 1;
+  const batchResults = [] as JobResults[][];
   while (jobs.length) {
     const batch = jobs.splice(0, concurrency).map((f) => f());
     batchResults.push(await Promise.all(batch)); // TODO Promise.race between same URL ?
