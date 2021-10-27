@@ -45,7 +45,7 @@ export async function delegateRequestsToProxies({ browser, url, proxies, timeout
   try {
     await page.goto(url);
     // scrape the page
-    const token = await projectScrape(page);
+    const token = await projectScrape(page, timeout);
     // success!
     clearTimeout(timer);
     return token;
