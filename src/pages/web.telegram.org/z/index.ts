@@ -11,7 +11,7 @@ export default async (browser: puppeteer.Browser) => {
   await page.waitForSelector(`canvas`);
   await waitForTransitionEnd(`#auth-qr-form > div > div`);
   const IMAGE_PATH = "dist/pages/web.telegram.org/z/index.png";
-  await ss({ page, path: IMAGE_PATH, selector: `canvas`, addHeight: false });
+  const buffer = await ss({ page, path: IMAGE_PATH, selector: `canvas`, addHeight: false });
   const jimp = await (await import("./jimp")).default;
   // console.log(jimp);
   await page.close();

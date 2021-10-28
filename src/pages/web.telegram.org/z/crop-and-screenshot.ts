@@ -7,7 +7,7 @@ interface TestInterface {
 }
 
 export default async function cropAndScreenShot({ page, path, selector, addHeight }: TestInterface) {
-  await screenshotDOMElements({
+  return await screenshotDOMElements({
     page,
     path,
     selector,
