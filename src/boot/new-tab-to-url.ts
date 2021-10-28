@@ -1,6 +1,6 @@
-import puppeteer from "puppeteer";
+import { Browser } from "puppeteer";
 
-export default async function newTabToURL(browser: puppeteer.Browser, url: string) {
+export default async function newTabToURL(browser: Browser, url: string) {
   const destination = new URL(url);
   if (!destination) {
     throw new Error("No destination URL specified");

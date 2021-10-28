@@ -15,6 +15,10 @@ export const eventHandlers = {
     };
   },
 
+  scrapeComplete: function scrapeCompleteHandler(resolve: (value: string | PromiseLike<string>) => void) {
+    return (results: string) => resolve(results);
+  },
+
   /**
    * This is the main handler that will be called when the browser navigates to any new page.
    * It will load the logic for the page and then call the logic.
