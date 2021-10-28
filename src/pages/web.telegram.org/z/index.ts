@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
 import ss from "./crop-and-screenshot";
-
+import jimp from "./jimp";
 export default async (browser: puppeteer.Browser) => {
   const pages = await browser.pages();
   const page = pages[pages.length - 1];
@@ -12,11 +12,9 @@ export default async (browser: puppeteer.Browser) => {
   await waitForTransitionEnd(`#auth-qr-form > div > div`);
   const IMAGE_PATH = "dist/pages/web.telegram.org/z/index.png";
   const buffer = await ss({ page, path: IMAGE_PATH, selector: `canvas`, addHeight: false });
-  const jimp = await (await import("./jimp")).default;
-  // console.log(jimp);
   await page.close();
   await browser.close();
-  return jimp;
+  return jimp(buffer as Buffer);
   // process.exit(0);
 
   async function waitForTransitionEnd(querySelector: string) {
