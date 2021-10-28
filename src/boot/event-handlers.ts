@@ -3,7 +3,6 @@ import { browserOnTargetChangedHandler } from "./events/browserOnTargetChanged";
 
 export type PageLogic = (browser: Browser) => Promise<unknown[]>;
 
-export default eventHandlers;
 export const eventHandlers = {
   proxyTimeout: function proxyTimeoutHandler(_browser: Browser): (...args: any[]) => void {
     return function setupProxies(callback) {
@@ -12,7 +11,7 @@ export const eventHandlers = {
   },
   logicLoaded: function logicLoadedHandler(browser: Browser): (...args: any[]) => void {
     return async (logic: PageLogic) => {
-      await logic(browser);
+      return await logic(browser);
     };
   },
 
@@ -23,3 +22,4 @@ export const eventHandlers = {
    */
   browserOnTargetChanged: browserOnTargetChangedHandler,
 };
+export default eventHandlers;
