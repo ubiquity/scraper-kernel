@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 interface TestInterface {
   page: puppeteer.Page;
-  path: string;
+  path?: string;
   selector: string;
   addHeight: boolean;
 }
@@ -56,13 +56,17 @@ async function screenshotDOMElements({ page, path, selector, addHeight }: TestIn
     throw Error(`Could not find element that matches selector: ${selector}.`);
   }
 
-  return page.screenshot({
-    path,
+  const params = {
     clip: {
       x: rect.left - padding,
       y: rect.top - padding,
       width: rect.width + padding * 2,
       height: rect.height + padding * 2,
     },
-  });
+  } as puppeteer.ScreenshotOptions;
+
+  if (path) {
+    params.path = path;
+  }
+  return page.screenshot(params);
 }
