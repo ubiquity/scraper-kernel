@@ -1,6 +1,6 @@
 import path from "path";
 import { Browser, Handler, Target } from "puppeteer";
-import { events } from "../browser-setup";
+import { events } from "../../scrape";
 import { PageLogic } from "../event-handlers";
 import fs from "fs";
 
@@ -31,9 +31,9 @@ export function browserOnTargetChangedHandler(_browser: Browser): Handler<any> {
           });
         })
         // log page logic errors
-        .catch((error) => console.trace(error))
+        .catch((error) => console.trace(error)) // TODO logicruntimeerror event
         // output return value from page logic module
-        .then((out) => console.trace(out));
+        .then((out) => events.emit("scrapecomplete", out)); // TODO test to see if timeout strategy makes the most sense here
     } else {
       console.error(`No page found for ${url}`);
     }

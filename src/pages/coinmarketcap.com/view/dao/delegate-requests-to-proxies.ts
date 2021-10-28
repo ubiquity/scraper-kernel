@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
 import useProxy from "puppeteer-page-proxy";
-import { events } from "../../../../boot/browser-setup";
+import { events } from "../../../../scrape";
 import { JobParams, JobResult } from "./index";
 import { projectScrape } from "./project-scrape";
 
