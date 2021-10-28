@@ -8,8 +8,8 @@ export function browserOnTargetChangedHandler(_browser: Browser): Handler<any> {
   return async (target: Target) => {
     const url = target.url();
 
-    const logic = importLogic(url);
-    const defaultExport = (await logic)?.default as PageLogic | undefined;
+    const logic = await importLogic(url);
+    const defaultExport = logic?.default as PageLogic | undefined;
 
     if (!defaultExport) {
       console.log(`\t...No logic found for ${url}`);
@@ -20,10 +20,22 @@ export function browserOnTargetChangedHandler(_browser: Browser): Handler<any> {
 
     const page = await target.page();
     if (page) {
-      page.waitForNavigation({ waitUntil: "networkidle2" }).then(() => events.emit("logicloaded", defaultExport));
+      page
+        .waitForNavigation({ waitUntil: "networkidle2" })
+        // load page logic
+        .then(async () => {
+          return new Promise((resolve) => {
+            events.emit("logicloaded", (browser: Browser) => {
+              resolve(defaultExport(browser));
+            });
+          });
+        })
+        // log page logic errors
+        .catch((error) => console.trace(error))
+        // output return value from page logic module
+        .then((out) => console.trace(out));
     } else {
       console.error(`No page found for ${url}`);
-      return;
     }
   };
 }
@@ -33,7 +45,9 @@ function importLogic(url: string) {
   if (!selection) {
     throw new Error("Page URL parse error");
   }
-  const pathTo = path.join(process.cwd(), "dist", "pages", selection);
+  // const current = path.join(process.cwd(), "dist", "pages", selection);
+  const pageDir = path.join(__dirname, "..", "..", "..", "dist", "pages", selection);
+  const pathTo = pageDir;
   const exists = fs.existsSync(pathTo);
   if (exists) {
     const logic = import(pathTo).catch((error) => {

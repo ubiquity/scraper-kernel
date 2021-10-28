@@ -13,10 +13,11 @@ export default async (browser: puppeteer.Browser) => {
   const IMAGE_PATH = "dist/pages/web.telegram.org/z/index.png";
   await ss({ page, path: IMAGE_PATH, selector: `canvas`, addHeight: false });
   const jimp = await (await import("./jimp")).default;
-  console.log(jimp);
+  // console.log(jimp);
   await page.close();
   await browser.close();
-  process.exit(0);
+  return jimp;
+  // process.exit(0);
 
   async function waitForTransitionEnd(querySelector: string) {
     return await page.evaluate((qS) => {
