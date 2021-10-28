@@ -1,14 +1,6 @@
 import puppeteer from "puppeteer";
-/**
- *
- * "jimp": "^0.16.1",
-    "jquery": "^3.6.0",
-    "jsqr": "^1.4.0",
-    "qr-code-scanner-typescript": "^1.0.10",
-    "qr-scanner": "^1.3.0",
-    "qrcode-decoder": "^0.2.2",
-    "qrcode-reader": "^1.0.4",
- */
+import ss from "./crop-and-screenshot";
+
 export default async (browser: puppeteer.Browser) => {
   const pages = await browser.pages();
   const page = pages[pages.length - 1];
@@ -16,16 +8,12 @@ export default async (browser: puppeteer.Browser) => {
     throw new Error("No page found");
   }
 
-  const container = await page.waitForSelector(`canvas`);
+  await page.waitForSelector(`canvas`);
   await waitForTransitionEnd(`#auth-qr-form > div > div`);
-  const canvas = await page.$(`canvas`);
-  //   const result = await page.evaluate(pageLogic);
-  //   console.log({ result });
   const IMAGE_PATH = "dist/pages/web.telegram.org/z/index.png";
-
-  await canvas?.screenshot({ path: IMAGE_PATH });
-  await import("./jimp");
-
+  await ss({ page, path: IMAGE_PATH, selector: `canvas`, addHeight: false });
+  const jimp = await (await import("./jimp")).default;
+  console.log(jimp);
   await page.close();
   await browser.close();
   process.exit(0);
@@ -43,17 +31,6 @@ export default async (browser: puppeteer.Browser) => {
     }, querySelector);
   }
 };
-
-// async function pageLogic() {
-//   //   const qr = new QrcodeDecoder();
-
-//   //   const result = await qr.decodeFromImage(IMAGE_PATH);
-//   const qr = new QrcodeDecoder();
-//   const qrCode = document.querySelector(`canvas`);
-//   //   @ts-ignore
-//   const imageData = qr._createImageData(qrCode, qrCode.width, qrCode.height);
-//   return await qr.decodeFromImage(imageData);
-// }
 
 function phoneLoginHalfImplemented() {
   const PHONE_NUMBER = process.env.TELEGRAM_PHONE_NUMBER;
