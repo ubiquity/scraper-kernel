@@ -7,8 +7,8 @@ const buffer = fs.readFileSync(__dirname + "/index.png");
 if (!buffer) {
   throw new Error("Could not read image");
 }
-console.log(buffer.byteLength, "bytes read");
-const promise = new Promise((resolve, reject) => {
+// console.log(buffer.byteLength, "bytes read");
+export default new Promise((resolve, reject) => {
   Jimp.read(buffer, callback);
 
   function callback(err: any, image: { bitmap: any }) {
@@ -25,5 +25,3 @@ const promise = new Promise((resolve, reject) => {
     qrcode.decode(image.bitmap);
   }
 });
-
-export default promise;
