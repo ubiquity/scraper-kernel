@@ -4,9 +4,10 @@ dotenv.config();
 import { EventEmitter } from "events";
 import "source-map-support/register";
 import browserSetup from "./boot/browser-setup";
+import config from "./boot/config";
 import { eventHandlers } from "./boot/event-handlers";
 import newTabToURL from "./boot/new-tab-to-url";
-import config from "./config";
+
 export const events = new EventEmitter();
 export default async function scrape(homePage: string): Promise<string> {
   const browser = await browserSetup(config); // Setup browser and listen for events

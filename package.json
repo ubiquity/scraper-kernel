@@ -2,7 +2,7 @@
   "name": "@ubiquity/scraper",
   "license": "MIT",
   "scripts": {
-    "test": "node dist https://web.telegram.org/z/",
+    "ci": "node dist/cli.js https://web.telegram.org/z/",
     "watch:telegram": "nodemon dist https://web.telegram.org/z/",
     "watch:scrape:dao": "nodemon dist https://coinmarketcap.com/view/dao/",
     "scrape:dao": "node dist https://coinmarketcap.com/view/dao/",
