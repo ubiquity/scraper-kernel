@@ -3,6 +3,8 @@
   "license": "MIT",
   "scripts": {
     "ci": "node dist/cli.js https://web.telegram.org/z/",
+    "predev": "rimraf cache",
+    "dev": "nodemon dist/cli.js https://web.telegram.org/z/",
     "watch:telegram": "nodemon dist https://web.telegram.org/z/",
     "watch:scrape:dao": "nodemon dist https://coinmarketcap.com/view/dao/",
     "scrape:dao": "node dist https://coinmarketcap.com/view/dao/",
@@ -10,7 +12,7 @@
     "prepare": "husky install",
     "prebuild": "run-s clean",
     "build": "tsc --watch",
-    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "clean": "rimraf dist tsconfig.tsbuildinfo cache",
     "format": "run-s format:*",
     "format:prettier": "prettier --write .",
     "format:eslint": "eslint . --ext .ts,.tsx --cache --fix --plugin tsc --rule 'tsc/config: [2, {configFile: \"./tsconfig.json\"}]'"

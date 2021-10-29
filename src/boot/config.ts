@@ -6,5 +6,5 @@ export default {
   headless: !process.env.DEBUG_HEADFUL,
   defaultViewport: null,
   args: ["--lang=en-US,en;q=0.9"] as string[],
-  cache: "../cache",
+  userDataDir: "./cache",
 } as BrowserConnectOptions;
