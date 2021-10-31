@@ -8,14 +8,31 @@ export default async (browser: puppeteer.Browser) => {
     throw new Error("No page found");
   }
 
+  await page.setRequestInterception(true);
+
+  page.on("request", (request) => {
+    console.log(">>", request.method(), request.url());
+    request.continue();
+  });
+
+  page.on("response", async (response) => {
+    console.log("<<", response.status(), response.url());
+
+    if (response.url().includes("authed=1") && response.status() === 200) {
+      console.log("logged in successfully");
+    }
+  });
+
+  // await page.waitForNavigation({ waitUntil: "networkidle2" });
+
   await page.waitForSelector(`canvas`);
   await waitForTransitionEnd(`#auth-qr-form > div > div`);
+
   // const IMAGE_PATH = "dist/pages/web.telegram.org/z/index.png";
   const buffer = await ss({ page, selector: `canvas`, addHeight: false });
-  await page.close();
-  await browser.close();
-  return jimp(buffer as Buffer);
-  // process.exit(0);
+  const parsed = await jimp(buffer as Buffer);
+  console.log({ parsed });
+  return parsed;
 
   async function waitForTransitionEnd(querySelector: string) {
     return await page.evaluate((qS) => {
