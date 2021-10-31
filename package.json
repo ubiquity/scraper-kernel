@@ -1,6 +1,12 @@
 {
   "name": "@ubiquity/scraper",
   "license": "MIT",
+  "author": {
+    "name": "アレクサンダー.eth"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "ci": "node dist/cli.js https://web.telegram.org/z/",
     "watch:telegram": "nodemon dist https://web.telegram.org/z/",
@@ -13,7 +19,8 @@
     "clean": "rimraf dist tsconfig.tsbuildinfo",
     "format": "run-s format:*",
     "format:prettier": "prettier --write .",
-    "format:eslint": "eslint . --ext .ts,.tsx --cache --fix --plugin tsc --rule 'tsc/config: [2, {configFile: \"./tsconfig.json\"}]'"
+    "format:eslint": "eslint . --ext .ts,.tsx --cache --fix --plugin tsc --rule 'tsc/config: [2, {configFile: \"./tsconfig.json\"}]'",
+    "prepublish": "tsc"
   },
   "unused-scripts": {
     "_cdroot": "./build-scripts/cd-to-project-root.sh",
