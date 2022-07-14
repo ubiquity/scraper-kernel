@@ -1,6 +1,6 @@
 import { BrowserConnectOptions } from "puppeteer";
 const headful = Boolean(process.env.DEBUG_HEADFUL);
-console.log(headful);
+
 export default {
   // slowMo: 10,
   devtools: false,
