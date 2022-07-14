@@ -9,7 +9,7 @@ dotenv.config();
 
 export const events = new EventEmitter();
 
-export default async function scrape(homePage: string): Promise<string> {
+export default async function scrape(url: string): Promise<string> {
   const browser = await browserSetup(config); // Setup browser and listen for events
   browser.on("targetchanged", eventHandlers.browserOnTargetChanged(browser));
   events.on("proxytimeout", eventHandlers.proxyTimeout(browser));
@@ -17,6 +17,6 @@ export default async function scrape(homePage: string): Promise<string> {
   return new Promise((resolve) => {
     events.on("scrapecomplete", eventHandlers.scrapeComplete(resolve));
     // events.on("logicfailed", eventHandlers.logicFailed(browser));
-    newTabToURL(browser, homePage); // Open new tab and load page
+    newTabToURL(browser, url); // Open new tab and load page
   });
 }

@@ -1,6 +1,28 @@
-const homePage = process.argv[2];
+// const cliParam = process.argv[2];
 import scrape from "./scrape";
+
 // CLI ADAPTER
-scrape(homePage)
-  .then((data) => console.log(data))
-  .catch((err) => console.error(err));
+export default async function cli(url: string) {
+  let results;
+  try {
+    results = await scrape(url);
+    console.log(results);
+  } catch (error) {
+    console.error(error);
+  }
+  return results;
+}
+
+const promises = [] as any[];
+for (const url of process.argv.slice(2)) {
+  promises.push(cli(url));
+}
+
+// interface Result {
+//   status: "fulfilled";
+//   value: number;
+// }
+Promise.allSettled(promises).then((...args) => {
+  console.trace(...args);
+  process.exit(0);
+});
