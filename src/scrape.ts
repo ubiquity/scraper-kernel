@@ -9,6 +9,7 @@ import { eventHandlers } from "./boot/event-handlers";
 import newTabToURL from "./boot/new-tab-to-url";
 
 export const events = new EventEmitter();
+
 export default async function scrape(homePage: string): Promise<string> {
   const browser = await browserSetup(config); // Setup browser and listen for events
   browser.on("targetchanged", eventHandlers.browserOnTargetChanged(browser));
@@ -16,7 +17,7 @@ export default async function scrape(homePage: string): Promise<string> {
   events.on("logicloaded", eventHandlers.logicLoaded(browser));
   return new Promise((resolve) => {
     events.on("scrapecomplete", eventHandlers.scrapeComplete(resolve));
-    // events.on("logicfailed", handlers.logicFailed());
+    // events.on("logicfailed", eventHandlers.logicFailed(browser));
     newTabToURL(browser, homePage); // Open new tab and load page
   });
 }

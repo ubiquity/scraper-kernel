@@ -14,6 +14,12 @@ export const eventHandlers = {
       return await logic(browser);
     };
   },
+  // logicFailed: function logicFailedHandler(browser: Browser): (...args: any[]) => void {
+  //   return async (logic: PageLogic) => {
+  //     await browser.close();
+  //     return process.exit(1);
+  //   };
+  // },
 
   scrapeComplete: function scrapeCompleteHandler(resolve: (value: string | PromiseLike<string>) => void) {
     return (results: string) => resolve(results);
