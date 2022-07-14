@@ -1,8 +1,8 @@
+import fs from "fs";
 import path from "path";
 import { Browser, Handler, Target } from "puppeteer";
 import { events } from "../../scrape";
 import { PageLogic } from "../event-handlers";
-import fs from "fs";
 
 export function browserOnTargetChangedHandler(_browser: Browser): Handler<any> {
   return async (target: Target) => {
