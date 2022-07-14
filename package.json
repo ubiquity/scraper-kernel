@@ -9,7 +9,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "start": "node dist/cli.js",
-    "ci": "node dist/cli.js https://web.telegram.org/z/",
+    "ci": "node dist/cli.js https://github.com/pavlovcik",
     "watch:telegram": "nodemon dist https://web.telegram.org/z/",
     "watch:scrape:dao": "nodemon dist https://coinmarketcap.com/view/dao/",
     "scrape:dao": "node dist https://coinmarketcap.com/view/dao/",
