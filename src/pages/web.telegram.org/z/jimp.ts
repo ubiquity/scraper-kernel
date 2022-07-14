@@ -1,5 +1,5 @@
-import Jimp from "jimp";
 import fs from "fs";
+import Jimp from "jimp";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const qrCode = require("qrcode-reader");
 

@@ -1,12 +1,11 @@
 import dotenv from "dotenv";
-dotenv.config();
-
 import { EventEmitter } from "events";
 import "source-map-support/register";
 import browserSetup from "./boot/browser-setup";
 import config from "./boot/config";
 import { eventHandlers } from "./boot/event-handlers";
 import newTabToURL from "./boot/new-tab-to-url";
+dotenv.config();
 
 export const events = new EventEmitter();
 
