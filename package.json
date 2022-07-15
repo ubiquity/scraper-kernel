@@ -23,12 +23,6 @@
     "format:eslint": "eslint . --ext .ts,.tsx --cache --fix --plugin tsc --rule 'tsc/config: [2, {configFile: \"./tsconfig.json\"}]'",
     "prepublish": "tsc"
   },
-  "unused-scripts": {
-    "_cdroot": "./build-scripts/cd-to-project-root.sh",
-    "start": "run-s _cdroot solidity:build next:build next:start",
-    "dev": "run-s _cdroot solidity:build next:dev",
-    "build": "run-s solidity:build next:build"
-  },
   "lint-staged": {
     "*.{ts,tsx}": "eslint --cache --fix --plugin tsc --rule 'tsc/config: [2, {configFile: \"./tsconfig.json\"}]'"
   },
