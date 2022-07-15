@@ -13,7 +13,7 @@ export default async (browser: puppeteer.Browser) => {
     request.continue();
   });
 
-  page.on("response", async (response) => console.log("<<", response.status(), response.url()));
+  page.on("response", (response) => console.log("<<", response.status(), response.url()));
 
   const contributionsElement = await page.$(`div.js-yearly-contributions h2`);
 
