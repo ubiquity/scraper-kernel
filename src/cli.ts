@@ -1,9 +1,9 @@
-const userInput = process.argv[2];
-import scrape from "./scrape";
+const userInput = process.argv.slice(2);
+import entryPoint from "./scrape";
 // CLI ADAPTER
-scrape(userInput)
+entryPoint(userInput)
   .then((data) => {
-    console.log(data);
+    console.log(`<<`, data);
     process.exit(0);
   })
   .catch((err) => {

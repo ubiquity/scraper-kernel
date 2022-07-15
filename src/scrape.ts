@@ -1,4 +1,5 @@
 import { EventEmitter } from "events";
+import { Browser } from "puppeteer";
 import "source-map-support/register";
 import browserSetup from "./boot/browser-setup";
 import config from "./boot/config";
@@ -6,25 +7,29 @@ import { eventHandlers } from "./boot/event-handlers";
 import { attachEvents } from "./boot/events/attachEvents";
 import newTabToURL from "./boot/new-tab-to-url";
 
-let _userInput: string;
+export default async function entryPoint(userInput: string[]) {
+  const browser = await browserSetup(config);
+  attachEvents(browser);
 
-browserSetup(config)
-  .then((browser) => attachEvents(browser))
-  .then((browser) => {
-    console.log({ _userInput });
-    newTabToURL(browser, _userInput);
-  });
-
-export default function scrape(userInput: string) {
-  _userInput = userInput;
-  const promise = new Promise(magicMysteryPromise);
-  return promise;
+  const urls = userInput;
+  console.log({ urls });
+  const completedScrapes = [] as unknown[];
+  for (const url of urls) {
+    completedScrapes.push(await scrapePage(url, browser));
+  }
+  return completedScrapes;
+  // return scrapePage(userInput, browser);
 }
 
-type ResolveFunction = (results: string) => void;
+async function scrapePage(userInput: string, browser: Browser) {
+  const scrapeCompleted = new Promise(addCallbackEvent);
+  console.log(`>>`, userInput);
+  newTabToURL(browser, userInput);
+  return await scrapeCompleted;
+}
 
-export const events = new EventEmitter();
-
-function magicMysteryPromise(resolve: ResolveFunction): void {
+function addCallbackEvent(resolve: ResolveFunction): void {
   events.on("scrapecomplete", eventHandlers.scrapeComplete(resolve));
 }
+type ResolveFunction = (results: string) => void;
+export const events = new EventEmitter();
