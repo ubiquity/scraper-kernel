@@ -1,22 +1,32 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import { EventEmitter } from "events";
+import { Browser } from "puppeteer";
 import "source-map-support/register";
 import browserSetup from "./boot/browser-setup";
 import config from "./boot/config";
 import { eventHandlers } from "./boot/event-handlers";
+import { attachEvents } from "./boot/events/attachEvents";
 import newTabToURL from "./boot/new-tab-to-url";
 
-export const events = new EventEmitter();
-export default async function scrape(homePage: string): Promise<string> {
-  const browser = await browserSetup(config); // Setup browser and listen for events
-  browser.on("targetchanged", eventHandlers.browserOnTargetChanged(browser));
-  events.on("proxytimeout", eventHandlers.proxyTimeout(browser));
-  events.on("logicloaded", eventHandlers.logicLoaded(browser));
-  return new Promise((resolve) => {
-    events.on("scrapecomplete", eventHandlers.scrapeComplete(resolve));
-    // events.on("logicfailed", handlers.logicFailed());
-    newTabToURL(browser, homePage); // Open new tab and load page
-  });
+export default async function entryPoint(userInput: string[]) {
+  const browser = await browserSetup(config);
+  attachEvents(browser);
+  const urls = userInput;
+  const completedScrapes = [] as unknown[];
+  for (const url of urls) {
+    completedScrapes.push(await scrapePage(url, browser));
+  }
+  return completedScrapes;
 }
+
+async function scrapePage(userInput: string, browser: Browser) {
+  const scrapeCompleted = new Promise(addCallbackEvent);
+  console.log(`>>`, userInput);
+  newTabToURL(browser, userInput);
+  return await scrapeCompleted;
+}
+
+function addCallbackEvent(resolve: ResolveFunction): void {
+  events.on("scrapecomplete", eventHandlers.scrapeComplete(resolve));
+}
+type ResolveFunction = (results: string) => void;
+export const events = new EventEmitter();

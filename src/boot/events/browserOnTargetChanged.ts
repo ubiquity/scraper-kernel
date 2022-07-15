@@ -1,8 +1,8 @@
+import fs from "fs";
 import path from "path";
 import { Browser, Handler, Target } from "puppeteer";
 import { events } from "../../scrape";
 import { PageLogic } from "../event-handlers";
-import fs from "fs";
 
 export function browserOnTargetChangedHandler(_browser: Browser): Handler<any> {
   return async (target: Target) => {
@@ -45,12 +45,20 @@ function importLogic(url: string) {
   if (!selection) {
     throw new Error("Page URL parse error");
   }
-  // const current = path.join(process.cwd(), "dist", "pages", selection);
-  const pageDir = path.join(__dirname, "..", "..", "..", "dist", "pages", selection);
+  const pageDir = path.join(process.cwd(), "dist", "pages", selection);
   const pathTo = pageDir;
   const exists = fs.existsSync(pathTo);
   if (exists) {
     const logic = import(pathTo).catch((error) => {
+      console.error(error);
+      console.error(`Import page logic error for ${selection}`);
+    });
+    return logic as Promise<Module>;
+  } else {
+    // falling back to importing index.ts in directory instead
+    const sliced = pathTo.slice(0, pathTo.lastIndexOf("/"));
+
+    const logic = import(sliced).catch((error) => {
       console.error(error);
       console.error(`Import page logic error for ${selection}`);
     });
