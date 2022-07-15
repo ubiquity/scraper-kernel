@@ -10,15 +10,12 @@ import newTabToURL from "./boot/new-tab-to-url";
 export default async function entryPoint(userInput: string[]) {
   const browser = await browserSetup(config);
   attachEvents(browser);
-
   const urls = userInput;
-  console.log({ urls });
   const completedScrapes = [] as unknown[];
   for (const url of urls) {
     completedScrapes.push(await scrapePage(url, browser));
   }
   return completedScrapes;
-  // return scrapePage(userInput, browser);
 }
 
 async function scrapePage(userInput: string, browser: Browser) {
