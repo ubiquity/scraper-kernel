@@ -1,8 +1,14 @@
+import dotenv from "dotenv";
 import { BrowserConnectOptions } from "puppeteer";
-const headful = Boolean(process.env.DEBUG_HEADFUL);
-
+dotenv.config();
+const DEBUG_HEADFUL = process.env.DEBUG_HEADFUL as "true" | "false" | undefined;
+let headful;
+if (!DEBUG_HEADFUL) {
+  headful = false;
+} else {
+  headful = JSON.parse(DEBUG_HEADFUL);
+}
 export default {
-  // slowMo: 10,
   devtools: false,
   headless: !headful,
   defaultViewport: null,
