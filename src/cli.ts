@@ -1,7 +1,7 @@
-const homePage = process.argv[2];
+const userInput = process.argv[2];
 import scrape from "./scrape";
 // CLI ADAPTER
-scrape(homePage)
+scrape(userInput)
   .then((data) => {
     console.log(data);
     process.exit(0);
