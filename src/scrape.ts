@@ -7,7 +7,7 @@ import { eventHandlers } from "./boot/event-handlers";
 import { attachEvents } from "./boot/events/attachEvents";
 import newTabToURL from "./boot/new-tab-to-url";
 
-export default async function entryPoint(userInput: string[]) {
+export default async function main(userInput: string[]) {
   const browser = await browserSetup(config);
   attachEvents(browser);
   const urls = userInput;

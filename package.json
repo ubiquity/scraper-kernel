@@ -9,7 +9,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "start": "node dist/cli.js",
-    "ci": "node dist/cli.js https://github.com/pavlovcik https://github.com/transitive-bullshit",
+    "ci": "node dist/cli.js $(cat fixtures/githubs.txt)",
     "watch:telegram": "nodemon dist https://web.telegram.org/z/",
     "watch:scrape:dao": "nodemon dist https://coinmarketcap.com/view/dao/",
     "scrape:dao": "node dist https://coinmarketcap.com/view/dao/",
@@ -48,6 +48,7 @@
   "dependencies": {
     "@types/node": "^16.10.8",
     "@types/puppeteer": "^5.4.4",
+    "@types/url-parse": "^1.4.8",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "dotenv": "^10.0.0",
