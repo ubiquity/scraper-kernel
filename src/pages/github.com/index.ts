@@ -15,20 +15,20 @@ export default async (browser: puppeteer.Browser) => {
 
   page.on("response", async (response) => console.log("<<", response.status(), response.url()));
 
-  const yearlyContributions = await page.$(`div.js-yearly-contributions h2`);
+  const contributionsElement = await page.$(`div.js-yearly-contributions h2`);
 
-  if (!yearlyContributions) {
-    throw new Error(`can not find yearly contributions div`);
+  if (!contributionsElement) {
+    throw new Error(`could not find the yearly contributions div`);
   }
-  const yearlyContributionsText = await yearlyContributions.getProperty("textContent");
-  const yearlyContributionsTextParsed: string | undefined = await yearlyContributionsText?.jsonValue();
-  if (!yearlyContributionsTextParsed) {
-    throw new Error(`can not find parse yearly contributions div`);
+  const contributionsElementTextNode = await contributionsElement.getProperty("textContent");
+  const text: string | undefined = await contributionsElementTextNode?.jsonValue();
+  if (!text) {
+    throw new Error(`can not find parse yearly contributions div text`);
   } else {
-    const matched = yearlyContributionsTextParsed?.match(/[0-9]*/gim);
+    const matched = text.match(/[0-9]*/gim);
     if (matched) {
-      const yearlyContributionsTextParsedNumbersOnly = Number(matched.join(``));
-      return yearlyContributionsTextParsedNumbersOnly;
+      const numbersInText = Number(matched.join(``));
+      return numbersInText;
     }
   }
 };
