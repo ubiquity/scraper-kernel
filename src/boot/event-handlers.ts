@@ -21,7 +21,7 @@ export const eventHandlers = {
   //   };
   // },
 
-  scrapeComplete: function scrapeCompleteHandler(resolve: (value: string | PromiseLike<string>) => void) {
+  scrapeComplete: function scrapeCompleteHandler(resolve) {
     return (results: string) => resolve(results);
   },
 

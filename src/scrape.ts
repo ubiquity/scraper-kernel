@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import { EventEmitter } from "events";
 import "source-map-support/register";
+import { attachEvents } from "./boot/events/attachEvents";
 import browserSetup from "./boot/browser-setup";
 import config from "./boot/config";
 import { eventHandlers } from "./boot/event-handlers";
@@ -9,14 +10,16 @@ dotenv.config();
 
 export const events = new EventEmitter();
 
-export default async function scrape(homePage: string): Promise<string> {
+export default async function scrape(userInput: string) {
   const browser = await browserSetup(config); // Setup browser and listen for events
-  browser.on("targetchanged", eventHandlers.browserOnTargetChanged(browser));
-  events.on("proxytimeout", eventHandlers.proxyTimeout(browser));
-  events.on("logicloaded", eventHandlers.logicLoaded(browser));
-  return new Promise((resolve) => {
-    events.on("scrapecomplete", eventHandlers.scrapeComplete(resolve));
-    // events.on("logicfailed", eventHandlers.logicFailed(browser));
-    newTabToURL(browser, homePage); // Open new tab and load page
-  });
+  attachEvents(browser);
+  newTabToURL(browser, userInput);
+  const promise = new Promise(magicMysteryPromise);
+  return promise;
+}
+
+type ResolveFunction = (results: string) => void;
+
+function magicMysteryPromise(resolve: ResolveFunction): void {
+  events.on("scrapecomplete", eventHandlers.scrapeComplete(resolve));
 }
