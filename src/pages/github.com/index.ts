@@ -15,13 +15,20 @@ export default async (browser: puppeteer.Browser) => {
 
   page.on("response", async (response) => console.log("<<", response.status(), response.url()));
 
-  const one = await page.$(
-    `#js-pjax-container > div.container-xl.px-3.px-md-4.px-lg-5 > div > div.Layout-main > div:nth-child(2) > div > div.mt-4.position-relative > div > div.col-12.col-lg-10 > div.js-yearly-contributions > div:nth-child(1) > h2`
-  );
-  //    eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //    @ts-ignore-error
-  const two = await (await one.getProperty("textContent")).jsonValue();
-  //    eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //    @ts-ignore-error
-  return Number(two.match(/[0-9]*/gim).join(``));
+  const yearlyContributions = await page.$(`div.js-yearly-contributions h2`);
+
+  if (!yearlyContributions) {
+    throw new Error(`can not find yearly contributions div`);
+  }
+  const yearlyContributionsText = await yearlyContributions.getProperty("textContent");
+  const yearlyContributionsTextParsed: string | undefined = await yearlyContributionsText?.jsonValue();
+  if (!yearlyContributionsTextParsed) {
+    throw new Error(`can not find parse yearly contributions div`);
+  } else {
+    const matched = yearlyContributionsTextParsed?.match(/[0-9]*/gim);
+    if (matched) {
+      const yearlyContributionsTextParsedNumbersOnly = Number(matched.join(``));
+      return yearlyContributionsTextParsedNumbersOnly;
+    }
+  }
 };
