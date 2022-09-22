@@ -7,10 +7,11 @@ import { eventHandlers } from "./boot/event-handlers";
 import { attachEvents } from "./boot/events/attachEvents";
 import newTabToURL from "./boot/new-tab-to-url";
 
-export default async function entryPoint(userInput: string[]) {
-  const browser = await browserSetup(config);
-  attachEvents(browser);
-  const urls = userInput;
+export default async function entryPoint(urls: string[], browser?: Browser) {
+  if (!browser) {
+    browser = await browserSetup(config);
+    attachEvents(browser);
+  }
   const completedScrapes = [] as unknown[];
   for (const url of urls) {
     completedScrapes.push(await scrapePage(url, browser));

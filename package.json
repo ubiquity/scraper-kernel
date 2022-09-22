@@ -4,8 +4,8 @@
   "author": {
     "name": "アレクサンダー.eth"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "dist/cli.js",
+  "module": "dist/cli.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "start": "node dist/cli.js",

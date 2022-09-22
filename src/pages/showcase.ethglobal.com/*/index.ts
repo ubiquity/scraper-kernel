@@ -1,4 +1,5 @@
 import puppeteer from "puppeteer";
+import { getPage } from "..";
 import { getProperty } from "../../../common";
 export default async (browser: puppeteer.Browser) => {
   const page = await getPage(browser);
@@ -11,13 +12,3 @@ export default async (browser: puppeteer.Browser) => {
     }
   }
 };
-
-async function getPage(browser: puppeteer.Browser) {
-  const pages = await browser.pages();
-  const page = pages[pages.length - 1];
-  if (!page) {
-    throw new Error("No page found");
-  }
-
-  return page;
-}

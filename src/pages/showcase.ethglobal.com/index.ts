@@ -1,15 +1,12 @@
 import puppeteer from "puppeteer";
-import { scrapePage } from "../../scrape";
+import entryPoint from "../../scrape";
 export default async (browser: puppeteer.Browser) => {
-  const page = await setupHackathonScraper(browser);
-
+  const page = await getPage(browser);
+  // await debugLogging(page);
   const hackathonURLs = await getHackathonURLs(page);
-  let x = hackathonURLs.length;
-  while (x--) {
-    const url = hackathonURLs[x];
-    // await page.goto(url, { waitUntil: "networkidle2" });
-    await scrapePage(url, browser);
-  }
+  const results = await entryPoint(hackathonURLs, browser);
+  console.log({ results });
+  return results;
 };
 
 async function getHackathonURLs(page: puppeteer.Page) {
@@ -28,13 +25,7 @@ async function getHackathonURLs(page: puppeteer.Page) {
   return hackathonURLs;
 }
 
-async function setupHackathonScraper(browser: puppeteer.Browser) {
-  const pages = await browser.pages();
-  const page = pages[pages.length - 1];
-  if (!page) {
-    throw new Error("No page found");
-  }
-
+async function debugLogging(page: puppeteer.Page) {
   await page.setRequestInterception(true);
 
   page.on("request", (request) => {
@@ -43,5 +34,14 @@ async function setupHackathonScraper(browser: puppeteer.Browser) {
   });
 
   page.on("response", (response) => console.log("<<", response.status(), response.url()));
+}
+
+export async function getPage(browser: puppeteer.Browser) {
+  const pages = await browser.pages();
+  const page = pages[pages.length - 1];
+  if (!page) {
+    throw new Error("No page found");
+  }
+
   return page;
 }

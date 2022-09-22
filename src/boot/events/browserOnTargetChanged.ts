@@ -41,41 +41,65 @@ export function browserOnTargetChangedHandler(_browser: Browser): Handler<any> {
 }
 
 function importLogic(url: string) {
+  // first it will try to find a direct match based on the URL and the /pages/ directory for a filename to dynamically load in the page logic
+  // next it will fall back to an index.ts in the same folder
+  // finally it will fallback to the first "*.ts" or "*/index.ts" it can find
+
   const selection = url.split("://").pop();
   if (!selection) {
     throw new Error("Page URL parse error");
   }
-  const pageDir = path.join(process.cwd(), "dist", "pages", selection);
-  const pathTo = pageDir;
-  const exists = fs.existsSync(pathTo);
+  const fullPath = path.join(process.cwd(), "dist", "pages", selection);
+  const exists = fs.existsSync(fullPath);
   if (exists) {
-    const logic = import(pathTo).catch((error) => {
-      console.error(error);
-      console.error(`Import page logic error for ${selection}`);
-    });
-    return logic as Promise<Module>;
+    return loadFrom(fullPath, selection);
   } else {
     // falling back to importing index.ts in directory instead
-    const sliced = pathTo.slice(0, pathTo.lastIndexOf("/"));
-    const exists = fs.existsSync(sliced);
+
+    const directoryPath = path.dirname(fullPath);
+    const exists = fs.existsSync(directoryPath);
     if (exists) {
-      const logic = import(sliced).catch((error) => {
-        console.error(error);
-        console.error(`Import page logic error for ${selection}`);
-      });
-      return logic as Promise<Module>;
+      return loadFrom(directoryPath, selection);
     } else {
       // falling back to importing wildcard directory "*/index.ts" or literally "*.ts"
-      const wildcard = sliced.slice(0, sliced.lastIndexOf("/"));
-      const pageDir = path.join(wildcard, "*");
-      const logic = import(pageDir).catch((error) => {
-        console.error(error);
-        console.error(`Import page logic error for ${selection}`);
-      });
-      return logic as Promise<Module>;
+      // const wildcard = directoryPath.slice(0, directoryPath.lastIndexOf("/"));
+      const wildcardPath = path.join(directoryPath, "*");
+      const exists = fs.existsSync(wildcardPath);
+      if (exists) {
+        return loadFrom(wildcardPath, selection);
+      }
     }
   }
 }
+
+// function recurseDirUp(dirUp, selection) {
+//   dirUp = path.join(dirUp, "..");
+//   const exists = fs.existsSync(dirUp);
+//   if (exists) {
+//     return wildCardFallback(dirUp, selection);
+//   } else {
+//     return recurseDirUp(dirUp, selection);
+//   }
+// }
+
+function loadFrom(newPath: string, selection: string) {
+  const logic = import(newPath).catch((error) => {
+    console.error(error);
+    console.error(`Import page logic error for ${selection}`);
+  });
+  return logic as Promise<Module>;
+}
+
+// function wildCardFallback(sliced: string, selection: string) {
+//   const wildcard = sliced.slice(0, sliced.lastIndexOf("/"));
+//   const newPath = path.join(wildcard, "*");
+//   const logic = import(newPath).catch((error) => {
+//     console.error(error);
+//     console.error(`Import page logic error for ${selection}`);
+//   });
+//   return logic as Promise<Module>;
+// }
+
 interface Module {
   default?: Function;
 }
