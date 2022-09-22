@@ -18,7 +18,7 @@ export default async function entryPoint(userInput: string[]) {
   return completedScrapes;
 }
 
-async function scrapePage(userInput: string, browser: Browser) {
+export async function scrapePage(userInput: string, browser: Browser) {
   const scrapeCompleted = new Promise(addCallbackEvent);
   console.log(`>>`, userInput);
   newTabToURL(browser, userInput);

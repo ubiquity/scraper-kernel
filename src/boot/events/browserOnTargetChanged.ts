@@ -57,12 +57,23 @@ function importLogic(url: string) {
   } else {
     // falling back to importing index.ts in directory instead
     const sliced = pathTo.slice(0, pathTo.lastIndexOf("/"));
-
-    const logic = import(sliced).catch((error) => {
-      console.error(error);
-      console.error(`Import page logic error for ${selection}`);
-    });
-    return logic as Promise<Module>;
+    const exists = fs.existsSync(sliced);
+    if (exists) {
+      const logic = import(sliced).catch((error) => {
+        console.error(error);
+        console.error(`Import page logic error for ${selection}`);
+      });
+      return logic as Promise<Module>;
+    } else {
+      // falling back to importing wildcard directory "*/index.ts" or literally "*.ts"
+      const wildcard = sliced.slice(0, sliced.lastIndexOf("/"));
+      const pageDir = path.join(wildcard, "*");
+      const logic = import(pageDir).catch((error) => {
+        console.error(error);
+        console.error(`Import page logic error for ${selection}`);
+      });
+      return logic as Promise<Module>;
+    }
   }
 }
 interface Module {
