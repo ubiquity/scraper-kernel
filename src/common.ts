@@ -1,4 +1,4 @@
-import { ElementHandle, Page } from "puppeteer";
+import { ElementHandle, Page, Browser } from "puppeteer";
 export const getSourcedDate = () => new Date().toLocaleDateString();
 export const scrollToBottom = async (page: Page) => await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 export async function getProperty(element: ElementHandle, query: string) {
@@ -20,4 +20,14 @@ export async function extractURLs(elements: ElementHandle<Element>[]) {
     urls.push(href);
   }
   return urls;
+}
+
+export async function getPage(browser: Browser) {
+  const pages = await browser.pages();
+  const page = pages[pages.length - 1];
+  if (!page) {
+    throw new Error("No page found");
+  }
+
+  return page;
 }

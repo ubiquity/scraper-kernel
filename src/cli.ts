@@ -1,8 +1,8 @@
 const userInput = process.argv.slice(2);
-import entryPoint from "./scrape";
+import scrapeUrlsInSeries from "./scrape";
 import fs from "fs";
 // CLI ADAPTER
-entryPoint(userInput)
+scrapeUrlsInSeries(userInput)
   .then((data) => {
     console.log(`<<`, data);
     fs.writeFileSync("results.json", JSON.stringify(data));

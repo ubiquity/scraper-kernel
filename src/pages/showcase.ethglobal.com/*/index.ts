@@ -1,6 +1,5 @@
 import puppeteer from "puppeteer";
-import { getPage } from "..";
-import { getProperty } from "../../../common";
+import { getPage, getProperty } from "../../../common";
 import fs from "fs";
 export default async (browser: puppeteer.Browser) => {
   const page = await getPage(browser);

@@ -1,10 +1,12 @@
 import puppeteer from "puppeteer";
-import entryPoint from "../../scrape";
+import { getPage } from "../../common";
+import scrapeUrlsInSeries from "../../scrape";
+
 export default async (browser: puppeteer.Browser) => {
   const page = await getPage(browser);
   // await debugLogging(page);
-  const hackathonURLs = await getHackathonURLs(page);
-  const results = await entryPoint(hackathonURLs, browser);
+  const hackathonUrls = await getHackathonURLs(page);
+  const results = await scrapeUrlsInSeries(hackathonUrls, browser);
 
   return results;
 };
@@ -32,14 +34,4 @@ async function debugLogging(page: puppeteer.Page) {
   });
 
   page.on("response", (response) => console.log("<<", response.status(), response.url()));
-}
-
-export async function getPage(browser: puppeteer.Browser) {
-  const pages = await browser.pages();
-  const page = pages[pages.length - 1];
-  if (!page) {
-    throw new Error("No page found");
-  }
-
-  return page;
 }
