@@ -2,7 +2,7 @@ import puppeteer from "puppeteer";
 import entryPoint from "../../scrape";
 export default async (browser: puppeteer.Browser) => {
   const page = await getPage(browser);
-  // await debugLogging(page);
+  await debugLogging(page);
   const hackathonURLs = await getHackathonURLs(page);
   const results = await entryPoint(hackathonURLs, browser);
   console.log({ results });
@@ -12,13 +12,11 @@ export default async (browser: puppeteer.Browser) => {
 async function getHackathonURLs(page: puppeteer.Page) {
   const hackathons = await page.$$(`#event > div > a`);
   if (!hackathons) {
-    throw new Error(`could not find the hackthons`);
+    throw new Error(`could not find the hackathons`);
   }
 
-  let x = hackathons.length;
   const hackathonURLs = [] as string[];
-  while (x--) {
-    const hackathon = hackathons[x];
+  for (const hackathon of hackathons) {
     const href = await hackathon.evaluate((element) => (element as HTMLAnchorElement).href);
     hackathonURLs.push(href);
   }

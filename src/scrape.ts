@@ -21,7 +21,7 @@ export default async function entryPoint(urls: string[], browser?: Browser) {
 
 export async function scrapePage(url: string, browser: Browser) {
   const scrapeCompleted = new Promise(addCallbackEvent);
-  // console.log(`>>`, userInput);
+  // console.log(`>>`, userInput); // useful to follow headless page navigation
   const tab = await newTabToURL(browser, url);
   const result = await scrapeCompleted;
   await tab.close(); // save memory

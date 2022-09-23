@@ -1,5 +1,6 @@
 import { Browser } from "puppeteer";
 import { browserOnTargetChangedHandler } from "./events/browserOnTargetChanged";
+import { events } from "../scrape";
 
 export type PageLogic = (browser: Browser) => Promise<unknown[]>;
 
@@ -21,6 +22,7 @@ export const eventHandlers = {
   },
 
   scrapeComplete: function scrapeCompleteHandler(resolve) {
+    events.off("scrapecomplete", eventHandlers.scrapeComplete(resolve)); // remove event to stop memory leak
     return (results: string) => resolve(results);
   },
 
