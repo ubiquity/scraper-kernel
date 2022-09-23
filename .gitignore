@@ -45,3 +45,4 @@ typings
 *.log
 tsconfig.tsbuildinfo
 src/pages/web.telegram.org/z/index.png
+*.csv
