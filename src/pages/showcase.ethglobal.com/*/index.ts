@@ -1,6 +1,7 @@
 import puppeteer from "puppeteer";
 import { getPage } from "..";
 import { getProperty } from "../../../common";
+import fs from "fs";
 export default async (browser: puppeteer.Browser) => {
   const page = await getPage(browser);
   const githubSelector = `a[href*=git]`; // I noticed gitlab and etherscan links for source code
@@ -9,7 +10,8 @@ export default async (browser: puppeteer.Browser) => {
   if (anchor) {
     const href = await getProperty(anchor, "href");
     if (href) {
-      console.log({ href });
+      // console.log({ href });
+      fs.appendFile("buffer.log", href, (error) => console.error(error));
       return href;
     }
   }
