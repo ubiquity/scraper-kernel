@@ -9,10 +9,7 @@ import { attachEvents } from "./boot/events/attachEvents";
 import newTabToURL from "./boot/new-tab-to-url";
 
 export default async function scrapeUrlsInSeries(urls: string[], browser?: Browser) {
-  if (!browser) {
-    browser = await browserSetup(config);
-    attachEvents(browser);
-  }
+  browser = await attachEventsOnFirstRun(browser);
   const completedScrapes = [] as unknown[];
   for (const url of urls) {
     completedScrapes.push(await scrapePage(url, browser));
@@ -21,10 +18,7 @@ export default async function scrapeUrlsInSeries(urls: string[], browser?: Brows
 }
 
 export async function scrapeUrlsInParallel(urls: string[], browser?: Browser, concurrency?: number) {
-  if (!browser) {
-    browser = await browserSetup(config);
-    attachEvents(browser);
-  }
+  browser = await attachEventsOnFirstRun(browser);
   const pendingScrapes = [] as Promise<unknown>[];
   for (const url of urls) {
     pendingScrapes.push(scrapePage(url, browser));
@@ -50,7 +44,13 @@ export async function scrapePage(url: string, browser: Browser) {
   await tab.close(); // save memory
   return result;
 }
-
+async function attachEventsOnFirstRun(browser: Browser | undefined) {
+  if (!browser) {
+    browser = await browserSetup(config);
+    attachEvents(browser);
+  }
+  return browser;
+}
 function addCallbackEvent(resolve: ResolveFunction): void {
   events.on("scrapecomplete", eventHandlers.scrapeComplete(resolve));
 }
