@@ -6,6 +6,6 @@ export function attachEvents(browser: Browser) {
   browser.on("targetchanged", eventHandlers.browserOnTargetChanged(browser));
   events.on("proxytimeout", eventHandlers.proxyTimeout(browser));
   events.on("logicloaded", eventHandlers.logicLoaded(browser));
-  // events.on("logicfailed", eventHandlers.logicFailed(browser));
+  events.on("logicfailed", eventHandlers.logicFailed(browser));
   return browser;
 }

@@ -14,12 +14,11 @@ export const eventHandlers = {
       return await logic(browser);
     };
   },
-  // logicFailed: function logicFailedHandler(browser: Browser): (...args: any[]) => void {
-  //   return async (logic: PageLogic) => {
-  //     await browser.close();
-  //     return process.exit(1);
-  //   };
-  // },
+  logicFailed: function logicFailedHandler(browser: Browser): (...args: any[]) => void {
+    return async (error: Error) => {
+      throw error;
+    };
+  },
 
   scrapeComplete: function scrapeCompleteHandler(resolve) {
     return (results: string) => resolve(results);
