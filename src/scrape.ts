@@ -1,5 +1,4 @@
 import { EventEmitter } from "events";
-import pAll from "p-all";
 import { Browser } from "puppeteer";
 import "source-map-support/register";
 import browserSetup from "./boot/browser-setup";
@@ -33,7 +32,8 @@ export async function scrapeUrlsInParallel(urls: string[], browser?: Browser, co
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-expect-error
-  return await pAll(pendingScrapes, { concurrency: concurrency || 10 });
+
+  await (await import("p-all")).default(pendingScrapes, { concurrency: concurrency || 10 });
 }
 
 export async function scrapePage(url: string, browser: Browser) {

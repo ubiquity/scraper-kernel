@@ -5,14 +5,14 @@ import scrapeUrlsInSeries from "../../scrape";
 export default async (browser: puppeteer.Browser) => {
   const page = await getPage(browser);
   // await debugLogging(page);
-  const hackathonUrls = await getHackathonURLs(page);
+  const hackathonUrls = await scrapeHrefsFromAnchors(page, `#event > div > a`);
   const results = await scrapeUrlsInSeries(hackathonUrls, browser);
 
   return results;
 };
 
-async function getHackathonURLs(page: puppeteer.Page) {
-  const hackathons = await page.$$(`#event > div > a`);
+export async function scrapeHrefsFromAnchors(page: puppeteer.Page, selectors: string) {
+  const hackathons = await page.$$(selectors);
   if (!hackathons) {
     throw new Error(`could not find the hackathons`);
   }
