@@ -11,7 +11,7 @@ export default async (browser: puppeteer.Browser) => {
     const href = await getProperty(anchor, "href");
     if (href) {
       // console.log({ href });
-      fs.appendFile("buffer.log", href, (error) => console.error(error));
+      fs.appendFile("buffer.log", href.concat("\n"), (error) => console.error(error));
       return href;
     }
   }

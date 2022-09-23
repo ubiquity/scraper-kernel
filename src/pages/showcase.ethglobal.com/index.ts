@@ -3,7 +3,7 @@ import entryPoint from "../../scrape";
 import fs from "fs";
 export default async (browser: puppeteer.Browser) => {
   const page = await getPage(browser);
-  await debugLogging(page);
+  // await debugLogging(page);
   const hackathonURLs = await getHackathonURLs(page);
   const results = await entryPoint(hackathonURLs, browser);
   console.log({ results });
