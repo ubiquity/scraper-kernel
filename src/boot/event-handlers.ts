@@ -22,7 +22,7 @@ export const eventHandlers = {
   },
 
   scrapeComplete: function scrapeCompleteHandler(resolve) {
-    events.off("scrapecomplete", eventHandlers.scrapeComplete); // remove event to stop memory leak
+    events.off("scrapecomplete", () => eventHandlers.scrapeComplete(resolve)); // remove event to stop memory leak
     return (results: string) => resolve(results);
   },
 
