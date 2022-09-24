@@ -1,9 +1,9 @@
 import puppeteer from "puppeteer";
-import { getPage } from "../../common";
+import { getActiveTab } from "../../common";
 import scrapeUrlsInSeries from "../../scrape";
 
 export default async (browser: puppeteer.Browser) => {
-  const page = await getPage(browser);
+  const page = await getActiveTab(browser);
   // await debugLogging(page);
   const hackathonUrls = await scrapeHrefsFromAnchors(page, `#event > div > a`);
   const results = await scrapeUrlsInSeries(hackathonUrls, browser);

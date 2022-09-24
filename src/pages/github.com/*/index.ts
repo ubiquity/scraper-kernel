@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-import { getPage } from "../../../common";
+import { getActiveTab } from "../../../common";
 export default async (browser: puppeteer.Browser) => {
-  const page = await getPage(browser);
+  const page = await getActiveTab(browser);
 };
