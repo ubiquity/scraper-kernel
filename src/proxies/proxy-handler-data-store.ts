@@ -50,14 +50,14 @@ export class ProxyHandlerDataStore {
       //	Temporarily hold on to the array of proxies
       this._proxies = proxyLocation;
     } else if (typeof proxyLocation === `object`) {
-      throw new Error(`Datastorage is expected to be an array of proxies, not an object!`);
+      throw new Error(`DataStorage is expected to be an array of proxies, not an object!`);
     } else {
-      throw new Error(`Datastorage must be a filename (on disk) or an array (in memory)!`);
+      throw new Error(`DataStorage must be a filename (on disk) or an array (in memory)!`);
     }
   }
 
   private setDataStoreAsString(newName: ProxyLocation) {
-    throw new Error(`Datastorage location as string is not implemented`);
+    throw new Error(`DataStorage location as string is not implemented`);
     // /**
     //  * This TRY/CATCH block needs to be thoroughly tested
     //  * Because it needs to know how to juggle the filename or
@@ -75,7 +75,7 @@ export class ProxyHandlerDataStore {
     //   const fromDisk = require(newName);
     //   if (!Array.isArray(fromDisk)) {
     //     //	File contents must be an array.
-    //     throw new Error(`Datastorage is expected to be an array of proxies!`);
+    //     throw new Error(`DataStorage is expected to be an array of proxies!`);
     //   } else {
     //     this._proxies = fromDisk; //	Success
     //   }

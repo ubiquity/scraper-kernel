@@ -1,5 +1,5 @@
 import ProxyHandler from "./proxy-handler";
-import { spysOneIps } from "./sources/spys-one";
+import { getSpysOneIps } from "./sources/spys-one";
 
 const proxiesDisabled = process.env.DEBUG_DISABLE_PROXIES;
 
@@ -11,7 +11,7 @@ export default async function proxies() {
     return handler;
   }
 
-  const ips = await spysOneIps();
+  const ips = await getSpysOneIps();
   const handler = new ProxyHandler();
   handler.storage.flattened = ips as string[];
   return handler;
