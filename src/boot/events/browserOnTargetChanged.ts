@@ -3,8 +3,6 @@ import { events } from "../../scrape";
 import { failSafe } from "./failSafe";
 import { loadPageLogic } from "./loadPageLogic";
 
-export type PageLogicSignature = Promise<(browser: Browser) => string[]>;
-
 export const browserOnTargetChangedHandler = (_browser: Browser) => async (target: Target) => {
   const url = target.url();
   const page = await target.page();

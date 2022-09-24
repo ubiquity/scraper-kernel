@@ -1,4 +1,4 @@
-import { PageLogicSignature } from "./browserOnTargetChanged";
+import { PageLogic } from "../event-handlers";
 import { failSafe } from "./failSafe";
 import { recurseDirUp } from "./recurseDirUp";
 
@@ -10,7 +10,7 @@ interface Params {
   fallback: typeof recurseDirUp;
 }
 
-export async function recurseAttemptImport({ destination, strategies, fallback }: Params): Promise<PageLogicSignature> {
+export async function recurseAttemptImport({ destination, strategies, fallback }: Params): Promise<Promise<PageLogic>> {
   const logic = await failSafe(async () => (await import(destination)).default);
 
   if (logic) {

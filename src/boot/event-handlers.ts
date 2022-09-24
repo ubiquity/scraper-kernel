@@ -2,7 +2,7 @@ import { Browser } from "puppeteer";
 import { browserOnTargetChangedHandler } from "./events/browserOnTargetChanged";
 import { events } from "../scrape";
 
-export type PageLogic = (browser: Browser) => Promise<unknown[]>;
+export type PageLogic = (browser: Browser) => Promise<string[]>;
 
 export const eventHandlers = {
   proxyTimeout: function proxyTimeoutHandler(_browser: Browser): (...args: any[]) => void {

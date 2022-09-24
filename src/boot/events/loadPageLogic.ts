@@ -1,9 +1,10 @@
 import path from "path";
+import { PageLogic } from "../event-handlers";
 import { recurseAttemptImport } from "./recurseAttemptImport";
-import { PageLogicSignature } from "./browserOnTargetChanged";
+
 import { recurseDirUp } from "./recurseDirUp";
 
-export async function loadPageLogic(url: string): Promise<PageLogicSignature> {
+export async function loadPageLogic(url: string): Promise<Promise<PageLogic>> {
   const destination = url.split("://").pop();
   if (!destination) {
     throw new Error("Page URL parse error");

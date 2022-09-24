@@ -1,7 +1,7 @@
 import { events } from "../../scrape";
-import { PageLogicSignature } from "./browserOnTargetChanged";
+import { PageLogic } from "../event-handlers";
 
-export async function failSafe(logic: { (): Promise<PageLogicSignature | void> }) {
+export async function failSafe(logic: { (): Promise<Promise<PageLogic> | void> }) {
   try {
     return await logic();
   } catch (error) {
