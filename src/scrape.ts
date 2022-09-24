@@ -57,6 +57,7 @@ export async function scrapeSingle(url: string, browser: Browser) {
   await tab.close(); // save memory
   return result;
 }
+
 async function attachEventsOnFirstRun(browser: Browser | undefined) {
   if (!browser) {
     browser = await browserSetup(config);
@@ -64,8 +65,9 @@ async function attachEventsOnFirstRun(browser: Browser | undefined) {
   }
   return browser;
 }
+
+export const events = new EventEmitter();
+type ResolveFunction = (results: string) => void;
 function addCallbackEvent(resolve: ResolveFunction): void {
   events.on("scrapecomplete", eventHandlers.scrapeComplete(resolve));
 }
-type ResolveFunction = (results: string) => void;
-export const events = new EventEmitter();
