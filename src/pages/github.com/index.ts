@@ -7,6 +7,7 @@ export default async (browser: puppeteer.Browser) => {
   return {
     contributions: await getContributions(page),
     name: await getUserFullName(page),
+    username: await getUserName(page),
   };
 };
 
@@ -22,4 +23,9 @@ async function getContributions(page) {
 async function getUserFullName(page) {
   const fullname = await scrapeTextNode(page, `.vcard-fullname`);
   return fullname?.trim();
+}
+
+async function getUserName(page) {
+  const username = await scrapeTextNode(page, `.vcard-username`);
+  return username?.trim();
 }
