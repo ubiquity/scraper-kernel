@@ -10,30 +10,31 @@ import newTabToURL from "./boot/new-tab-to-url";
 export default async function scrape(urls: string[] | string, browser?: Browser, concurrency?: number) {
   browser = await attachEventsOnFirstRun(browser);
 
-  if (Array.isArray(urls)) {
+  if (typeof urls === "string") {
+    return await _scrapeSingle(urls, browser);
+  } else if (Array.isArray(urls)) {
     if (concurrency) {
-      return await scrapeConcurrently(urls, browser, concurrency);
+      return await _scrapeConcurrently(urls, browser, concurrency);
+    } else {
+      return await _scrapeSeries(urls, browser);
     }
-    return await scrapeSeries(urls, browser);
-  } else if (typeof urls === "string") {
-    return await scrapeSingle(urls, browser);
   } else {
     throw new Error("`urls` must be of types `string[] | string` ");
   }
 }
 
-export async function scrapeSeries(urls: string[], browser: Browser) {
+export async function _scrapeSeries(urls: string[], browser: Browser) {
   const completedScrapes = [] as unknown[];
   for (const url of urls) {
-    completedScrapes.push(await scrapeSingle(url, browser));
+    completedScrapes.push(await _scrapeSingle(url, browser));
   }
   return completedScrapes;
 }
 
-export async function scrapeConcurrently(urls: string[], browser: Browser, concurrency?: number) {
+export async function _scrapeConcurrently(urls: string[], browser: Browser, concurrency?: number) {
   const pendingScrapes = [] as Promise<unknown>[];
   for (const url of urls) {
-    pendingScrapes.push(scrapeSingle(url, browser));
+    pendingScrapes.push(_scrapeSingle(url, browser));
   }
 
   // const actions = [
@@ -49,7 +50,7 @@ export async function scrapeConcurrently(urls: string[], browser: Browser, concu
   await (await import("p-all")).default(pendingScrapes, { concurrency: concurrency || 6 }); // http2 simultaneous connection limit?
 }
 
-export async function scrapeSingle(url: string, browser: Browser) {
+export async function _scrapeSingle(url: string, browser: Browser) {
   const scrapeCompleted = new Promise(addCallbackEvent);
   console.log(`>>`, url); // useful to follow headless page navigation
   const tab = await newTabToURL(browser, url);

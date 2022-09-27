@@ -5,7 +5,7 @@ import fs from "fs";
 scrape(userInput)
   .then((data) => {
     console.log(`<<`, data);
-    fs.writeFileSync("results.json", JSON.stringify(data));
+    fs.writeFileSync("results.json", JSON.stringify(data)); // temporary
     process.exit(0);
   })
   .catch((err) => {

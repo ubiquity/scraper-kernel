@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-import ScrapedProject from "../../../../@types/scraped-project";
+import ScrapedProject from "../../@types/scraped-project";
 import Proxies from "../../../../proxies";
 import { getCurrenciesPageURLs } from "./get-currencies-page-urls";
 import { makeJobPerURL } from "./make-job-per-url";
