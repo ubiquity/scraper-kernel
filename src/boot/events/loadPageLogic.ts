@@ -1,7 +1,7 @@
 import path from "path";
 import { warn } from "../../utils";
 import { PageLogic } from "../event-handlers";
-import { DestinationStrategy, recurseAttemptImport } from "./recurseAttemptImport";
+import { DestinationStrategy, searchForImport } from "./search-for-import";
 
 // recurse import strategies, in order.
 let _strategies = [] as DestinationStrategy[];
@@ -16,9 +16,9 @@ export function resetStrategies() {
   _strategies = [
     function direct(destination: string) {
       // ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/showcase/page/2
-      const pathTo = path.join(process.cwd(), "dist", "pages", destination); // filename matches exactly
-      warn(`importing ${pathTo}`);
-      return pathTo;
+      // const pathTo = path.join(process.cwd(), "dist", "pages", destination); // filename matches exactly
+      warn(`importing ${destination}`);
+      return destination;
     },
     function wildcard(destination: string) {
       // ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/showcase/page/*
@@ -42,12 +42,14 @@ export function resetStrategies() {
 }
 
 export async function loadPageLogic(url: string): Promise<Promise<PageLogic>> {
-  const importing = url.split("://").pop();
+  let importing = url.split("://").pop();
   if (!importing) {
     throw new Error("Page URL parse error");
   }
-
-  return await recurseAttemptImport({
+  // console.log({ importing });
+  importing = path.resolve(process.cwd(), "dist", "pages", importing); // initialize
+  // console.log({ importing });
+  return await searchForImport({
     importing,
     strategies: _strategies,
   });
