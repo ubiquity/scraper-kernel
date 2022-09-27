@@ -1,8 +1,9 @@
 import fs from "fs";
 import { PageLogic } from "../event-handlers";
 import { recurseDirUp } from "./recurseDirUp";
+import { resetStrategies } from "./loadPageLogic";
 
-type DestinationStrategy = (destination: string) => string;
+export type DestinationStrategy = (destination: string) => string;
 
 interface Params {
   importing: string;
@@ -22,9 +23,11 @@ export async function recurseAttemptImport({ importing, strategies, fallback }: 
   // }
 
   if (logic) {
+    resetStrategies();
     return logic;
   } else {
     const changeDestinationStrategy = strategies.shift();
+    console.log(changeDestinationStrategy);
     if (changeDestinationStrategy) {
       importing = changeDestinationStrategy(importing);
       return await recurseAttemptImport({ importing, strategies, fallback });

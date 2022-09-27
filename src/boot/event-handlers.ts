@@ -16,7 +16,7 @@ export const eventHandlers = {
     };
   },
   logicFailed: function logicFailedHandler(browser: Browser): (...args: any[]) => void {
-    return async (error: Error) => {
+    return (error: Error) => {
       throw error;
     };
   },
