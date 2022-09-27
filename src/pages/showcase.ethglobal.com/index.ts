@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-import { getActiveTab } from "../../common";
+import { getActiveTab } from "../../utils";
 import scrape from "../../scrape";
 
 export default async (browser: puppeteer.Browser) => {

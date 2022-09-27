@@ -1,14 +1,12 @@
 import fs from "fs";
 import path from "path";
+import { warn } from "../../utils";
 
 const projectDirectory = process.cwd();
 
-export async function recurseDirUp(directory: string, searchHistory?: string[]) {
-  if (!searchHistory) {
-    searchHistory = [] as string[];
-  }
-  const dirUp = path.join(directory, "..", "..", "*");
-  searchHistory.push(dirUp);
+export async function recurseDirUp(directory: string) {
+  const dirUp = path.join(directory, "..", "*");
+  warn(`importing ${dirUp}`);
 
   if (!dirUp.includes(projectDirectory)) {
     return;
@@ -16,7 +14,6 @@ export async function recurseDirUp(directory: string, searchHistory?: string[]) 
 
   const exists = fs.existsSync(dirUp);
   if (exists) {
-    searchHistory = [];
     const logic = await import(dirUp);
     if (logic?.default) {
       return logic.default;

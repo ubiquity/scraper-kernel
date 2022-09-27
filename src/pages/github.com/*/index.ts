@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-import { getActiveTab, getAttribute } from "../../../common";
+import { getActiveTab, getAttribute } from "../../../utils";
 // this is likely to be dynamically loaded when looking at a specific repository, due to the nesting of the url
 // e.g. https://github.com/ubiquity/dollar
 
