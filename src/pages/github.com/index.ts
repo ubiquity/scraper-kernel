@@ -8,6 +8,8 @@ export default async (browser: puppeteer.Browser) => {
     contributions: await getContributions(page),
     name: await getUserFullName(page),
     username: await getUserName(page),
+    bio: await getBio(page),
+    twitter: await getTwitter(page),
   };
 };
 
@@ -28,4 +30,14 @@ async function getUserFullName(page) {
 async function getUserName(page) {
   const username = await scrapeTextNode(page, `.vcard-username`);
   return username?.trim();
+}
+
+async function getBio(page) {
+  const value = await scrapeTextNode(page, `[data-bio-text]`);
+  return value;
+}
+async function getTwitter(page) {
+  // document.querySelectorAll(``).forEach(el=>console.log(el.textContent)?.trim())
+  const value = await scrapeTextNode(page, `[href*=twitter]`);
+  return value;
 }
