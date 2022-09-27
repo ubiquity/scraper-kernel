@@ -3,8 +3,6 @@ import { warn } from "../../utils";
 import { PageLogic } from "../event-handlers";
 import { DestinationStrategy, recurseAttemptImport } from "./recurseAttemptImport";
 
-import { recurseDirUp } from "./recurseDirUp";
-
 // recurse import strategies, in order.
 let _strategies = [] as DestinationStrategy[];
 resetStrategies();
@@ -22,7 +20,7 @@ export function resetStrategies() {
       warn(`importing ${pathTo}`);
       return pathTo;
     },
-    function currentDirWildcard(destination: string) {
+    function wildcard(destination: string) {
       // ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/showcase/page/*
       const pathTo = path.join(destination, "..", "*");
       warn(`importing ${pathTo}`);
@@ -31,6 +29,12 @@ export function resetStrategies() {
     function index(destination: string) {
       // ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/showcase/page
       const pathTo = path.dirname(destination);
+      warn(`importing ${pathTo}`);
+      return pathTo;
+    },
+    function up(destination: string) {
+      // ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/showcase/
+      const pathTo = path.join(destination, "..");
       warn(`importing ${pathTo}`);
       return pathTo;
     },
@@ -46,6 +50,5 @@ export async function loadPageLogic(url: string): Promise<Promise<PageLogic>> {
   return await recurseAttemptImport({
     importing,
     strategies: _strategies,
-    fallback: recurseDirUp,
   });
 }
