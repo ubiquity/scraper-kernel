@@ -8,7 +8,7 @@ export type DestinationStrategy = (destination: string) => string;
 const cwd = process.cwd();
 
 export async function searchForImport(importing: string): Promise<PageLogic> {
-  console.trace(colorizeText(`recursion!`, "fgWhite"));
+  console.log(colorizeText(`recursion!`, "fgWhite"));
   if (!importing.includes(cwd)) {
     console.error(colorizeText(`\t⚠ out of bounds`, "fgRed"));
     // THE REQUESTED IMPORT PATH IS OUTSIDE OF THE PROJECT DIRECTORY, WHICH IS INVALID
