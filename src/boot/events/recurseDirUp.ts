@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { events } from "../../scrape";
 
 const projectDirectory = process.cwd();
 
@@ -10,6 +9,8 @@ export async function recurseDirUp(directory: string, searchHistory?: string[]) 
   }
   const dirUp = path.join(directory, "..", "..", "*");
   searchHistory.push(dirUp);
+
+  console.log({ searchHistory });
 
   if (!dirUp.includes(projectDirectory)) {
     console.trace(searchHistory);
@@ -25,7 +26,12 @@ export async function recurseDirUp(directory: string, searchHistory?: string[]) 
   const exists = fs.existsSync(dirUp);
   if (exists) {
     searchHistory = [];
-    return await import(dirUp);
+    const logic = await import(dirUp);
+    if (logic?.default) {
+      return logic.default;
+    } else {
+      throw new Error(`${dirUp} requires a default export to work`);
+    }
   } else {
     return await recurseDirUp(dirUp);
   }

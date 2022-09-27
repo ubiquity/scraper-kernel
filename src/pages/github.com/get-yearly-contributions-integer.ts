@@ -1,17 +1,5 @@
 import puppeteer from "puppeteer";
-// import { getPage } from "../../common";
 export default async (page: puppeteer.Page) => {
-  // const page = await getPage(browser);
-
-  // await page.setRequestInterception(true);
-
-  // page.on("request", (request) => {
-  //   console.log(">>", request.method(), request.url());
-  //   request.continue();
-  // });
-
-  // page.on("response", (response) => console.log("<<", response.status(), response.url()));
-
   const contributionsElement = await page.$(`div.js-yearly-contributions h2`);
 
   if (!contributionsElement) {

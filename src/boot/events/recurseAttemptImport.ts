@@ -26,8 +26,8 @@ export async function recurseAttemptImport({ importing, strategies, fallback }: 
     resetStrategies();
     return logic;
   } else {
-    const changeDestinationStrategy = strategies.shift();
-    console.log(changeDestinationStrategy);
+    const changeDestinationStrategy = strategies.shift() as Function;
+    console.log(changeDestinationStrategy?.name.concat(" strategy")); // temporary
     if (changeDestinationStrategy) {
       importing = changeDestinationStrategy(importing);
       return await recurseAttemptImport({ importing, strategies, fallback });
