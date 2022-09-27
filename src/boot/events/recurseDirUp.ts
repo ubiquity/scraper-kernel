@@ -10,18 +10,9 @@ export async function recurseDirUp(directory: string, searchHistory?: string[]) 
   const dirUp = path.join(directory, "..", "..", "*");
   searchHistory.push(dirUp);
 
-  console.log({ searchHistory });
-
   if (!dirUp.includes(projectDirectory)) {
-    console.trace(searchHistory);
     return;
-    // events.emit("logicfailed", new Error(`Page logic not found! Search history: ${searchHistory}`));
   }
-
-  // console.log({
-  //   dirUp: path.resolve(dirUp),
-  //   cwd: process.cwd(),
-  // });
 
   const exists = fs.existsSync(dirUp);
   if (exists) {
