@@ -1,27 +1,35 @@
+import fs from "fs";
 import { PageLogic } from "../event-handlers";
-import { failSafe } from "./failSafe";
 import { recurseDirUp } from "./recurseDirUp";
 
 type DestinationStrategy = (destination: string) => string;
 
 interface Params {
-  destination: string;
+  importing: string;
   strategies: DestinationStrategy[];
   fallback: typeof recurseDirUp;
 }
 
-export async function recurseAttemptImport({ destination, strategies, fallback }: Params): Promise<Promise<PageLogic>> {
-  const logic = await failSafe(async () => (await import(destination)).default);
+export async function recurseAttemptImport({ importing, strategies, fallback }: Params): Promise<Promise<PageLogic>> {
+  let logic: PageLogic | undefined;
+
+  if (fs.existsSync(importing)) {
+    const module = await import(importing);
+    logic = module.default;
+  }
+  // else {
+  // events.emit("logicfailed", error);
+  // }
 
   if (logic) {
     return logic;
   } else {
     const changeDestinationStrategy = strategies.shift();
     if (changeDestinationStrategy) {
-      destination = changeDestinationStrategy(destination);
-      return await recurseAttemptImport({ destination, strategies, fallback });
+      importing = changeDestinationStrategy(importing);
+      return await recurseAttemptImport({ importing, strategies, fallback });
     } else {
-      return await fallback(destination);
+      return await fallback(importing);
     }
   }
 }

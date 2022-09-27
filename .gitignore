@@ -46,3 +46,4 @@ typings
 tsconfig.tsbuildinfo
 src/pages/web.telegram.org/z/index.png
 *.csv
+results.json

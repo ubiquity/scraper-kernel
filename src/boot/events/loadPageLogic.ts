@@ -5,13 +5,13 @@ import { recurseAttemptImport } from "./recurseAttemptImport";
 import { recurseDirUp } from "./recurseDirUp";
 
 export async function loadPageLogic(url: string): Promise<Promise<PageLogic>> {
-  const destination = url.split("://").pop();
-  if (!destination) {
+  const importing = url.split("://").pop();
+  if (!importing) {
     throw new Error("Page URL parse error");
   }
 
   return await recurseAttemptImport({
-    destination,
+    importing,
     strategies: [
       (destination: string) => path.join(process.cwd(), "dist", "pages", destination),
       (destination: string) => path.dirname(destination),
