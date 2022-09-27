@@ -1,89 +1,44 @@
 import fs from "fs";
 import path from "path";
 import { PageLogic } from "../event-handlers";
-import { Browser } from "puppeteer";
 import { colorizeText } from "../../utils";
 
 export type DestinationStrategy = (destination: string) => string;
 
-interface Params {
-  importing: string;
-  strategies: DestinationStrategy[];
-  index: number;
-}
-
 const cwd = process.cwd();
 
-export async function searchForImport({ importing, strategies, index }: Params): Promise<Promise<PageLogic>> {
-  // console.log(colorizeText(`\t⚠ strategy index: ${index}`, "fgWhite"));
-
+export async function searchForImport(importing: string): Promise<PageLogic> {
+  console.trace(colorizeText(`recursion!`, "fgWhite"));
   if (!importing.includes(cwd)) {
-    console.error(colorizeText(`\t⚠ THE REQUESTED IMPORT PATH IS OUTSIDE OF THE PROJECT DIRECTORY, WHICH IS INVALID`, "fgRed"));
+    console.error(colorizeText(`\t⚠ out of bounds`, "fgRed"));
     // THE REQUESTED IMPORT PATH IS OUTSIDE OF THE PROJECT DIRECTORY, WHICH IS INVALID
-    return async (_browser: Browser) => {
-      throw new Error("the requested page logic import path is outside of the project directory, which is invalid");
-    };
+    throw new Error("the requested page logic import path is outside of the project directory, which is invalid");
   }
 
-  // let logic: PageLogic | undefined;
+  const logic = (await checkModifier(importing, "index")) || (await checkModifier(importing, "*"));
 
-  // IMPORT DEFAULT IF REQUESTED MODULE HAS BEEN FOUND
-  console.log(importing);
-
-  const importingIndex = path.join(importing, "index");
-  const importingWildcard = path.join(importing, "*");
-  let module;
-  let logic;
-  if (fs.existsSync(importingIndex)) {
-    console.log(colorizeText(`\t⚠ file found looking for [default] in ${importingIndex}`, "fgWhite"));
-    module = await import(importingIndex); // where the problem is
-    logic = module.default;
-  }
-  if (fs.existsSync(importingWildcard)) {
-    console.log(colorizeText(`\t⚠ file found looking for [default] in ${importingWildcard}`, "fgWhite"));
-    module = await import(importingWildcard); // where the problem is
-    logic = module.default;
-  }
-
-  // if (fs.existsSync(importingIndex) || fs.existsSync(importingWildcard)) {
-  // @FIXME: needs to do fs.fileExistsSync because I have an edge case where I have an empty directory
-  // importing can be a path to an empty directory and still pass
-  // console.log(colorizeText(`\t⚠ file found looking for [default] in ${importing}`, "fgWhite"));
-  // const module = await import(importing); // where the problem is
-  // logic = module.default;
   if (logic) {
-    // MODULE HAS BEEN LOADED SUCCESSFULLY, RESET STRATEGIES AND RETURN IT
-    console.log(colorizeText(`\t⚠ module loaded successfully`, "fgGreen"));
-    // strategies = resetStrategies();
-    index = 0;
-    console.log(logic);
     return logic;
+  } else {
+    // const directory = path.filename(importing); // normalize
+    importing = path.join(importing, ".."); // go up one
+    return await searchForImport(importing);
   }
-  // }
+}
 
-  // LOGIC HAS NOT BEEN LOADED, TRY THE NEXT STRATEGY AND TRY AGAIN
-
-  const strategy = strategies[index++];
-
-  // WE FOUND A NEW STRATEGY
-  if (strategy) {
-    importing = strategy(importing);
-    return await searchForImport({
-      importing,
-      strategies,
-      index,
-    });
+async function checkModifier(importing: string, modifier: string) {
+  let logic;
+  const importingDestination = path.join(importing, modifier);
+  console.log(colorizeText(`\t⚠ importing ${importingDestination}`, "fgWhite"));
+  // console.trace(importingDestination);
+  if (fs.existsSync(importingDestination)) {
+    // console.log(colorizeText(`\t⚠ file found looking for [default] in ${importingDestination}`, "fgWhite"));
+    logic = (await import(importingDestination))?.default;
+    if (logic) {
+      console.log(colorizeText(`\t⚠ module loaded successfully ${importingDestination}`, "fgGreen"));
+      return logic as PageLogic;
+    }
+  } else {
+    return null;
   }
-  // console.error(colorizeText(`\t⚠ strategy not found`, "fgRed"));
-  // else {
-  // WE DO NOT HAVE ANY MORE STRATEGIES, SO GO UP TO PARENT DIRECTORY, RESET STRATEGIES, AND TRY AGAIN
-  importing = path.resolve(importing, ".."); // go up one
-  // strategies = resetStrategies();
-  index = 0;
-  return await searchForImport({
-    importing,
-    strategies,
-    index,
-  });
-  // }
 }

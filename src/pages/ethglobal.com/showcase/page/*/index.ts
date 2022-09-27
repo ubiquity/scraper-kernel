@@ -1,8 +1,9 @@
 import puppeteer from "puppeteer";
 import fs from "fs";
-import { getActiveTab, getProperty } from "../../../utils";
+import { colorizeText, getActiveTab, getProperty } from "../../../../../utils";
 export default async (browser: puppeteer.Browser) => {
-  console.log(`logic executing for ${__filename}`);
+  console.log(colorizeText(`DEEP`, "fgMagenta"));
+
   const page = await getActiveTab(browser);
   const githubSelector = `a[href*=git]`; // I noticed gitlab and etherscan links for source code
   // const anchor = await page.waitForSelector(githubSelector, { timeout: 5000 }).catch((error) => console.error(`Couldn't find Git link`, error));

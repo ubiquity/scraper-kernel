@@ -1,48 +1,14 @@
 import path from "path";
-import { colorizeText } from "../../utils";
 import { PageLogic } from "../event-handlers";
 import { searchForImport } from "./search-for-import";
+import { colorizeText } from "../../utils";
 
-export function initalizeStrategies() {
-  console.warn(colorizeText(`\t⚠ resetting strategies`, "fgYellow"));
-  // this is a hook to store the same strategies in memory until a successful import occurs.
-  return [
-    function direct(destination: string) {
-      // ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/showcase/page/2
-      // const pathTo = path.join(process.cwd(), "dist", "pages", destination); // filename matches exactly
-
-      return destination;
-    },
-    function wildcard(destination: string) {
-      // ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/showcase/page/*
-      const pathTo = path.join(destination, "..", "*");
-
-      return pathTo;
-    },
-    // function index(destination: string) {
-    //   // ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/showcase/page
-    //   const pathTo = path.dirname(destination);
-
-    //   return pathTo;
-    // },
-    function up(destination: string) {
-      // ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/showcase/
-      const pathTo = path.join(destination, "..");
-
-      return pathTo;
-    },
-  ];
-}
-
-export async function loadPageLogic(url: string): Promise<Promise<PageLogic>> {
+export async function loadPageLogic(url: string): Promise<PageLogic> {
   let importing = url.split("://").pop();
   if (!importing) {
     throw new Error("Page URL parse error");
   }
   importing = path.resolve(process.cwd(), "dist", "pages", importing); // initialize
-  return await searchForImport({
-    importing,
-    strategies: initalizeStrategies(), // initialize
-    index: 0,
-  });
+  console.log(colorizeText(`loading page logic for ${importing}`, "fgRed"));
+  return await searchForImport(importing);
 }

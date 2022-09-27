@@ -13,15 +13,18 @@ export const browserOnTargetChangedHandler = (_browser: Browser) => async (targe
 
   const scrapeCompletedCallback = new Promise((resolve, reject) => {
     events.emit("logicloaded", async (browser: Browser) => {
-      const pageLogic = await loadPageLogic(url).catch((error) => {
-        events.emit("logicfailed", error);
-        return async (error) => {
-          reject(error);
-          throw error;
-        };
-      });
-      const logic = pageLogic(browser);
-      return resolve(logic);
+      const logic = await loadPageLogic(url)
+        // ERROR HANDLE
+        .catch((error) => {
+          events.emit("logicfailed", error);
+          return async (error) => {
+            reject(error);
+            throw error;
+          };
+        });
+      // ERROR HANDLE
+      const results = logic(browser);
+      return resolve(results);
     });
   });
 
