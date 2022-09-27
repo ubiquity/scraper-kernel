@@ -44,4 +44,6 @@ systemctl/ \*_/_.DS_Store
 typings
 *.log
 tsconfig.tsbuildinfo
-src/pages/web.telegram.org/z/index.png
+*.png
+*.csv
+*.json

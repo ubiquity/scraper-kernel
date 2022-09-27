@@ -1,6 +1,6 @@
 import fetchSpysOne from "./fetch-spys-one";
 
-export async function spysOneIps() {
+export async function getSpysOneIps() {
   const response = await fetchSpysOne();
   const ips = getIpAddressesWithPortNumber(response);
   return ips;

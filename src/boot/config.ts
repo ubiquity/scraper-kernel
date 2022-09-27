@@ -2,11 +2,11 @@ import dotenv from "dotenv";
 import { BrowserConnectOptions } from "puppeteer";
 dotenv.config();
 const DEBUG_HEADFUL = process.env.DEBUG_HEADFUL as "true" | "false" | undefined;
-let headful;
+let headful: boolean;
 if (!DEBUG_HEADFUL) {
   headful = false;
 } else {
-  headful = JSON.parse(DEBUG_HEADFUL);
+  headful = JSON.parse(DEBUG_HEADFUL) as true | false;
 }
 export default {
   devtools: false,
