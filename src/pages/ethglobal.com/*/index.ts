@@ -1,7 +1,8 @@
 import puppeteer from "puppeteer";
 import fs from "fs";
-import { getActiveTab, getProperty } from "../../../../utils";
+import { getActiveTab, getProperty } from "../../../utils";
 export default async (browser: puppeteer.Browser) => {
+  console.trace();
   const page = await getActiveTab(browser);
   const githubSelector = `a[href*=git]`; // I noticed gitlab and etherscan links for source code
   // const anchor = await page.waitForSelector(githubSelector, { timeout: 5000 }).catch((error) => console.error(`Couldn't find Git link`, error));
@@ -19,5 +20,7 @@ export default async (browser: puppeteer.Browser) => {
       fs.appendFile("buffer.csv", row.concat("\n"), (error) => error && console.error(error));
       return githubUrl;
     }
+  } else {
+    return null;
   }
 };

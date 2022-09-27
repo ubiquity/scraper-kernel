@@ -1,19 +1,11 @@
 import path from "path";
 import { warn } from "../../utils";
 import { PageLogic } from "../event-handlers";
-import { DestinationStrategy, searchForImport } from "./search-for-import";
-
-// recurse import strategies, in order.
-let _strategies = [] as DestinationStrategy[];
-resetStrategies();
-
-// ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/showcase/* <====== missing
-// ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/*
-// ⚠ importing * <======= remove
+import { searchForImport } from "./search-for-import";
 
 export function resetStrategies() {
   // this is a hook to store the same strategies in memory until a successful import occurs.
-  _strategies = [
+  return [
     function direct(destination: string) {
       // ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/showcase/page/2
       // const pathTo = path.join(process.cwd(), "dist", "pages", destination); // filename matches exactly
@@ -46,11 +38,9 @@ export async function loadPageLogic(url: string): Promise<Promise<PageLogic>> {
   if (!importing) {
     throw new Error("Page URL parse error");
   }
-  // console.log({ importing });
   importing = path.resolve(process.cwd(), "dist", "pages", importing); // initialize
-  // console.log({ importing });
   return await searchForImport({
     importing,
-    strategies: _strategies,
+    strategies: resetStrategies(), // initialize
   });
 }
