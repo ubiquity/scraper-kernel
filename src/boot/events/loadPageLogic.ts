@@ -10,25 +10,25 @@ export function initalizeStrategies() {
     function direct(destination: string) {
       // ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/showcase/page/2
       // const pathTo = path.join(process.cwd(), "dist", "pages", destination); // filename matches exactly
-      console.log(colorizeText(`\t⚠ importing ${destination}`, "fgGreen"));
+
       return destination;
     },
     function wildcard(destination: string) {
       // ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/showcase/page/*
       const pathTo = path.join(destination, "..", "*");
-      console.log(colorizeText(`\t⚠ importing ${pathTo}`, "fgGreen"));
+
       return pathTo;
     },
-    function index(destination: string) {
-      // ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/showcase/page
-      const pathTo = path.dirname(destination);
-      console.log(colorizeText(`\t⚠ importing ${pathTo}`, "fgGreen"));
-      return pathTo;
-    },
+    // function index(destination: string) {
+    //   // ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/showcase/page
+    //   const pathTo = path.dirname(destination);
+
+    //   return pathTo;
+    // },
     function up(destination: string) {
       // ⚠ importing /Users/nv/repos/ubiquity/scraper/dist/pages/ethglobal.com/showcase/
       const pathTo = path.join(destination, "..");
-      console.log(colorizeText(`\t⚠ importing ${pathTo}`, "fgGreen"));
+
       return pathTo;
     },
   ];

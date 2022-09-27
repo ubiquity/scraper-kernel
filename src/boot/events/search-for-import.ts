@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import { PageLogic } from "../event-handlers";
-import { initalizeStrategies } from "./loadPageLogic";
 import { Browser } from "puppeteer";
 import { colorizeText } from "../../utils";
 
@@ -16,7 +15,7 @@ interface Params {
 const cwd = process.cwd();
 
 export async function searchForImport({ importing, strategies, index }: Params): Promise<Promise<PageLogic>> {
-  console.log(colorizeText(`\t⚠ strategy index: ${index}`, "fgWhite"));
+  // console.log(colorizeText(`\t⚠ strategy index: ${index}`, "fgWhite"));
 
   if (!importing.includes(cwd)) {
     console.error(colorizeText(`\t⚠ THE REQUESTED IMPORT PATH IS OUTSIDE OF THE PROJECT DIRECTORY, WHICH IS INVALID`, "fgRed"));
@@ -26,22 +25,41 @@ export async function searchForImport({ importing, strategies, index }: Params):
     };
   }
 
-  let logic: PageLogic | undefined;
+  // let logic: PageLogic | undefined;
 
   // IMPORT DEFAULT IF REQUESTED MODULE HAS BEEN FOUND
-  if (fs.existsSync(importing)) {
-    console.log(colorizeText(`\t⚠ file found looking for [default] in ${importing}`, "fgWhite"));
-    const module = await import(importing);
+  console.log(importing);
+
+  const importingIndex = path.join(importing, "index");
+  const importingWildcard = path.join(importing, "*");
+  let module;
+  let logic;
+  if (fs.existsSync(importingIndex)) {
+    console.log(colorizeText(`\t⚠ file found looking for [default] in ${importingIndex}`, "fgWhite"));
+    module = await import(importingIndex); // where the problem is
     logic = module.default;
-    if (logic) {
-      // MODULE HAS BEEN LOADED SUCCESSFULLY, RESET STRATEGIES AND RETURN IT
-      console.log(colorizeText(`\t⚠ module loaded successfully`, "fgGreen"));
-      // strategies = resetStrategies();
-      index = 0;
-      console.log(logic);
-      return logic;
-    }
   }
+  if (fs.existsSync(importingWildcard)) {
+    console.log(colorizeText(`\t⚠ file found looking for [default] in ${importingWildcard}`, "fgWhite"));
+    module = await import(importingWildcard); // where the problem is
+    logic = module.default;
+  }
+
+  // if (fs.existsSync(importingIndex) || fs.existsSync(importingWildcard)) {
+  // @FIXME: needs to do fs.fileExistsSync because I have an edge case where I have an empty directory
+  // importing can be a path to an empty directory and still pass
+  // console.log(colorizeText(`\t⚠ file found looking for [default] in ${importing}`, "fgWhite"));
+  // const module = await import(importing); // where the problem is
+  // logic = module.default;
+  if (logic) {
+    // MODULE HAS BEEN LOADED SUCCESSFULLY, RESET STRATEGIES AND RETURN IT
+    console.log(colorizeText(`\t⚠ module loaded successfully`, "fgGreen"));
+    // strategies = resetStrategies();
+    index = 0;
+    console.log(logic);
+    return logic;
+  }
+  // }
 
   // LOGIC HAS NOT BEEN LOADED, TRY THE NEXT STRATEGY AND TRY AGAIN
 
@@ -49,7 +67,6 @@ export async function searchForImport({ importing, strategies, index }: Params):
 
   // WE FOUND A NEW STRATEGY
   if (strategy) {
-    // console.log(colorizeText(`\t⚠ strategy found`, "fgGreen"));
     importing = strategy(importing);
     return await searchForImport({
       importing,
