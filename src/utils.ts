@@ -59,6 +59,6 @@ export function colorizeText(text: string, color: keyof typeof colors): string {
   return colors[color].concat(text).concat(colors.reset);
 }
 
-export function warn(message: string) {
-  console.warn(colorizeText(`\t⚠ ${message}`, "fgYellow"));
-}
+// export function warn(message: string) {
+//   console.warn(colorizeText(`\t⚠ ${message}`, "fgYellow"));
+// }

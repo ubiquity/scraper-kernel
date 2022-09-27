@@ -1,28 +1,29 @@
 import { Browser, Target } from "puppeteer";
 import { events } from "../../scrape";
-import { failSafe } from "./failSafe";
 import { loadPageLogic } from "./loadPageLogic";
 
 export const browserOnTargetChangedHandler = (_browser: Browser) => async (target: Target) => {
   const url = target.url();
   const page = await target.page();
   if (!page) {
-    // console.warn(`No page found for ${url} (perhaps this is an iframe?)`);
     return;
   }
 
-  await failSafe(async () => {
-    await page.waitForNavigation({ waitUntil: "networkidle2" });
+  await page.waitForNavigation({ waitUntil: "networkidle2" });
 
-    const scrapeCompletedCallback = new Promise((resolve) => {
-      events.emit("logicloaded", async (browser: Browser) => {
-        await failSafe(async () => {
-          const pageLogic = await loadPageLogic(url);
-          return resolve(pageLogic(browser));
-        });
+  const scrapeCompletedCallback = new Promise((resolve, reject) => {
+    events.emit("logicloaded", async (browser: Browser) => {
+      const pageLogic = await loadPageLogic(url).catch((error) => {
+        events.emit("logicfailed", error);
+        return async (error) => {
+          reject(error);
+          throw error;
+        };
       });
+      const logic = pageLogic(browser);
+      return resolve(logic);
     });
-
-    events.emit("scrapecomplete", scrapeCompletedCallback);
   });
+
+  events.emit("scrapecomplete", scrapeCompletedCallback);
 };
