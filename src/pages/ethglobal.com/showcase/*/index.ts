@@ -1,8 +1,9 @@
-import puppeteer, { Page } from "puppeteer";
 import fs from "fs";
-import { getActiveTab, getProperty, colorizeText } from "../../../../utils";
+import puppeteer, { Page } from "puppeteer";
+import { getActiveTab, getProperty } from "../../../../utils";
+// ethglobal.com/showcase default logic
 export default async (browser: puppeteer.Browser) => {
-  console.log(colorizeText(`>> [ ${__filename} ]`, "fgYellow"));
+  // console.log(colorizeText(`>> [ ${__filename} ]`, "fgYellow"));
   const page = await getActiveTab(browser);
   return await scrapeGit(page);
 };
