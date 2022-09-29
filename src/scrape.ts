@@ -67,8 +67,8 @@ async function attachEventsOnFirstRun(browser: Browser | undefined) {
   return browser;
 }
 
-export const events = new EventEmitter();
+export const eventEmitter = new EventEmitter();
 type ResolveFunction = (results: string) => void;
 function addCallbackEvent(resolve: ResolveFunction): void {
-  events.on("scrapecomplete", eventHandlers.scrapeComplete(resolve));
+  eventEmitter.once("scrapecomplete", eventHandlers.scrapeComplete(resolve));
 }

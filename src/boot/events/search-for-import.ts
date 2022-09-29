@@ -8,7 +8,7 @@ export type DestinationStrategy = (destination: string) => string;
 const cwd = process.cwd();
 
 export async function searchForImport(importing: string): Promise<PageLogic> {
-  console.log(colorizeText(`recursion!`, "fgWhite"));
+  // console.log(colorizeText(`recursion!`, "fgWhite"));
   if (!importing.includes(cwd)) {
     console.error(colorizeText(`\t⚠ out of bounds`, "fgRed"));
     // THE REQUESTED IMPORT PATH IS OUTSIDE OF THE PROJECT DIRECTORY, WHICH IS INVALID
@@ -29,13 +29,13 @@ export async function searchForImport(importing: string): Promise<PageLogic> {
 async function checkModifier(importing: string, modifier: string) {
   let logic;
   const importingDestination = path.join(importing, modifier);
-  console.log(colorizeText(`\t⚠ importing ${importingDestination}`, "fgWhite"));
+  // console.log(colorizeText(`\t⚠ importing ${importingDestination}`, "fgWhite"));
   // console.trace(importingDestination);
   if (fs.existsSync(importingDestination)) {
     // console.log(colorizeText(`\t⚠ file found looking for [default] in ${importingDestination}`, "fgWhite"));
     logic = (await import(importingDestination))?.default;
     if (logic) {
-      console.log(colorizeText(`\t⚠ module loaded successfully ${importingDestination}`, "fgGreen"));
+      // console.log(colorizeText(`\t⚠ module loaded successfully ${importingDestination}`, "fgGreen"));
       return logic as PageLogic;
     }
   } else {

@@ -1,11 +1,11 @@
 import { Browser } from "puppeteer";
-import { events } from "../../scrape";
+import { eventEmitter } from "../../scrape";
 import { eventHandlers } from "../event-handlers";
 
 export function attachEvents(browser: Browser) {
   browser.on("targetchanged", eventHandlers.browserOnTargetChanged(browser));
-  events.on("proxytimeout", eventHandlers.proxyTimeout(browser));
-  events.on("logicloaded", eventHandlers.logicLoaded(browser));
-  events.on("logicfailed", eventHandlers.logicFailed(browser));
+  eventEmitter.on("proxytimeout", eventHandlers.proxyTimeout(browser));
+  eventEmitter.on("logicloaded", eventHandlers.logicLoaded(browser));
+  eventEmitter.on("logicfailed", eventHandlers.logicFailed(browser));
   return browser;
 }

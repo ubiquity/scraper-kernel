@@ -1,6 +1,6 @@
 import path from "path";
 import { Browser, Target } from "puppeteer";
-import { events } from "../../scrape";
+import { eventEmitter } from "../../scrape";
 import { searchForImport } from "./search-for-import";
 
 export const browserOnTargetChangedHandler = (_browser: Browser) => async (target: Target) => {
@@ -12,10 +12,10 @@ export const browserOnTargetChangedHandler = (_browser: Browser) => async (targe
   await page.waitForNavigation({ waitUntil: "networkidle2" });
 
   const scrapeCompletedCallback = new Promise((resolve, reject) => {
-    events.emit("logicloaded", logicLoadedCallback(target, reject, resolve));
+    eventEmitter.emit("logicloaded", logicLoadedCallback(target, reject, resolve));
   });
 
-  events.emit("scrapecomplete", scrapeCompletedCallback);
+  eventEmitter.emit("scrapecomplete", scrapeCompletedCallback);
 };
 
 function logicLoadedCallback(target: Target, reject, resolve) {
@@ -30,7 +30,7 @@ function logicLoadedCallback(target: Target, reject, resolve) {
     const logic = await searchForImport(importing as string)
       // ERROR HANDLE
       .catch((error) => {
-        events.emit("logicfailed", error);
+        eventEmitter.emit("logicfailed", error);
         return async (error) => {
           reject(error);
           throw error;
