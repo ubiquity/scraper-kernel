@@ -1,8 +1,8 @@
 import puppeteer from "puppeteer";
 import scrape from "../../../../../scrape";
 import { getActiveTab } from "../../../../../utils";
+// gallery view default logic
 import { scrapeHrefsFromAnchors } from "../../../../showcase.ethglobal.com";
-// ethglobal.com/showcase/page/ default logic
 // there's 84 pages as of 29 sep 2022
 export default async (browser: puppeteer.Browser) => {
   // console.log(colorizeText(`>> [ ${__filename} ]`, "fgYellow"));

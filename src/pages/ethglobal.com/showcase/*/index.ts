@@ -1,11 +1,15 @@
 import fs from "fs";
 import puppeteer, { Page } from "puppeteer";
+import scrape from "../../../../scrape";
 import { getActiveTab, getProperty } from "../../../../utils";
-// ethglobal.com/showcase default logic
+// project view default logic
 export default async (browser: puppeteer.Browser) => {
   // console.log(colorizeText(`>> [ ${__filename} ]`, "fgYellow"));
   const page = await getActiveTab(browser);
-  return await scrapeGit(page);
+  const githubUrl = await scrapeGit(page);
+  if (githubUrl) {
+    return await scrape(githubUrl, browser);
+  }
 };
 
 async function scrapeGit(page: Page) {
