@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
-import ScrapedProject from "../../@types/scraped-project";
 import Proxies from "../../../../proxies";
+import ScrapedProject from "../../@types/scraped-project";
 import { getCurrenciesPageURLs } from "./get-currencies-page-urls";
 import { makeJobPerURL } from "./make-job-per-url";
 import { scrollToBottomOfFirstTab } from "./scroll-to-bottom-of-first-tab";

@@ -1,6 +1,6 @@
+import fs from "fs";
 import puppeteer from "puppeteer";
 import { getActiveTab, getProperty } from "../../../utils";
-import fs from "fs";
 export default async (browser: puppeteer.Browser) => {
   const page = await getActiveTab(browser);
   const githubSelector = `a[href*=git]`; // I noticed gitlab and etherscan links for source code

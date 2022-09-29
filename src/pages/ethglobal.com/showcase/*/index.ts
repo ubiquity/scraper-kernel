@@ -1,7 +1,7 @@
 import fs from "fs";
 import puppeteer, { Page } from "puppeteer";
 import scrape from "../../../../scrape";
-import { getActiveTab, getProperty } from "../../../../utils";
+import { getProperty } from "../../../../utils";
 // project view default logic
 export default async (browser: puppeteer.Browser, page: puppeteer.Page) => {
   const githubUrl = await scrapeGit(page);

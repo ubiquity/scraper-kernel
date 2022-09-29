@@ -1,6 +1,5 @@
 import puppeteer from "puppeteer";
 import scrape from "../../../../../scrape";
-import { getActiveTab } from "../../../../../utils";
 // gallery view default logic
 import { scrapeHrefsFromAnchors } from "../../../../showcase.ethglobal.com";
 // there's 84 pages as of 29 sep 2022

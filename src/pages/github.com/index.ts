@@ -1,5 +1,4 @@
 import puppeteer from "puppeteer";
-import { colorizeText } from "../../utils";
 import scrapeTextNode from "./scrape-text-node";
 export default async function gitHubProfileView(browser: puppeteer.Browser, page: puppeteer.Page) {
   // console.log(colorizeText("> github profile view", "fgWhite"));

@@ -1,6 +1,6 @@
 import puppeteer, { ElementHandle } from "puppeteer";
-import PageProps from "../../@types/page-props";
 import { getProperty } from "../../../../utils";
+import PageProps from "../../@types/page-props";
 
 export async function projectScrape(page: puppeteer.Page, timeout: number) {
   const selector = `script#__NEXT_DATA__[type="application/json"]`;
