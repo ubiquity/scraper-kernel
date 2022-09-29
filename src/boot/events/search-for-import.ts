@@ -15,7 +15,7 @@ export async function searchForImport(importing: string): Promise<PageLogic> {
     throw new Error("the requested page logic import path is outside of the project directory, which is invalid");
   }
 
-  const logic = (await checkModifier(importing, "index")) || (await checkModifier(importing, "*"));
+  const logic = (await checkModifier(importing, "index.js")) || (await checkModifier(importing, "*"));
 
   if (logic) {
     return logic;
@@ -29,16 +29,17 @@ export async function searchForImport(importing: string): Promise<PageLogic> {
 async function checkModifier(importing: string, modifier: string) {
   let logic;
   const importingDestination = path.join(importing, modifier);
-  // console.log(colorizeText(`\t⚠ importing ${importingDestination}`, "fgWhite"));
+  // console.log(colorizeText(`\t⚠ trying ${importingDestination}`, "fgWhite"));
   // console.trace(importingDestination);
   if (fs.existsSync(importingDestination)) {
-    // console.log(colorizeText(`\t⚠ file found looking for [default] in ${importingDestination}`, "fgWhite"));
+    console.log(colorizeText(`\t⚠ [${importingDestination}] found looking for [default]`, "fgWhite"));
     logic = (await import(importingDestination))?.default;
     if (logic) {
-      // console.log(colorizeText(`\t⚠ module loaded successfully ${importingDestination}`, "fgGreen"));
+      console.log(colorizeText(`\t⚠ [${importingDestination}] module loaded successfully`, "fgGreen"));
       return logic as PageLogic;
     }
   } else {
+    console.log(colorizeText(`\t⚠ [${importingDestination}] not found `, "fgRed"));
     return null;
   }
 }
