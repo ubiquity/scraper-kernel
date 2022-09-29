@@ -3,13 +3,7 @@ import puppeteer, { Page } from "puppeteer";
 import scrape from "../../../../scrape";
 import { getActiveTab, getProperty } from "../../../../utils";
 // project view default logic
-export default async (browser: puppeteer.Browser, target: puppeteer.Target) => {
-  // console.log(colorizeText(`>> [ ${__filename} ]`, "fgYellow"));
-  // const page = await getActiveTab(browser, target);
-  const page = await target.page();
-  if (!page) {
-    throw new Error("no page found");
-  }
+export default async (browser: puppeteer.Browser, page: puppeteer.Page) => {
   const githubUrl = await scrapeGit(page);
   if (githubUrl) {
     return await scrape(githubUrl, browser);

@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
-import { PageLogic } from "../event-handlers";
 import { colorizeText } from "../../utils";
+import { PageLogic } from "../event-handlers";
 
 export type DestinationStrategy = (destination: string) => string;
 

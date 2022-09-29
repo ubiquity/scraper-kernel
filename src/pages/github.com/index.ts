@@ -1,9 +1,8 @@
 import puppeteer from "puppeteer";
-import { getActiveTab } from "../../utils";
+import { colorizeText } from "../../utils";
 import scrapeTextNode from "./scrape-text-node";
-export default async (browser: puppeteer.Browser) => {
-  const page = await getActiveTab(browser);
-
+export default async function gitHubProfileView(browser: puppeteer.Browser, page: puppeteer.Page) {
+  console.log(colorizeText("> github profile view", "fgWhite"));
   return {
     username: await getUserName(page),
     name: await getUserFullName(page),
@@ -11,7 +10,7 @@ export default async (browser: puppeteer.Browser) => {
     twitter: await getTwitter(page),
     bio: await getBio(page),
   };
-};
+}
 
 async function getContributions(page) {
   let contributions = await scrapeTextNode(page, `div.js-yearly-contributions h2`);

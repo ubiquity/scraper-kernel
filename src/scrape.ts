@@ -8,6 +8,7 @@ import { attachEvents } from "./boot/events/attachEvents";
 import newTabToURL from "./boot/new-tab-to-url";
 
 import pMap from "p-map";
+export const eventEmitter = new EventEmitter();
 
 export default async function scrape(urls: string[] | string, browser?: Browser, concurrency?: number) {
   browser = await attachEventsOnFirstRun(browser);
@@ -37,28 +38,30 @@ export async function _scrapeConcurrently(urls: string[], browser: Browser, conc
   const input: AsyncIterable<unknown> | Iterable<unknown> = urls;
   const mapper = async (site) => await _scrapeSingle(site, browser);
   const options = { concurrency };
-  return await pMap(input, mapper, options);
+  return await pMap(input, mapper, options).catch((error) => error && console.trace(error));
 }
 
 export async function _scrapeSingle(url: string, browser: Browser) {
-  const scrapeCompleted = new Promise(addCallbackEvent);
+  type ResolveFunction = (results: string) => void;
+  const scrapeJob = new Promise(function addCallbackEvent(resolve: ResolveFunction, reject): void {
+    eventEmitter.once("scrapecomplete", eventHandlers.scrapeComplete(resolve, reject));
+  });
   console.log(`>>`, url); // useful to follow headless page navigation
   const tab = await newTabToURL(browser, url);
-  const result = await scrapeCompleted;
-  await tab.close(); // save memory
-  return result;
+  // console.trace("closing tab");
+  try {
+    const results = await scrapeJob;
+    await tab.close(); // save memory
+    return results;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
-async function attachEventsOnFirstRun(browser: Browser | undefined) {
+async function attachEventsOnFirstRun(browser?: Browser) {
   if (!browser) {
     browser = await browserSetup(config);
     attachEvents(browser);
   }
   return browser;
-}
-
-export const eventEmitter = new EventEmitter();
-type ResolveFunction = (results: string) => void;
-function addCallbackEvent(resolve: ResolveFunction): void {
-  eventEmitter.once("scrapecomplete", eventHandlers.scrapeComplete(resolve));
 }

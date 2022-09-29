@@ -1,6 +1,7 @@
 import path from "path";
-import { Browser, Target } from "puppeteer";
+import { Browser, Page, Target } from "puppeteer";
 import { eventEmitter } from "../../scrape";
+import { colorizeText } from "../../utils";
 import { searchForImport } from "./search-for-import";
 
 export const browserOnTargetChangedHandler = (_browser: Browser) => async (target: Target) => {
@@ -15,15 +16,15 @@ export const browserOnTargetChangedHandler = (_browser: Browser) => async (targe
   }
 
   const scrapeCompletedCallback = new Promise((resolve, reject) => {
-    eventEmitter.emit("logicloaded", logicLoadedCallback(target, reject, resolve));
-  });
+    eventEmitter.emit("logicloaded", logicLoadedCallback(page, resolve, reject));
+  }).catch((error: Error) => error && console.error(error));
 
   eventEmitter.emit("scrapecomplete", scrapeCompletedCallback);
 };
 
-function logicLoadedCallback(target: Target, reject, resolve) {
-  return async (browser: Browser) => {
-    const url = target.url();
+function logicLoadedCallback(page: Page, resolve, reject) {
+  return async function testingFunctionName(browser: Browser) {
+    const url = page.url();
     let importing = url.split("://").pop();
     if (!importing) {
       throw new Error("Page URL parse error");
@@ -32,15 +33,15 @@ function logicLoadedCallback(target: Target, reject, resolve) {
 
     const logic = await searchForImport(importing as string)
       // ERROR HANDLE
-      .catch((error) => {
+      .catch(function testingFunctionError2(error) {
         eventEmitter.emit("logicfailed", error);
-        return async (error) => {
+        return async function testingFunctionError3(error) {
           reject(error);
           throw error;
         };
       });
     // ERROR HANDLE
-    const results = logic(browser, target);
+    const results = logic(browser, page);
     return resolve(results);
   };
 }
