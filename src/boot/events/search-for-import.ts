@@ -32,14 +32,14 @@ async function checkModifier(importing: string, modifier: string) {
   // console.log(colorizeText(`\t⚠ trying ${importingDestination}`, "fgWhite"));
   // console.trace(importingDestination);
   if (fs.existsSync(importingDestination)) {
-    console.log(colorizeText(`\t⚠ [${importingDestination}] found looking for [default]`, "fgWhite"));
+    // console.log(colorizeText(`\t⚠ [${importingDestination}] found looking for [default]`, "fgWhite"));
     logic = (await import(importingDestination))?.default;
     if (logic) {
       console.log(colorizeText(`\t⚠ [${importingDestination}] module loaded successfully`, "fgGreen"));
       return logic as PageLogic;
     }
   } else {
-    console.log(colorizeText(`\t⚠ [${importingDestination}] not found `, "fgRed"));
+    console.log(colorizeText(`\t⚠ [${importingDestination}] not found `, "fgWhite"));
     return null;
   }
 }
