@@ -7,6 +7,9 @@ export type DestinationStrategy = (destination: string) => string;
 
 const cwd = process.cwd();
 
+// @TODO: loading logic should recurse up directory parents and replace them with asterisks
+// e.g. github.com/*/* should be considered for repos
+
 export async function searchForImport(importing: string): Promise<PageLogic> {
   // console.log(colorizeText(`recursion!`, "fgWhite"));
   if (!importing.includes(cwd)) {
@@ -15,7 +18,7 @@ export async function searchForImport(importing: string): Promise<PageLogic> {
     throw new Error("the requested page logic import path is outside of the project directory, which is invalid");
   }
 
-  const logic = (await checkModifier(importing, "index.js")) || (await checkModifier(importing, "*"));
+  const logic = (await checkModifier(importing, "index.js")) || (await checkModifier(importing, "../*"));
 
   if (logic) {
     return logic;
@@ -28,7 +31,7 @@ export async function searchForImport(importing: string): Promise<PageLogic> {
 
 async function checkModifier(importing: string, modifier: string) {
   let logic;
-  const importingDestination = path.join(importing, modifier);
+  const importingDestination = path.resolve(importing, modifier);
   // console.log(colorizeText(`\t⚠ trying ${importingDestination}`, "fgWhite"));
   // console.trace(importingDestination);
   if (fs.existsSync(importingDestination)) {
