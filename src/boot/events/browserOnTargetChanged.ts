@@ -20,7 +20,6 @@ export const browserOnTargetChangedHandler = (_browser: Browser) => async (targe
 
 function logicLoadedCallback(target: Target, reject, resolve) {
   return async (browser: Browser) => {
-    console.trace("logicLoadedCallback");
     const url = target.url();
     let importing = url.split("://").pop();
     if (!importing) {

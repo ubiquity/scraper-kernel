@@ -11,12 +11,12 @@ export const eventHandlers = {
     };
   },
   logicLoaded: function logicLoadedHandler(browser: Browser): (...args: any[]) => void {
-    return async (logic: PageLogic) => {
+    return async function _logicLoadedHandler(logic: PageLogic) {
       return await logic(browser);
     };
   },
   logicFailed: function logicFailedHandler(browser: Browser): (...args: any[]) => void {
-    return (error: Error) => {
+    return function _logicFailedHandler(error: Error) {
       throw error;
     };
   },
