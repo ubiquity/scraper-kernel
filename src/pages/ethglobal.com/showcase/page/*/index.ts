@@ -10,7 +10,7 @@ export default async (browser: puppeteer.Browser) => {
   const showcaseUrls = await scrapeHrefsFromAnchors(page, `a[href^="/showcase/"]`);
   const projectUrls = showcaseUrls.filter((element: string) => !element.includes("/page/")); // filter page links out
   projectUrls.push(showcaseUrls.pop() as string);
-  const results = await scrape(projectUrls, browser);
+  const results = await scrape(projectUrls, browser, 2);
 
   return results;
 };

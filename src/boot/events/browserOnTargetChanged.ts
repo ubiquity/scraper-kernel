@@ -8,8 +8,11 @@ export const browserOnTargetChangedHandler = (_browser: Browser) => async (targe
   if (!page) {
     return;
   }
-
-  await page.waitForNavigation({ waitUntil: "networkidle2" });
+  try {
+    await page.waitForNavigation({ waitUntil: "networkidle2" });
+  } catch (error) {
+    eventEmitter.emit("logicfailed", error);
+  }
 
   const scrapeCompletedCallback = new Promise((resolve, reject) => {
     eventEmitter.emit("logicloaded", logicLoadedCallback(target, reject, resolve));
@@ -37,7 +40,7 @@ function logicLoadedCallback(target: Target, reject, resolve) {
         };
       });
     // ERROR HANDLE
-    const results = logic(browser);
+    const results = logic(browser, target);
     return resolve(results);
   };
 }

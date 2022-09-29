@@ -2355,7 +2355,7 @@ optionator@^0.9.1:
     type-check "^0.4.0"
     word-wrap "^1.2.3"
 
-p-all@*, p-all@^4.0.0:
+p-all@*:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/p-all/-/p-all-4.0.0.tgz#fd0d57391727646da85cfe9595b9215617982c19"
   integrity sha512-QXqMc8PpYu0gmNM6VcKP0uYqeI+dtvSNeaDb8ktnNjposr+nftHHCSYbj/S/oUceF6R868jw1XOxkJKUSiHgEQ==

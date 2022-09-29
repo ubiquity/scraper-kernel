@@ -7,6 +7,8 @@ import { eventHandlers } from "./boot/event-handlers";
 import { attachEvents } from "./boot/events/attachEvents";
 import newTabToURL from "./boot/new-tab-to-url";
 
+import pMap from "p-map";
+
 export default async function scrape(urls: string[] | string, browser?: Browser, concurrency?: number) {
   browser = await attachEventsOnFirstRun(browser);
 
@@ -31,23 +33,11 @@ export async function _scrapeSeries(urls: string[], browser: Browser) {
   return completedScrapes;
 }
 
-export async function _scrapeConcurrently(urls: string[], browser: Browser, concurrency?: number) {
-  const pendingScrapes = [] as Promise<unknown>[];
-  for (const url of urls) {
-    pendingScrapes.push(_scrapeSingle(url, browser));
-  }
-
-  // const actions = [
-  // 	() => got('https://sindresorhus.com'),
-  // 	() => got('https://avajs.dev'),
-  // 	() => checkSomething(),
-  // 	() => doSomethingElse()
-  // ];
-
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-expect-error
-
-  await (await import("p-all")).default(pendingScrapes, { concurrency: concurrency || 6 }); // http2 simultaneous connection limit?
+export async function _scrapeConcurrently(urls: string[], browser: Browser, concurrency: number) {
+  const input: AsyncIterable<unknown> | Iterable<unknown> = urls;
+  const mapper = async (site) => await _scrapeSingle(site, browser);
+  const options = { concurrency };
+  return await pMap(input, mapper, options);
 }
 
 export async function _scrapeSingle(url: string, browser: Browser) {

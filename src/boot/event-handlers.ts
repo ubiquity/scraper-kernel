@@ -1,9 +1,9 @@
-import { Browser } from "puppeteer";
+import { Browser, Target } from "puppeteer";
 import { browserOnTargetChangedHandler } from "./events/browserOnTargetChanged";
 import { eventEmitter } from "../scrape";
 import { colorizeText } from "../utils";
 
-export type PageLogic = (browser: Browser) => Promise<string[]>;
+export type PageLogic = (browser: Browser, target: Target) => Promise<string[]>;
 
 export const eventHandlers = {
   proxyTimeout: function proxyTimeoutHandler(_browser: Browser): (...args: any[]) => void {
@@ -11,9 +11,9 @@ export const eventHandlers = {
       callback();
     };
   },
-  logicLoaded: function logicLoadedHandler(browser: Browser): (...args: any[]) => void {
+  logicLoaded: function logicLoadedHandler(browser: Browser, target: Target): (...args: any[]) => void {
     return async function _logicLoadedHandler(logic: PageLogic) {
-      return await logic(browser);
+      return await logic(browser, target);
     };
   },
   logicFailed: function logicFailedHandler(browser: Browser): (...args: any[]) => void {
