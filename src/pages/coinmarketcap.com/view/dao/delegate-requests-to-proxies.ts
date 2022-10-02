@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
 import useProxy from "puppeteer-page-proxy";
-import { events } from "../../../../scrape";
+import { eventEmitter } from "../../../../scrape";
 import { JobParams, JobResult } from "./index";
 import { projectScrape } from "./project-scrape";
 
@@ -35,7 +35,7 @@ export async function delegateRequestsToProxies({ browser, url, proxies, timeout
 
   // start the page timeout timer
   // if the page doesn't load within the timeout, we'll try the next proxy
-  const timer = setTimeout(() => events.emit("proxytimeout", () => killJob({ timer, page })), timeout);
+  const timer = setTimeout(() => eventEmitter.emit("proxytimeout", () => killJob({ timer, page })), timeout);
 
   // enable the proxy
   if (usingProxy) {

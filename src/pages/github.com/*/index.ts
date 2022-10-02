@@ -1,13 +1,41 @@
 import puppeteer from "puppeteer";
-import { getActiveTab, getAttribute } from "../../../common";
-// this is likely to be dynamically loaded when looking at a specific repository, due to the nesting of the url
-// e.g. https://github.com/ubiquity/dollar
+import scrapeTextNode from "../scrape-text-node";
+export default async function gitHubProfileView(browser: puppeteer.Browser, page: puppeteer.Page) {
+  // console.log(colorizeText("> github profile view", "fgWhite"));
+  return {
+    username: await getUserName(page),
+    name: await getUserFullName(page),
+    contributions: await getContributions(page),
+    twitter: await getTwitter(page),
+    bio: await getBio(page),
+  };
+}
 
-const selectors = { contributors: `[data-hovercard-type="user"]:not([data-test-selector])` };
+async function getContributions(page) {
+  let contributions = await scrapeTextNode(page, `div.js-yearly-contributions h2`);
+  const matched = contributions?.match(/[0-9]*/gim);
+  if (matched) {
+    contributions = matched.join(``);
+  }
+  return contributions;
+}
 
-export default async (browser: puppeteer.Browser) => {
-  const page = await getActiveTab(browser);
-  const contributors = await page.$$(selectors.contributors);
-  const hrefs = await getAttribute(contributors, "href");
-  return hrefs;
-};
+async function getUserFullName(page) {
+  const fullname = await scrapeTextNode(page, `.vcard-fullname`);
+  return fullname?.trim();
+}
+
+async function getUserName(page) {
+  const username = await scrapeTextNode(page, `.vcard-username`);
+  return username?.trim();
+}
+
+async function getBio(page) {
+  const value = await scrapeTextNode(page, `[data-bio-text]`);
+  return value;
+}
+
+async function getTwitter(page) {
+  const value = await scrapeTextNode(page, `[href*=twitter]`);
+  return value?.replace("@", "");
+}

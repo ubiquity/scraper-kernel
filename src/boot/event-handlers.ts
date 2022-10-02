@@ -1,8 +1,7 @@
-import { Browser } from "puppeteer";
+import { Browser, Page } from "puppeteer";
 import { browserOnTargetChangedHandler } from "./events/browserOnTargetChanged";
-import { events } from "../scrape";
 
-export type PageLogic = (browser: Browser) => Promise<string[]>;
+export type PageLogic = (browser: Browser, page: Page) => Promise<string[]>;
 
 export const eventHandlers = {
   proxyTimeout: function proxyTimeoutHandler(_browser: Browser): (...args: any[]) => void {
@@ -11,18 +10,17 @@ export const eventHandlers = {
     };
   },
   logicLoaded: function logicLoadedHandler(browser: Browser): (...args: any[]) => void {
-    return async (logic: PageLogic) => {
-      return await logic(browser);
+    return async function _logicLoadedHandler(logic: PageLogic, page: Page) {
+      return await logic(browser, page);
     };
   },
   logicFailed: function logicFailedHandler(browser: Browser): (...args: any[]) => void {
-    return (error: Error) => {
+    return function _logicFailedHandler(error: Error) {
       throw error;
     };
   },
 
-  scrapeComplete: function scrapeCompleteHandler(resolve) {
-    events.off("scrapecomplete", () => eventHandlers.scrapeComplete(resolve)); // remove event to stop memory leak
+  scrapeComplete: function scrapeCompleteHandler(resolve, reject) {
     return (results: string) => resolve(results);
   },
 
