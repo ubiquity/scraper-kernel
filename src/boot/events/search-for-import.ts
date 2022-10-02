@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { colorizeText } from "../../utils";
+import { log } from "../../utils";
 import { PageLogic } from "../event-handlers";
 
 export type DestinationStrategy = (destination: string) => string;
@@ -10,23 +10,54 @@ const cwd = process.cwd();
 // @TODO: loading logic should recurse up directory parents and replace them with asterisks
 // e.g. github.com/*/* should be considered for repos
 
-export async function searchForImport(importing: string): Promise<PageLogic> {
+let failsafe = 10;
+
+export async function searchForImport(importing: string, savedPosition?: string): Promise<PageLogic> {
+  if (!--failsafe) {
+    throw new Error("infinite loop?");
+  }
   // console.log(colorizeText(`recursion!`, "fgWhite"));
   if (!importing.includes(cwd)) {
-    console.error(colorizeText(`\t⚠ out of bounds`, "fgRed"));
-    // THE REQUESTED IMPORT PATH IS OUTSIDE OF THE PROJECT DIRECTORY, WHICH IS INVALID
-    throw new Error("the requested page logic import path is outside of the project directory, which is invalid");
+    log.error(`out of bounds`);
+    if (!savedPosition) {
+      // THE REQUESTED IMPORT PATH IS OUTSIDE OF THE PROJECT DIRECTORY, WHICH IS INVALID
+      throw new Error("the requested page logic import path is outside of the project directory, which is invalid");
+    } else {
+      importing = path.resolve(savedPosition, ".."); // go up one
+      log.warn(importing);
+    }
   }
 
-  const logic = (await checkModifier(importing, "index.js")) || (await checkModifier(importing, "../*"));
+  const logic = (await checkModifier(importing, "index.js")) || (await checkModifier(importing, "*"));
 
   if (logic) {
     return logic;
   } else {
-    // const directory = path.filename(importing); // normalize
-    importing = path.join(importing, ".."); // go up one
-    return await searchForImport(importing);
+    const startPosition = importing;
+    const wildCardPath = renameLastPartOfPathToWildCard(importing); // pathname ends with */*
+    return await searchForImport(wildCardPath, startPosition);
   }
+}
+
+function renameLastPartOfPathToWildCard(query: string) {
+  const pathParts = query.split(path.sep); // for windows "\" and unix "/" like separators
+  let x = pathParts.length;
+  while (x--) {
+    // fast reverse loop
+    const part = pathParts[x];
+    if (part !== "*") {
+      // rename latest path part
+      pathParts[x] = "*";
+      break;
+    }
+  }
+  let resolved = path.resolve(...pathParts);
+  resolved = resolved.replace(process.cwd(), "");
+
+  // console.warn(pathParts);
+  // log.warn(pathParts.join(path.sep));
+  // log.ok(resolved);
+  return resolved;
 }
 
 async function checkModifier(importing: string, modifier: string) {
@@ -38,11 +69,11 @@ async function checkModifier(importing: string, modifier: string) {
     // console.log(colorizeText(`\t⚠ [${importingDestination}] found looking for [default]`, "fgWhite"));
     logic = (await import(importingDestination))?.default;
     if (logic) {
-      console.log(colorizeText(`\t⚠ [${importingDestination}] module loaded successfully`, "fgGreen"));
+      log.ok(`[${importingDestination.slice(process.cwd().length)}] module loaded successfully`);
       return logic as PageLogic;
     }
   } else {
-    console.log(colorizeText(`\t⚠ [${importingDestination}] not found `, "fgWhite"));
+    log.info(`[${importingDestination.slice(process.cwd().length)}] not found`);
     return null;
   }
 }
