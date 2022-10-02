@@ -1,11 +1,12 @@
-import { searchForImport } from "./search-for-import";
+import { log } from "../../utils";
+import { renameLastPartOfPathToWildCard, searchForImport } from "./search-for-import";
 
 // test
 const paths = [
-  "/Users/nv/repos/ubiquity/scraper/dist/pages/test.com/pavlovcik/test-repo",
-  // "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/pavlovcik/",
-  // "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/ubiquity/",
-  // "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/ubiquity/ubiquity-dollar",
+  "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/ubiquity/",
+  "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/pavlovcik",
+  "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/ubiquity/ubiquity-dollar",
+  "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/ubiquity/ubiquity-dollar/",
 ];
 
 /**
@@ -49,12 +50,15 @@ describe the pattern:
 
  */
 
-async function test() {
+async function test(paths) {
   for (const path of paths) {
     console.log(`>> ${path}`);
     await searchForImport(path);
     console.log();
+    // log.warn(`${renameLastPartOfPathToWildCard(path)}`);
+
+    console.log();
   }
 }
 
-test();
+test(paths);

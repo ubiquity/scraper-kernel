@@ -18,6 +18,12 @@ export async function searchForImport(importing: string, startPosition?: string)
 }
 
 async function _searchForImport(importing: string, startPosition: string) {
+  if (importing.endsWith(path.sep)) {
+    // normalize requested path name to remove trailing slash
+    importing = importing.slice(0, -1);
+    // console.log({ importing });
+  }
+
   // if (!savedPosition) {
   //   // THE REQUESTED IMPORT PATH IS OUTSIDE OF THE PROJECT DIRECTORY, WHICH IS INVALID
   //   throw new Error("the requested page logic import path is outside of the project directory, which is invalid");
@@ -47,7 +53,7 @@ async function _searchForImport(importing: string, startPosition: string) {
   }
 }
 
-function renameLastPartOfPathToWildCard(query: string) {
+export function renameLastPartOfPathToWildCard(query: string) {
   const pathParts = query.split(path.sep); // for windows "\" and unix "/" like separators
   let x = pathParts.length;
   while (x--) {
