@@ -14,7 +14,7 @@ export default async function (browser: puppeteer.Browser, page: puppeteer.Page)
     // If contributions are found, its likely to be a personal profile page.
     return await scrapePersonalProfile(page, contributions);
   } else {
-    log.info(`<< [${page.url()}] this is an organization profile`);
+    log.info(`this is an organization profile`);
     // If no contributions are found, its likely to be an organization page.
     return await openReposOnOrganizationPage(page, browser);
   }

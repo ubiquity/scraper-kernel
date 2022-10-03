@@ -4,7 +4,7 @@ export default async function scrapeTextNode(page: puppeteer.Page, selector: str
   const htmlElement = await page.$(selector);
 
   if (!htmlElement) {
-    log.warn(`<< [${page.url()}] "${selector}" not found`);
+    log.warn(`"${selector}" not found`);
     return null;
   }
   const htmlElementTextNode = await htmlElement.getProperty("textContent");

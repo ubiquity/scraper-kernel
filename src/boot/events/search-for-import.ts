@@ -68,7 +68,7 @@ async function checkModifier(importing: string, modifier: string) {
       return logic as PageLogic;
     }
   } else {
-    // log.info(`[${importingDestination.slice(process.cwd().length)}] not found`);
+    log.info(`[${importingDestination.slice(process.cwd().length)}] not found`);
     return null;
   }
 }

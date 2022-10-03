@@ -1,4 +1,5 @@
 import { ElementHandle, Page, Browser } from "puppeteer";
+import { VERBOSE } from "./cli";
 
 export const getSourcedDate = () => new Date().toLocaleDateString();
 
@@ -60,17 +61,25 @@ export function colorizeText(text: string, color: keyof typeof colors): string {
 }
 
 export const log = {
-  error: function error(message: string) {
-    console.error(colorizeText(`\t⚠ ${message}`, "fgRed"));
+  error: function errorLog(message: string) {
+    if (VERBOSE && VERBOSE >= 1) {
+      console.error(colorizeText(`\t⚠ ${message}`, "fgRed"));
+    }
   },
-  warn: function warn(message: string) {
-    console.warn(colorizeText(`\t⚠ ${message}`, "fgYellow"));
+  ok: function okLog(message: string) {
+    if (VERBOSE && VERBOSE >= 2) {
+      console.log(colorizeText(`\t⚠ ${message}`, "fgGreen"));
+    }
   },
-  ok: function ok(message: string) {
-    console.log(colorizeText(`\t⚠ ${message}`, "fgGreen"));
+  warn: function warnLog(message: string) {
+    if (VERBOSE && VERBOSE >= 3) {
+      console.warn(colorizeText(`\t⚠ ${message}`, "fgYellow"));
+    }
   },
-  info: function info(message: string) {
-    console.info(colorizeText(`\t⚠ ${message}`, "fgWhite"));
+  info: function infoLog(message: string) {
+    if (VERBOSE && VERBOSE >= 4) {
+      console.info(colorizeText(`\t⚠ ${message}`, "fgWhite"));
+    }
   },
 };
 

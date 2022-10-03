@@ -5,15 +5,17 @@ import scrape from "./scrape";
 const options = commandLineArgs([
   { name: "urls", type: String, multiple: true, defaultOption: true, alias: "u" },
   { name: "concurrency", type: Number, alias: "c" },
+  { name: "verbose", type: Number, alias: "v" },
 ]);
+export const VERBOSE = options.verbose;
 // CLI ADAPTER
-scrape(options.urls, undefined, options.concurrency)
-  .then((data) => {
-    console.log(`<<`, data);
-    fs.writeFileSync("results.json", JSON.stringify(data)); // temporary
-    process.exit(0);
-  })
-  .catch((err) => {
-    console.error(err);
-    process.exit(1);
-  });
+scrape(options.urls, undefined, options.concurrency).then((data) => {
+  console.log(`<<`, data);
+  // fs.writeFileSync("results.json", JSON.stringify(data)); // temporary
+  process.exit(0);
+});
+// .catch((err) => {
+// console.error(err);
+// throw err;
+// process.exit(1);
+// });
