@@ -2,13 +2,15 @@ import puppeteer from "puppeteer";
 import scrapeTextNode from "../scrape-text-node";
 export default async function gitHubProfileView(browser: puppeteer.Browser, page: puppeteer.Page) {
   // console.log(colorizeText("> github profile view", "fgWhite"));
-  return {
+  const profile = {
     username: await getUserName(page),
     name: await getUserFullName(page),
     contributions: await getContributions(page),
     twitter: await getTwitter(page),
     bio: await getBio(page),
   };
+  console.log(profile);
+  return profile;
 }
 
 async function getContributions(page) {
