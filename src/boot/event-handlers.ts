@@ -1,4 +1,5 @@
 import { Browser, Page } from "puppeteer";
+import { JobResult } from "../scrape";
 import { browserOnTargetChangedHandler } from "./events/browserOnTargetChanged";
 
 export type PageLogic = (browser: Browser, page: Page) => Promise<string[]>;
@@ -21,7 +22,7 @@ export const eventHandlers = {
   },
 
   scrapeComplete: function scrapeCompleteHandler(resolve, reject) {
-    return (results: string) => resolve(results);
+    return (results: JobResult) => resolve(results);
   },
 
   /**

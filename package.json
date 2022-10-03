@@ -21,7 +21,9 @@
     "format": "run-s format:*",
     "format:prettier": "prettier --write .",
     "format:eslint": "eslint . --ext .ts,.tsx --cache --fix --plugin tsc --rule 'tsc/config: [2, {configFile: \"./tsconfig.json\"}]'",
-    "prepublish": "tsc"
+    "prepublish": "tsc",
+    "test:series": "node . --urls https://github.com/finnovateinc/iwns-demo https://github.com/mbcse/web3me-ethonline.git https://github.com/txme/doTransfer https://github.com/apoorvlathey/uni-feeswap https://github.com/pikachua7/DigiOffice-v2.0 https://github.com/Dasika-Vaishnavi/Oceano_Eth https://github.com/Ajand/Coursalize https://github.com/knrdrbn/m1n75n1p3r/ https://github.com/orgs/surfDB/repositories https://github.com/xcryptoshadow/BoxShare https://github.com/zerpajose/PostIt-Backend-and-Contracts https://github.com/goldzulu/myprecious.git https://github.com/emmajane1313/inarisynth https://github.com/Siddesh7/eth-split1 https://github.com/itsanishjain/W3commerce https://github.com/Ptodoroff/NFT-Metaverse",
+    "test:concurrent": "node . --concurrency 8 --urls https://github.com/finnovateinc/iwns-demo https://github.com/mbcse/web3me-ethonline.git https://github.com/txme/doTransfer https://github.com/apoorvlathey/uni-feeswap https://github.com/pikachua7/DigiOffice-v2.0 https://github.com/Dasika-Vaishnavi/Oceano_Eth https://github.com/Ajand/Coursalize https://github.com/knrdrbn/m1n75n1p3r/ https://github.com/orgs/surfDB/repositories https://github.com/xcryptoshadow/BoxShare https://github.com/zerpajose/PostIt-Backend-and-Contracts https://github.com/goldzulu/myprecious.git https://github.com/emmajane1313/inarisynth https://github.com/Siddesh7/eth-split1 https://github.com/itsanishjain/W3commerce https://github.com/Ptodoroff/NFT-Metaverse"
   },
   "lint-staged": {
     "*.{ts,tsx}": "eslint --cache --fix --plugin tsc --rule 'tsc/config: [2, {configFile: \"./tsconfig.json\"}]'"
@@ -43,6 +45,7 @@
     }
   },
   "devDependencies": {
+    "@types/command-line-args": "^5.2.0",
     "@types/source-map-support": "^0.5.4"
   },
   "dependencies": {
@@ -51,6 +54,7 @@
     "@types/puppeteer": "^5.4.4",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
+    "command-line-args": "^5.2.1",
     "dotenv": "^10.0.0",
     "eslint": "^8.0.0",
     "eslint-config-prettier": "^8.3.0",

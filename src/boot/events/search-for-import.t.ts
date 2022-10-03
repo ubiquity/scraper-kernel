@@ -57,8 +57,7 @@ async function test(paths) {
     await searchForImport(path);
     console.log();
     // log.warn(`${renameLastPartOfPathToWildCard(path)}`);
-
-    console.log();
+    // console.log();
   }
 }
 

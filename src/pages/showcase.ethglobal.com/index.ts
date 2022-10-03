@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
 import scrape from "../../scrape";
-import { getActiveTab } from "../../utils";
+import { getActiveTab, scrapeHrefsFromAnchors } from "../../utils";
 
 export default async (browser: puppeteer.Browser) => {
   const page = await getActiveTab(browser);
@@ -10,20 +10,6 @@ export default async (browser: puppeteer.Browser) => {
 
   return results;
 };
-
-export async function scrapeHrefsFromAnchors(page: puppeteer.Page, selectors: string) {
-  const hackathons = await page.$$(selectors);
-  if (!hackathons) {
-    throw new Error(`could not find the hackathons`);
-  }
-
-  const hackathonURLs = [] as string[];
-  for (const hackathon of hackathons) {
-    const href = await hackathon.evaluate((element) => (element as HTMLAnchorElement).href);
-    hackathonURLs.push(href);
-  }
-  return hackathonURLs;
-}
 
 async function debugLogging(page: puppeteer.Page) {
   await page.setRequestInterception(true);

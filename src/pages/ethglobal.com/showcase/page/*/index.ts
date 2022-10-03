@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 import scrape from "../../../../../scrape";
+import { scrapeHrefsFromAnchors } from "../../../../../utils";
 // gallery view default logic
-import { scrapeHrefsFromAnchors } from "../../../../showcase.ethglobal.com";
 // there's 84 pages as of 29 sep 2022
 export default async (browser: puppeteer.Browser, page: puppeteer.Page) => {
   // const page = await target?.page();

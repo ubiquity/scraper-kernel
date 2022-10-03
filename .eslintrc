@@ -4,7 +4,8 @@
   "plugins": ["@typescript-eslint", "prettier"],
   "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
   "rules": {
-    "@typescript-eslint/ban-types": "off"
+    "@typescript-eslint/ban-types": "off",
+    "no-debugger": "warn"
   },
   "env": {
     "node": true

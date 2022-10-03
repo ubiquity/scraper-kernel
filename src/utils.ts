@@ -73,3 +73,17 @@ export const log = {
     console.info(colorizeText(`\t⚠ ${message}`, "fgWhite"));
   },
 };
+
+export async function scrapeHrefsFromAnchors(page: Page, selectors: string) {
+  const anchors = (await page.$$(selectors)) as ElementHandle<HTMLAnchorElement>[] | null;
+  if (!anchors) {
+    throw new Error(`could not find the anchors`);
+  }
+
+  const destinations = [] as string[];
+  for (const anchor of anchors) {
+    const href = await anchor.evaluate((element) => (element as HTMLAnchorElement).href);
+    destinations.push(href);
+  }
+  return destinations;
+}
