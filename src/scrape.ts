@@ -11,7 +11,11 @@ import newTabToURL from "./boot/new-tab-to-url";
 export const eventEmitter = new EventEmitter();
 export type JobResult = string | null; // definitely string, but not sure if `void` or `null` is correct to signal no results found
 
-export default async function scrape(urls: string[] | string, browser?: Browser, concurrency?: number): Promise<JobResult | JobResult[]> {
+export default async function scrape(
+  urls: string[] | string,
+  browser?: Browser
+  // , concurrency?: number
+): Promise<JobResult | JobResult[]> {
   browser = await attachEventsOnFirstRun(browser);
 
   if (typeof urls === "string") {
@@ -19,15 +23,15 @@ export default async function scrape(urls: string[] | string, browser?: Browser,
     // console.trace({ urls, singleResult });
     return singleResult;
   } else if (Array.isArray(urls)) {
-    if (concurrency) {
-      const concurrentResults = await _scrapeConcurrently(urls, browser, concurrency);
-      // console.trace({ urls, concurrentResults });
-      throw concurrentResults; // @FIXME: should return when this doesn't throw an error
-    } else {
-      const seriesResults = await _scrapeSeries(urls, browser);
-      // console.trace({ urls, seriesResults });
-      return seriesResults;
-    }
+    // if (concurrency) {
+    //   const concurrentResults = await _scrapeConcurrently(urls, browser, concurrency);
+    //   // console.trace({ urls, concurrentResults });
+    //   throw concurrentResults; // @FIXME: should return when this doesn't throw an error
+    // } else {
+    const seriesResults = await _scrapeSeries(urls, browser);
+    // console.trace({ urls, seriesResults });
+    return seriesResults;
+    // }
   } else {
     throw new Error("`urls` must be of types `string[] | string` ");
   }
