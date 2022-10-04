@@ -1,16 +1,14 @@
-import "source-map-support/register";
-
 import { EventEmitter } from "events";
+import pMap from "p-map";
 import { Browser } from "puppeteer";
+import "source-map-support/register";
 import browserSetup from "./boot/browser-setup";
 import config from "./boot/config";
 import { eventHandlers } from "./boot/event-handlers";
 import { attachEvents } from "./boot/events/attachEvents";
 import newTabToURL from "./boot/new-tab-to-url";
 
-import pMap from "p-map";
 export const eventEmitter = new EventEmitter();
-
 export type JobResult = string | null; // definitely string, but not sure if `void` or `null` is correct to signal no results found
 
 export default async function scrape(urls: string[] | string, browser?: Browser, concurrency?: number): Promise<JobResult | JobResult[]> {
