@@ -22,7 +22,14 @@ export const eventHandlers = {
   },
 
   scrapeComplete: function scrapeCompleteHandler(resolve, reject) {
-    return (results: JobResult) => resolve(results);
+    return async function _scrapeCompleteHandler(results: JobResult) {
+      if (!results) {
+        reject("no results");
+      }
+      // console.trace({ results: await results });
+      // debugger;
+      return resolve(results);
+    };
   },
 
   /**

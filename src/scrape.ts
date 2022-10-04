@@ -1,6 +1,7 @@
+import "source-map-support/register";
+
 import { EventEmitter } from "events";
 import { Browser } from "puppeteer";
-import "source-map-support/register";
 import browserSetup from "./boot/browser-setup";
 import config from "./boot/config";
 import { eventHandlers } from "./boot/event-handlers";
@@ -16,12 +17,18 @@ export default async function scrape(urls: string[] | string, browser?: Browser,
   browser = await attachEventsOnFirstRun(browser);
 
   if (typeof urls === "string") {
-    return await _scrapeSingle(urls, browser);
+    const singleResult = await _scrapeSingle(urls, browser);
+    // console.trace({ urls, singleResult });
+    return singleResult;
   } else if (Array.isArray(urls)) {
     if (concurrency) {
-      return await _scrapeConcurrently(urls, browser, concurrency);
+      const concurrentResults = await _scrapeConcurrently(urls, browser, concurrency);
+      // console.trace({ urls, concurrentResults });
+      return concurrentResults;
     } else {
-      return await _scrapeSeries(urls, browser);
+      const seriesResults = await _scrapeSeries(urls, browser);
+      // console.trace({ urls, seriesResults });
+      return seriesResults;
     }
   } else {
     throw new Error("`urls` must be of types `string[] | string` ");
@@ -41,7 +48,7 @@ export async function _scrapeConcurrently(urls: string[], browser: Browser, conc
   const mapper = async (site) => await _scrapeSingle(site, browser);
   const options = { concurrency };
   const pmap = await pMap(input, mapper, options).catch((error) => error && console.trace(error));
-  debugger;
+  // debugger;
   return pmap;
 }
 
@@ -55,12 +62,15 @@ export async function _scrapeSingle(url: string, browser: Browser): Promise<JobR
   // console.trace("closing tab");
   try {
     const results = await scrapeJob;
+    if (results == void 0) {
+      throw new Error("Scrape Job returned `undefined`. Set return type on page controller to `null` to fix this error");
+    }
     await tab.close(); // save memory
     return results;
   } catch (error) {
     console.error(error);
+    return error as JobResult;
   }
-  return null;
 }
 
 async function attachEventsOnFirstRun(browser?: Browser) {
