@@ -22,7 +22,7 @@ export default async function scrape(urls: string[] | string, browser?: Browser,
     if (concurrency) {
       const concurrentResults = await _scrapeConcurrently(urls, browser, concurrency);
       // console.trace({ urls, concurrentResults });
-      return concurrentResults;
+      throw concurrentResults; // @FIXME: should return when this doesn't throw an error
     } else {
       const seriesResults = await _scrapeSeries(urls, browser);
       // console.trace({ urls, seriesResults });
@@ -41,13 +41,15 @@ export async function _scrapeSeries(urls: string[], browser: Browser): Promise<J
   return completedScrapes;
 }
 
-export async function _scrapeConcurrently(urls: string[], browser: Browser, concurrency: number): Promise<JobResult[]> {
-  const input: AsyncIterable<unknown> | Iterable<unknown> = urls;
-  const mapper = async (site) => await _scrapeSingle(site, browser);
-  const options = { concurrency };
-  const pmap = await pMap(input, mapper, options).catch((error) => error && console.trace(error));
-  // debugger;
-  return pmap;
+export async function _scrapeConcurrently(urls: string[], browser: Browser, concurrency: number) {
+  // : Promise<JobResult[]>
+  return new Error("function _scrapeConcurrently isn't implemented correctly");
+  // const input: AsyncIterable<unknown> | Iterable<unknown> = urls;
+  // const mapper = async (site) => await _scrapeSingle(site, browser);
+  // const options = { concurrency };
+  // const map = await pMap(input, mapper, options).catch((error) => error && console.trace(error));
+  // // debugger;
+  // return map;
 }
 
 export async function _scrapeSingle(url: string, browser: Browser): Promise<JobResult> {
