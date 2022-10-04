@@ -1,21 +1,15 @@
-import fs from "fs";
-import puppeteer from "puppeteer";
-import { getActiveTab, getProperty } from "../../../utils";
-export default async (browser: puppeteer.Browser) => {
-  const page = await getActiveTab(browser);
-  const githubSelector = `a[href*=git]`; // I noticed gitlab and etherscan links for source code
-  const button = await page.$(githubSelector).catch((error) => error && console.error(`Couldn't find Git link`, error));
-  if (button) {
-    const githubUrl = await getProperty(button, "href");
-    if (githubUrl) {
-      const row = [
-        Date.now(), // timestamp
-        page.url().replace("https://showcase.ethglobal.com/", "").split("/"), // page url
-        githubUrl, // github url
-      ].join(",");
+import scrape from "../../../scrape";
+import { log } from "../../../utils";
+import { scrapeGit } from "../../ethglobal.com/showcase/*";
+// /Users/nv/repos/ubiquity/scraper/src/pages/showcase.ethglobal.com/*/index.ts
 
-      fs.appendFile("buffer.csv", row.concat("\n"), (error) => console.error(error));
-      return githubUrl;
-    }
+const regexRemoveFilter = "https://showcase.ethglobal.com/";
+const githubSelector = `a[href^="https://github.com/"]`; // Just scrape GitHub even though I noticed gitlab and etherscan links for "source code"
+// `a[href*=git]`
+
+export default async function showcaseEthGlobal(browser, page) {
+  const githubUrl = await scrapeGit(page, regexRemoveFilter, githubSelector).catch((error) => error && log.error(`Couldn't find GitHub link at ${page.url()}`));
+  if (githubUrl) {
+    return await scrape(githubUrl, browser);
   }
-};
+}

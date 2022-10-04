@@ -2,23 +2,21 @@ import fs from "fs";
 import puppeteer, { Page } from "puppeteer";
 import scrape from "../../../../scrape";
 import { getProperty, log } from "../../../../utils";
+// /Users/nv/repos/ubiquity/scraper/src/pages/ethglobal.com/showcase/*/index.ts
 // project view default logic
-export default async (browser: puppeteer.Browser, page: puppeteer.Page) => {
-  const githubUrl = await scrapeGit(page).catch((error) => error && log.error(`Couldn't find GitHub link at ${page.url()}`));
+
+const regexRemoveFilter = "https://ethglobal.com/showcase/";
+const githubSelector = `a[href^="https://github.com/"]`; // Just scrape GitHub even though I noticed gitlab and etherscan links for "source code"
+
+export default async function projectViewController(browser: puppeteer.Browser, page: puppeteer.Page) {
+  const githubUrl = await scrapeGit(page, regexRemoveFilter, githubSelector).catch((error) => error && log.error(`Couldn't find GitHub link at ${page.url()}`));
   if (githubUrl) {
     return await scrape(githubUrl, browser);
   }
-};
+}
 
-async function scrapeGit(page: Page) {
-  const githubSelector = `a[href^="https://github.com/"]`; // Just scrape GitHub even though I noticed gitlab and etherscan links for "source code"
-
-  // const button = await page.waitForSelector(githubSelector, { timeout: 1000 }).catch((error) => error && console.error(`Couldn't find GitHub link`, error));
-
-  const button = await page
-    .$(githubSelector)
-    // .then((value) => value && log.ok(`GitHub link found`))
-    .catch((error) => error && log.error(`Couldn't find GitHub link at ${page.url()}`));
+export async function scrapeGit(page: Page, regexRemoveFilter: string, githubSelector: string) {
+  const button = await page.$(githubSelector).catch((error) => error && log.error(`Couldn't find GitHub link at ${page.url()}`));
 
   if (button) {
     const githubUrl = await getProperty(button, "href");
@@ -26,7 +24,7 @@ async function scrapeGit(page: Page) {
     if (parsed.href && !githubUrl.includes("ethglobal")) {
       const row = [
         Date.now(), // timestamp
-        page.url().replace("https://ethglobal.com/showcase/", "").split("/"), // page url
+        page.url().replace(regexRemoveFilter, "").split("/"), // page url
         parsed.href, // github url
       ].join(",");
 

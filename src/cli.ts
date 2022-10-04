@@ -1,6 +1,5 @@
 import "source-map-support/register";
 
-// const userInput = process.argv.slice(2);
 import commandLineArgs from "command-line-args";
 import fs from "fs";
 import scrape from "./scrape";
@@ -21,11 +20,7 @@ if (VERBOSE) {
 }
 
 // CLI ADAPTER
-scrape(
-  options.urls,
-  undefined
-  // , options.concurrency
-).then((data) => {
+scrape(options.urls).then((data) => {
   console.log(`<<`, data);
   // fs.writeFileSync("results.json", JSON.stringify(data)); // temporary
   process.exit(0);
