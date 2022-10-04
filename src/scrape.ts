@@ -9,7 +9,7 @@ import { attachEvents } from "./boot/events/attachEvents";
 import newTabToURL from "./boot/new-tab-to-url";
 
 export const eventEmitter = new EventEmitter();
-export type JobResult = string | null; // definitely string, but not sure if `void` or `null` is correct to signal no results found
+export type JobResult = Error | string | null; // definitely string, but not sure if `void` or `null` is correct to signal no results found
 
 export default async function scrape(
   urls: string[] | string,
@@ -56,25 +56,23 @@ export async function _scrapeConcurrently(urls: string[], browser: Browser, conc
   // return map;
 }
 
-export async function _scrapeSingle(url: string, browser: Browser): Promise<JobResult> {
+export async function _scrapeSingle(url: string, browser: Browser): Promise<JobResult | Error> {
   type ResolveFunction = (results: string) => void;
   const scrapeJob = new Promise(function addCallbackEvent(resolve: ResolveFunction, reject): void {
     eventEmitter.once("scrapecomplete", eventHandlers.scrapeComplete(resolve, reject));
   });
   console.log(`>>`, url); // useful to follow headless page navigation
-  const tab = await newTabToURL(browser, url);
-  // console.trace("closing tab");
-  try {
-    const results = await scrapeJob;
-    if (results == void 0) {
-      throw new Error("Scrape Job returned `undefined`. Set return type on page controller to `null` to fix this error");
-    }
-    await tab.close(); // save memory
-    return results;
-  } catch (error) {
-    console.error(error);
-    return error as JobResult;
+  const { page, response } = await newTabToURL(browser, url);
+  if (response.status() >= 300) {
+    // this is silent, i think; but will not hang at `await scrapeJob` if there is an unexpected response
+    return new Error(`<< [ ${url} ] HTTP status code ${response.status()}`);
   }
+  const results = await scrapeJob;
+  if (results == void 0) {
+    return new Error("Scrape Job returned `undefined`. Set return type on page controller to `null` to fix this error");
+  }
+  await page.close(); // save memory
+  return results;
 }
 
 async function attachEventsOnFirstRun(browser?: Browser) {

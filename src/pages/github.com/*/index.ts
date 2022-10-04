@@ -1,11 +1,10 @@
+import fs from "fs";
 import puppeteer from "puppeteer";
 import scrape from "../../../scrape";
 import { log, scrapeHrefsFromAnchors } from "../../../utils";
 import scrapeTextNode from "../scrape-text-node";
 
 export default async function gitHubProfileViewController(browser: puppeteer.Browser, page: puppeteer.Page) {
-  // console.log(colorizeText("> github profile view", "fgWhite"));
-
   const contributions = await getContributions(page);
 
   // @TODO: need to design best strategy to determine if this is a personal profile or organization view
@@ -22,11 +21,15 @@ export default async function gitHubProfileViewController(browser: puppeteer.Bro
 
 async function scrapeReposOnOrganizationPage(page, browser) {
   const repos = await scrapeHrefsFromAnchors(page, `#org-repositories a[data-hovercard-type="repository"]`);
-  const contributors = (await scrape(repos, browser)) as string[]; //.catch((error) => error && log.error(`<< [ ${page.url()} ] caught error`));
+  const results = (await scrape(repos, browser)) as unknown; // @FIXME: standardize page scraper controller return data type
+  if (typeof results != "string") {
+    // results are probably scraped data
+    return results;
+  }
+  const contributors = results as unknown as string[]; //.catch((error) => error && log.error(`<< [ ${page.url()} ] caught error`));
   const flattened = contributors.flat(Infinity);
   const unique = [...new Set(flattened)];
   const scrapeReposOnOrganizationPageResults = await scrape(unique, browser);
-  // console.log({ scrapeReposOnOrganizationPageResults });
   return scrapeReposOnOrganizationPageResults;
 }
 
@@ -38,8 +41,27 @@ async function scrapePersonalProfile(page, contributions) {
     twitter: await getTwitter(page),
     bio: await getBio(page),
   };
-  // console.trace({ profile });
-  // debugger;
+
+  const values = Object.values(profile);
+  const row = [
+    new Date(), // timestamp
+    // page.url().replace("https://github.com/", "").split("/"), // page url
+    values.map((value) => {
+      if (value == null) return value;
+      if (value.includes(",") || value.includes("\n")) {
+        value = `"${value}"`; // double quote escape for csvs
+      }
+      return value;
+    }),
+  ].join(",");
+  const bufferExists = fs.existsSync(`buffer.csv`);
+  if (!bufferExists) {
+    // set headers
+    const buffer = [`date`, ...Object.keys(profile)].join(",");
+    fs.appendFile(`buffer.csv`, buffer.concat("\n"), (error) => error && console.error(error));
+  }
+
+  fs.appendFile(`buffer.csv`, row.concat("\n"), (error) => error && console.error(error));
   return profile;
 }
 

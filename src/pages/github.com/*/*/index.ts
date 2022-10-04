@@ -1,4 +1,5 @@
 import puppeteer from "puppeteer";
+import scrape from "../../../../scrape";
 import { getAttribute, log, scrapeHrefsFromAnchors } from "../../../../utils";
 // this is likely to be dynamically loaded when looking at a specific repository, due to the nesting of the url
 // e.g. https://github.com/ubiquity/dollar
@@ -9,7 +10,7 @@ const selectors = {
 };
 
 export default async function gitHubRepoView(browser: puppeteer.Browser, page: puppeteer.Page) {
-  log.info(`this is a repository`);
+  log.warn(`this is a repository`);
   let contributorURLs = await scrapeHrefsFromAnchors(page, selectors.contributors);
   log.info(`contributors: ${contributorURLs.length}`);
   if (!contributorURLs.length) {
@@ -21,5 +22,6 @@ export default async function gitHubRepoView(browser: puppeteer.Browser, page: p
   }
   // const HREFs = await getAttribute(contributors, "href");
   log.ok(contributorURLs.join(", "));
-  return contributorURLs;
+  // await page.close();
+  return await scrape(contributorURLs, browser);
 }

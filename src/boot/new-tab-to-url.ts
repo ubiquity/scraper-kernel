@@ -6,6 +6,8 @@ export default async function newTabToURL(browser: Browser, url: string) {
     throw new Error("No destination URL specified");
   }
   const page = await browser.newPage();
-  await page.goto(destination.href, { waitUntil: "networkidle2" });
-  return page;
+
+  const response = await page.goto(destination.href, { waitUntil: "networkidle2" });
+
+  return { page, response };
 }

@@ -83,7 +83,7 @@ export const log = {
   },
 };
 
-export async function scrapeHrefsFromAnchors(page: Page, selectors: string) {
+export async function scrapeHrefsFromAnchors(page: Page, selectors: string): Promise<string[]> {
   const anchors = (await page.$$(selectors)) as ElementHandle<HTMLAnchorElement>[] | null;
   if (!anchors) {
     throw new Error(`could not find the anchors`);
@@ -96,3 +96,7 @@ export async function scrapeHrefsFromAnchors(page: Page, selectors: string) {
   }
   return destinations;
 }
+
+// class Database(){
+
+// }
