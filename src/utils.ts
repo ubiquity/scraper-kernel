@@ -1,4 +1,5 @@
 import { ElementHandle, Page, Browser } from "puppeteer";
+import { VERBOSE } from "./cli";
 
 export const getSourcedDate = () => new Date().toLocaleDateString();
 
@@ -60,16 +61,42 @@ export function colorizeText(text: string, color: keyof typeof colors): string {
 }
 
 export const log = {
-  error: function error(message: string) {
-    console.error(colorizeText(`\t⚠ ${message}`, "fgRed"));
+  error: function errorLog(message: string) {
+    if (VERBOSE && VERBOSE >= 1) {
+      console.error(colorizeText(`\t⚠ ${message}`, "fgRed"));
+    }
   },
-  warn: function warn(message: string) {
-    console.warn(colorizeText(`\t⚠ ${message}`, "fgYellow"));
+  ok: function okLog(message: string) {
+    if (VERBOSE && VERBOSE >= 2) {
+      console.log(colorizeText(`\t⚠ ${message}`, "fgGreen"));
+    }
   },
-  ok: function ok(message: string) {
-    console.log(colorizeText(`\t⚠ ${message}`, "fgGreen"));
+  warn: function warnLog(message: string) {
+    if (VERBOSE && VERBOSE >= 3) {
+      console.warn(colorizeText(`\t⚠ ${message}`, "fgYellow"));
+    }
   },
-  info: function info(message: string) {
-    console.info(colorizeText(`\t⚠ ${message}`, "fgWhite"));
+  info: function infoLog(message: string) {
+    if (VERBOSE && VERBOSE >= 4) {
+      console.info(colorizeText(`\t⚠ ${message}`, "fgWhite"));
+    }
   },
 };
+
+export async function scrapeHrefsFromAnchors(page: Page, selectors: string): Promise<string[]> {
+  const anchors = (await page.$$(selectors)) as ElementHandle<HTMLAnchorElement>[] | null;
+  if (!anchors) {
+    throw new Error(`could not find the anchors`);
+  }
+
+  const destinations = [] as string[];
+  for (const anchor of anchors) {
+    const href = await anchor.evaluate((element) => (element as HTMLAnchorElement).href);
+    destinations.push(href);
+  }
+  return destinations;
+}
+
+// class Database(){
+
+// }

@@ -3,10 +3,11 @@ import { renameLastPartOfPathToWildCard, searchForImport } from "./search-for-im
 
 // test
 const paths = [
-  "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/ubiquity/",
-  "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/pavlovcik",
-  "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/ubiquity/ubiquity-dollar",
-  "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/ubiquity/ubiquity-dollar/",
+  "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/orgs/surfDB/repositories",
+  // "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/ubiquity/",
+  // "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/pavlovcik",
+  // "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/ubiquity/ubiquity-dollar",
+  // "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/ubiquity/ubiquity-dollar/",
 ];
 
 /**
@@ -56,8 +57,7 @@ async function test(paths) {
     await searchForImport(path);
     console.log();
     // log.warn(`${renameLastPartOfPathToWildCard(path)}`);
-
-    console.log();
+    // console.log();
   }
 }
 

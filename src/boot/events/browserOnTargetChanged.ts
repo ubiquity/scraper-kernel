@@ -23,7 +23,7 @@ export const browserOnTargetChangedHandler = (_browser: Browser) => async (targe
 };
 
 function logicLoadedCallback(page: Page, resolve, reject) {
-  return async function testingFunctionName(browser: Browser) {
+  return async function _logicLoadedCallback(browser: Browser) {
     const url = page.url();
     let importing = url.split("://").pop();
     if (!importing) {
@@ -33,15 +33,16 @@ function logicLoadedCallback(page: Page, resolve, reject) {
 
     const logic = await searchForImport(importing as string)
       // ERROR HANDLE
-      .catch(function testingFunctionError2(error) {
+      .catch(function _logicLoadedCallbackErrorCatch(error) {
         eventEmitter.emit("logicfailed", error);
-        return async function testingFunctionError3(error) {
+        return async function _logicLoadedCallbackErrorCatch_(error) {
           reject(error);
           throw error;
         };
       });
     // ERROR HANDLE
     const results = logic(browser, page);
+
     return resolve(results);
   };
 }
