@@ -3,23 +3,70 @@ import puppeteer from "puppeteer";
 import scrape from "../../../scrape";
 import { log, scrapeHrefsFromAnchors } from "../../../utils";
 import scrapeTextNode from "../scrape-text-node";
+import GitHubUser from "./@types/users-USER";
+import { GitHubClient } from "./api";
 
-export default async function gitHubProfileViewController(browser: puppeteer.Browser, page: puppeteer.Page) {
+// github.com/*
+const github = new GitHubClient();
+export default async function githubPage(_browser: puppeteer.Browser, page: puppeteer.Page) {
+  const pagePath = page.url().split("https://github.com/").pop();
+  if (!pagePath) {
+    throw new Error("page path couldn't be parsed");
+  }
+  // const proxies = await github.ready();
+  // console.log((await proxies?.list)?.length);
+
+  const profile = await github.profile(pagePath);
+
+  if ("User" == profile.type) {
+    const profileNoUrls = filterUrls(profile);
+    writeToStorage(profileNoUrls, `profiles.csv`);
+    return profileNoUrls; // User profile
+  }
+
+  if ("Organization" == profile.type) {
+    // Scrape repositories in organization
+    const repositories = await github.repositoriesFromOrganization(pagePath);
+    console.log({ repositories });
+    const users = [] as { [k: string]: any }[];
+
+    for (const repository of repositories) {
+      if (repository.fork) {
+        // ignore forks
+        continue;
+      }
+      const contributors = await github.contributorsFromRepository(repository.owner.login, repository.name);
+      console.log({ contributors });
+      for (const contributor of contributors) {
+        const user = await github.profile(contributor.url);
+        const userNoUrls = filterUrls(user);
+        writeToStorage(userNoUrls, `profiles.csv`);
+        users.push(userNoUrls);
+      }
+    }
+    return users;
+  }
+
+  throw new Error(`unhandled profile type: "${profile.type}"`); // not user or organization
+}
+
+async function _githubPageDeprecated(browser: puppeteer.Browser, page: puppeteer.Page) {
+  // @TODO: need to design best strategy to determine if this is a personal profile or organization view
   const contributions = await getContributions(page);
 
-  // @TODO: need to design best strategy to determine if this is a personal profile or organization view
   if (contributions) {
-    log.info(`this is a personal profile`);
     // If contributions are found, its likely to be a personal profile page.
-    return await scrapePersonalProfile(page, contributions);
+    log.info(`this is a personal profile`);
+    return await _scrapePersonalProfile(page, contributions);
   } else {
-    log.info(`this is an organization profile`);
     // If no contributions are found, its likely to be an organization page.
-    return await scrapeReposOnOrganizationPage(page, browser);
+    log.info(`this is an organization profile`);
+    // const repositories = await github.repositoriesFromOrganization(ORGANIZATION);
+    return await _scrapeReposOnOrganizationPage(page, browser);
   }
 }
 
-async function scrapeReposOnOrganizationPage(page, browser) {
+async function _scrapeReposOnOrganizationPage(page, browser) {
   const repos = await scrapeHrefsFromAnchors(page, `#org-repositories a[data-hovercard-type="repository"]`);
   const results = (await scrape(repos, browser)) as unknown; // @FIXME: standardize page scraper controller return data type
   if (typeof results != "string") {
@@ -33,36 +80,58 @@ async function scrapeReposOnOrganizationPage(page, browser) {
   return scrapeReposOnOrganizationPageResults;
 }
 
-async function scrapePersonalProfile(page, contributions) {
-  const profile = {
-    username: await getUserName(page),
-    name: await getUserFullName(page),
-    contributions: contributions,
-    twitter: await getTwitter(page),
-    bio: await getBio(page),
-  };
+async function _scrapePersonalProfile(page, contributions) {
+  const USER_ID = await getUserName(page);
+  if (!USER_ID) {
+    throw new Error(`failed to fetch user id from github profile`);
+  }
 
+  const profile = await github.profile(USER_ID);
+  if (!profile) {
+    log.error("failed to fetch user profile from github api");
+    const scraped = {
+      username: await getUserName(page),
+      name: await getUserFullName(page),
+      contributions: contributions,
+      twitter: await getTwitter(page),
+      bio: await getBio(page),
+    };
+    writeToStorage(scraped, `profiles-scraped.csv`);
+    return scraped; // Not sure if a good idea
+  }
+
+  writeToStorage(profile, `profiles-fetched.csv`);
+  return profile;
+}
+
+function writeToStorage(profile: GitHubUser | { [key: string]: string | null }, FILENAME: string) {
   const values = Object.values(profile);
   const row = [
-    new Date(), // timestamp
+    new Date(),
+
     // page.url().replace("https://github.com/", "").split("/"), // page url
     values.map((value) => {
-      if (value == null) return value;
-      if (value.includes(",") || value.includes("\n")) {
-        value = `"${value}"`; // double quote escape for csvs
+      if (value == null) {
+        return value;
       }
+
+      if (typeof value == "string") {
+        if (value.includes(",") || value.includes("\n")) {
+          value = `"${value}"`; // double quote escape for csvs
+        }
+      }
+
       return value;
     }),
   ].join(",");
-  const bufferExists = fs.existsSync(`buffer.csv`);
-  if (!bufferExists) {
-    // set headers
+  const fileExists = fs.existsSync(FILENAME);
+  if (!fileExists) {
+    // set spreadsheet headers
     const buffer = [`date`, ...Object.keys(profile)].join(",");
-    fs.appendFile(`buffer.csv`, buffer.concat("\n"), (error) => error && console.error(error));
+    fs.appendFile(FILENAME, buffer.concat("\n"), (error) => error && console.error(error));
   }
-
-  fs.appendFile(`buffer.csv`, row.concat("\n"), (error) => error && console.error(error));
-  return profile;
+  // write row
+  fs.appendFile(FILENAME, row.concat("\n"), (error) => error && console.error(error));
 }
 
 async function getContributions(page) {
@@ -105,4 +174,8 @@ function trimmedOrNull(value: string | null | undefined) {
     return trimmed;
   }
   return null;
+}
+
+function filterUrls(profile: GitHubUser) {
+  return Object.fromEntries(Object.entries(profile).filter(([key]) => !key.includes("url")));
 }

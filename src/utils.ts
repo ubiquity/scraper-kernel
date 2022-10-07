@@ -1,6 +1,6 @@
 import { ElementHandle, Page, Browser } from "puppeteer";
-import { VERBOSE } from "./cli";
-
+import verboseMode from "./verbose";
+const VERBOSE = verboseMode();
 export const getSourcedDate = () => new Date().toLocaleDateString();
 
 export const scrollToBottom = async (page: Page) => await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));

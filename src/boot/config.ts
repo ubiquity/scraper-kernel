@@ -14,4 +14,4 @@ export default {
   defaultViewport: null,
   args: ["--lang=en-US,en;q=0.9"] as string[],
   cache: "../cache",
-} as BrowserConnectOptions;
+}; // as BrowserConnectOptions;
