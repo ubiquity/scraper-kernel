@@ -2,6 +2,7 @@ import "source-map-support/register";
 import ProxyVerifier from "proxy-verifier";
 import { log } from "../../../utils";
 import { getSpysOneProxies, parseIpAddressesWithPortNumber, prefixWithHttpsOrHttp } from "./proxy";
+import httpProxyAgent from "./http-proxy-agent";
 
 process.on("uncaughtException", (error) => console.error(error));
 
@@ -23,44 +24,70 @@ export default async function test() {
     const _process = processor(proxyIpAddress);
     processes.push(_process);
   }
-  console.log(await Promise.any(processes));
+  const settled = await Promise.allSettled(processes);
+  console.log({ settled });
+  for (const settle of settled) {
+    if ("fulfilled" == settle.status) {
+      // settled
+      // const success = (await Promise.any(processes)) as string;
+      const value = settle.value as string;
+
+      const proxy = "http://".concat(value);
+      console.log({ proxy });
+      // "https://api.github.com/users/pavlovcik"
+      httpProxyAgent(proxy, "https://api.inventum.digital/headers");
+    }
+  }
 }
 
 test();
 
 function processor(proxyIpAddress?, b?, c?, d?) {
-  const getProto = (parsed: URL) => {
-    if (parsed.href.includes("https")) {
-      return parsed.protocol.slice(0, -1) as "https";
-    } else {
-      return "https";
-    }
-  };
+  // const getProto = (parsed: URL) => {
+  //   if (parsed.href.includes("https")) {
+  //     return parsed.protocol.slice(0, -1) as "https";
+  //   } else {
+  //     return "https";
+  //   }
+  // };
+
   return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      reject("timed out");
+    }, 30000);
+
+    let proxyWithProtocol = proxyIpAddress;
+
     if (!proxyIpAddress.includes("https")) {
-      proxyIpAddress = "https://".concat(proxyIpAddress);
+      proxyWithProtocol = "https://".concat(proxyIpAddress);
     }
 
-    const parsed = new URL(proxyIpAddress);
-    const proto = getProto(parsed);
+    const parsed = new URL(proxyWithProtocol);
+    // const proto = getProto(parsed);
     // console.log(proto);
     const protocol = "http";
+
     const verifyMe = {
       ipAddress: parsed.hostname,
       port: Number(parsed.port),
       protocol, // proto,
     };
-
+    interface OK {
+      anonymityLevel: "anonymous";
+      tunnel: { ok: true };
+      protocols: { http: { ok: true } };
+    }
     const callback = (message: string) =>
       function _callback(error, result) {
         if (error) {
           return reject(error);
         } else {
+          log.ok(JSON.stringify(result));
           const _error = result.protocols[protocol]?.error?.message;
           if (_error) {
             log.error(_error);
             return reject(result);
-          } else if (result?.tunnel?.ok) {
+          } else if ((result as OK)?.tunnel?.ok) {
             return resolve(message);
           }
         }

@@ -28,7 +28,7 @@ export default function httpProxyAgent(proxy: string, endpoint: string) {
       "upgrade-insecure-requests": "1",
     },
   };
-
+  // console.log({ go });
   https.request(go, function (response: IncomingMessage) {
     let body = "";
     response.on("readable", function () {
