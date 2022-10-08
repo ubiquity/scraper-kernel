@@ -26,7 +26,10 @@ export async function getLocation(page: Page) {
 export async function getEmail(page: Page) {
   const emails = await page.evaluate(() => document.body.textContent?.match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/gi));
   if (emails?.length) {
-    return emails;
+    const email = emails.shift();
+    if (email) {
+      return emails;
+    }
   } else {
     return null;
   }
