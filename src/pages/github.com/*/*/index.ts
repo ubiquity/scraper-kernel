@@ -1,6 +1,6 @@
 import puppeteer from "puppeteer";
 import scrape from "../../../../scrape";
-import { getAttribute, log, scrapeHrefsFromAnchors } from "../../../../utils";
+import { log, scrapeHrefsFromAnchors } from "../../../../utils";
 // this is likely to be dynamically loaded when looking at a specific repository, due to the nesting of the url
 // e.g. https://github.com/ubiquity/dollar
 

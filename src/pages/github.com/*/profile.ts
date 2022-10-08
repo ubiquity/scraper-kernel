@@ -1,4 +1,5 @@
-import { Page } from "puppeteer";
+import puppeteer, { Page } from "puppeteer";
+import { log } from "../../../utils";
 
 export async function getLogin(page: Page) {
   return await extractTextFrom(page, `.vcard-username`);
@@ -97,9 +98,6 @@ function trimmedOrNull(value: string | null | undefined) {
   return null;
 }
 
-import puppeteer from "puppeteer";
-import { log } from "../../../utils";
-import { getContributions } from ".";
 export default async function scrapeTextNode(page: puppeteer.Page, selector: string) {
   const htmlElement = await page.$(selector);
 
@@ -110,31 +108,4 @@ export default async function scrapeTextNode(page: puppeteer.Page, selector: str
   const htmlElementTextNode = await htmlElement.getProperty("textContent");
   const text: string | undefined = await htmlElementTextNode?.jsonValue();
   return text;
-}
-
-interface MyProfile {
-  login: "pavlovcik";
-  id: 4975670;
-  node_id: "MDQ6VXNlcjQ5NzU2NzA=";
-  gravatar_id: "";
-  type: "User";
-  site_admin: false;
-  name: "アレクサンダー.eth";
-  company: "@ubiquity";
-  blog: "アレクサンダー.com";
-  location: "Ethereum";
-  email: null;
-  hireable: null;
-  bio: "Philomath. \r\nDigital media and technology pioneer.";
-  twitter_username: "0x4007";
-  public_repos: 20;
-  public_gists: 10;
-  followers: 23;
-  following: 54;
-  created_at: "2013-07-09T18:20:01Z";
-  updated_at: "2022-10-05T05:16:37Z";
-}
-
-function notImplemented(page: Page) {
-  console.warn("not implemented");
 }

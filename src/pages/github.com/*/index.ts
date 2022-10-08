@@ -3,26 +3,26 @@ import puppeteer from "puppeteer";
 import scrape from "../../../scrape";
 import { log, scrapeHrefsFromAnchors } from "../../../utils";
 import scrapeTextNode, {
+  // getUpdated_at,
+  getBio,
+  getBlog,
+  getCompany,
+  getCreated_at,
+  getEmail,
+  // getPublic_gists,
+  getFollowers,
+  getFollowing,
+  getLocation,
   getLogin,
+  // getSite_admin,
+  getName,
+  getPublic_repos,
+  // getHireable,
+  getTwitter_username,
   // getId,
   // getNode_id,
   // getGravatar_id,
   getType,
-  // getSite_admin,
-  getName,
-  getCompany,
-  getBlog,
-  getLocation,
-  getEmail,
-  // getHireable,
-  getTwitter_username,
-  getPublic_repos,
-  // getPublic_gists,
-  getFollowers,
-  getFollowing,
-  getCreated_at,
-  // getUpdated_at,
-  getBio,
 } from "./profile";
 
 export default async function gitHubProfileViewController(browser: puppeteer.Browser, page: puppeteer.Page) {
@@ -78,12 +78,21 @@ async function scrapePersonalProfile(page, contributions) {
     // hireable: await getHireable(page),
     bio: await getBio(page),
     twitter_username: await getTwitter_username(page),
+
+    // The underscore prefixed properties can not return data in the same format as the GitHub API.
+    // It's an approximation because the numbers are truncated with "k" for thousands.
+
     _public_repos: await getPublic_repos(page),
     // public_gists: await getPublic_gists(page),
     _followers: await getFollowers(page),
     _following: await getFollowing(page),
+
+    // This just looks for the oldest year on the timeline on the right side.
+
     _created_at: await getCreated_at(page),
     // updated_at: await getUpdated_at(page),
+
+    contributions: await getContributions(page),
   };
 
   const values = Object.values(profile);
