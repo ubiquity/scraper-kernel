@@ -15,8 +15,7 @@ export async function getName(page: Page) {
   return await extractTextFrom(page, `.vcard-fullname`);
 }
 export async function getCompany(page: Page) {
-  // document.querySelectorAll(`[aria-label^="Organization:"]`)
-  return await extractTextFrom(page, `[data-hovercard-type="organization"]`);
+  return await extractTextFrom(page, `[aria-label^="Organization:"]`);
 }
 export async function getBlog(page: Page) {
   return await extractTextFrom(page, `[data-test-selector="profile-website-url"]`);
