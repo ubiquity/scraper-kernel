@@ -9,6 +9,7 @@ export const browserOnTargetChangedHandler = (_browser: Browser) => async (targe
   if (!page) {
     return;
   }
+  await disableCosmetics(page);
   try {
     await page.waitForNavigation({ waitUntil: "networkidle2" });
   } catch (error) {
@@ -21,6 +22,34 @@ export const browserOnTargetChangedHandler = (_browser: Browser) => async (targe
 
   eventEmitter.emit("scrapecomplete", scrapeCompletedCallback);
 };
+
+async function disableCosmetics(page: Page) {
+  await page.setRequestInterception(true);
+
+  page.on("request", (request) => {
+    switch (request.resourceType()) {
+      case "document":
+      case "script":
+        request.continue();
+        break;
+      case "stylesheet":
+      case "image":
+      case "media":
+      case "font":
+      case "texttrack":
+      case "xhr":
+      case "fetch":
+      case "eventsource":
+      case "websocket":
+      case "manifest":
+      case "other":
+        request.abort();
+        break;
+      default:
+        request.abort();
+    }
+  });
+}
 
 function logicLoadedCallback(page: Page, resolve, reject) {
   return async function _logicLoadedCallback(browser: Browser) {
