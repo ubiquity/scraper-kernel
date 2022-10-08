@@ -54,6 +54,18 @@ async function scrapeReposOnOrganizationPage(page, browser) {
   return scrapeReposOnOrganizationPageResults;
 }
 
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.SUPABASE_URL;
+if (!supabaseUrl?.length) {
+  throw new Error("no supabase url found");
+}
+const supabaseKey = process.env.SUPABASE_KEY;
+if (!supabaseKey?.length) {
+  throw new Error("no supabase key found");
+}
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 async function scrapePersonalProfile(page, contributions) {
   // const profile = {
   //   username: await getUserName(page),
@@ -95,9 +107,17 @@ async function scrapePersonalProfile(page, contributions) {
     contributions: await getContributions(page),
   };
 
+  const bufferExists = fs.existsSync(`buffer.csv`);
+  if (!bufferExists) {
+    // set headers
+    const buffer = [`date`, ...Object.keys(profile)].join(",");
+    fs.appendFile(`buffer.csv`, buffer.concat("\n"), (error) => error && console.error(error));
+  }
+
   const values = Object.values(profile);
+
   const row = [
-    new Date(), // timestamp
+    // new Date(), // timestamp
     // page.url().replace("https://github.com/", "").split("/"), // page url
     values.map((value) => {
       if (value == null) return value;
@@ -106,15 +126,14 @@ async function scrapePersonalProfile(page, contributions) {
       }
       return value;
     }),
-  ].join(",");
-  const bufferExists = fs.existsSync(`buffer.csv`);
-  if (!bufferExists) {
-    // set headers
-    const buffer = [`date`, ...Object.keys(profile)].join(",");
-    fs.appendFile(`buffer.csv`, buffer.concat("\n"), (error) => error && console.error(error));
-  }
+  ];
 
-  fs.appendFile(`buffer.csv`, row.concat("\n"), (error) => error && console.error(error));
+  fs.appendFile(`buffer.csv`, [new Date(), ...row].join(",").concat("\n"), (error) => error && console.error(error));
+
+  // const response = await supabase.from("GitHub User").insert(profile);
+  const response = await supabase.from("GitHub User").upsert(profile, { onConflict: "login" });
+
+  console.log(response); // { data, error }
   return profile;
 }
 
