@@ -1,5 +1,4 @@
 export async function proxies() {
-
   if (process.env.DEBUG_DISABLE_PROXIES) {
     console.trace("Proxies disabled");
     return [];
@@ -15,17 +14,41 @@ export async function getSpysOneProxies() {
   if (!rows) {
     throw new Error("no rows");
   }
-  const proxiesRaw = rows.map((row) => {
-    const ip = parseIpAddressesWithPortNumber(row)?.shift();
+  return prefixWithHttpsOrHttp(rows);
+}
+
+// export function _filterForHttps(rows: RegExpMatchArray) {
+//   const proxiesRaw = rows.map((row) => {
+//     const ip = parseIpAddressesWithPortNumber(row)?.shift();
+//     if (ip) {
+//       const https = row.includes("-S ");
+//       return https ? "https://".concat(ip) : "http://".concat(ip); // https or http;
+//     } else {
+//       return null;
+//     }
+//   });
+//   // return proxiesRaw;
+//   return proxiesRaw.filter(Boolean) as string[];
+// }
+export function prefixWithHttpsOrHttp(rows: RegExpMatchArray) {
+  const list = rows.map((row) => {
+    const ip = parseIpAddressesRow(row)?.shift();
     if (ip) {
       const https = row.includes("-S ");
-      return https ? "https://".concat(ip) : "http://".concat(ip); // https or http;
+      const value = https ? "https://".concat(ip) : "http://".concat(ip); // https or http;
+      // if (https) {
+      // console.log(value);
+      // }
+      return value;
     } else {
       return null;
     }
   });
+
+  const filtered = list.filter(Boolean) as string[];
+  // console.log({ filtered });
   // return proxiesRaw;
-  return proxiesRaw.filter(Boolean) as string[];
+  return filtered;
 }
 
 function parseIpAddressesRow(response: string) {
