@@ -12,6 +12,7 @@ export const browserOnTargetChangedHandler = (_browser: Browser) => async (targe
   await disableCosmetics(page);
   try {
     await page.waitForNavigation({ waitUntil: "networkidle2" });
+    // .catch((error) => eventEmitter.emit("logicfailed", error));
   } catch (error) {
     eventEmitter.emit("logicfailed", error);
   }

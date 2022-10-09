@@ -28,7 +28,7 @@ export async function getEmail(page: Page) {
   if (emails?.length) {
     const email = emails.shift();
     if (email) {
-      return emails;
+      return email;
     }
   } else {
     return null;

@@ -10,14 +10,13 @@ const options = commandLineArgs([
 ]);
 export const VERBOSE = options.verbose;
 
-if (VERBOSE) {
-  // log unhandledRejections
-  process.on("unhandledRejection", (error: Error, promise: Promise<unknown>) => {
-    console.error("Unhandled Rejection at: Promise", promise, "reason:", error);
-    // Stack Trace
-    console.error(error.stack);
-  });
-}
+// log unhandledRejections
+// this is a hack for when pageTimeouts crash the scraper
+process.on("unhandledRejection", (error: Error, promise: Promise<unknown>) => {
+  console.error("Unhandled Rejection at: Promise", promise, "reason:", error);
+  // Stack Trace
+  console.error(error.stack);
+});
 
 // CLI ADAPTER
 scrape(options.urls).then((data) => {
