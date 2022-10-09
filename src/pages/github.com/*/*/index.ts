@@ -14,10 +14,12 @@ export default async function gitHubRepoView(browser: puppeteer.Browser, page: p
   let contributorURLs = await scrapeHrefsFromAnchors(page, selectors.contributors);
   log.info(`contributors: ${contributorURLs.length}`);
   if (!contributorURLs.length) {
+    const soleContributor = await page.waitForSelector(selectors.soleContributor);
     contributorURLs = await scrapeHrefsFromAnchors(page, selectors.soleContributor);
     log.info(`soleContributors: ${contributorURLs.length}`);
   }
   if (!contributorURLs.length) {
+    debugger;
     throw new Error(`no contributors found on repo view?`);
   }
   // const HREFs = await getAttribute(contributors, "href");

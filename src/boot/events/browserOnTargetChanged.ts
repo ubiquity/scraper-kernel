@@ -31,6 +31,7 @@ async function disableCosmetics(page: Page) {
     switch (request.resourceType()) {
       case "document":
       case "script":
+      case "fetch":
         request.continue();
         break;
       case "stylesheet":
@@ -39,7 +40,6 @@ async function disableCosmetics(page: Page) {
       case "font":
       case "texttrack":
       case "xhr":
-      case "fetch":
       case "eventsource":
       case "websocket":
       case "manifest":
