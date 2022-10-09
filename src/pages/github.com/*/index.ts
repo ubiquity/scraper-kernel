@@ -2,7 +2,7 @@ import fs from "fs";
 import puppeteer from "puppeteer";
 import scrape from "../../../scrape";
 import { log, scrapeHrefsFromAnchors } from "../../../utils";
-import scrapeTextNode, {
+import {
   // getUpdated_at,
   getBio,
   getBlog,
@@ -23,6 +23,9 @@ import scrapeTextNode, {
   // getNode_id,
   // getGravatar_id,
   getType,
+  getCodeStyle,
+  getContributions,
+  getPercent,
 } from "./profile";
 
 export default async function gitHubProfileViewController(browser: puppeteer.Browser, page: puppeteer.Page) {
@@ -75,6 +78,9 @@ async function scrapePersonalProfile(page, contributions) {
   //   bio: await getBio(page),
   // };
 
+  const codeStyle = await getCodeStyle(page);
+  // {"Commits":73,"Issues":16,"Pull requests":6,"Code review":5}
+
   const profile = {
     login: await getLogin(page),
     // id: await getId(page),
@@ -105,6 +111,11 @@ async function scrapePersonalProfile(page, contributions) {
     // updated_at: await getUpdated_at(page),
 
     contributions: await getContributions(page),
+
+    percent_commits: getPercent("Commits", codeStyle),
+    percent_issues: getPercent("Issues", codeStyle),
+    percent_pull_requests: getPercent("Pull requests", codeStyle),
+    percent_code_reviews: getPercent("Code review", codeStyle),
   };
 
   const bufferExists = fs.existsSync(`buffer.csv`);
@@ -135,14 +146,4 @@ async function scrapePersonalProfile(page, contributions) {
 
   console.log(response); // { data, error }
   return profile;
-}
-
-export async function getContributions(page) {
-  let contributions = await scrapeTextNode(page, `div.js-yearly-contributions h2`);
-  const matched = contributions?.match(/[0-9]*/gim);
-  if (matched) {
-    contributions = matched.join(``);
-    return contributions;
-  }
-  return null;
 }

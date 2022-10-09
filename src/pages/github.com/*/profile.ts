@@ -84,6 +84,16 @@ export async function getCreated_at(page: Page) {
 //   return notImplemented(page);
 // }
 
+export async function getContributions(page) {
+  let contributions = await scrapeTextNode(page, `div.js-yearly-contributions h2`);
+  const matched = contributions?.match(/[0-9]*/gim);
+  if (matched) {
+    contributions = matched.join(``);
+    return contributions;
+  }
+  return null;
+}
+
 async function extractTextFrom(page: Page, selector: string) {
   const text = await scrapeTextNode(page, selector);
   return trimmedOrNull(text);
@@ -100,7 +110,7 @@ function trimmedOrNull(value: string | null | undefined) {
   return null;
 }
 
-export default async function scrapeTextNode(page: puppeteer.Page, selector: string) {
+export async function scrapeTextNode(page: puppeteer.Page, selector: string) {
   const htmlElement = await page.$(selector);
 
   if (!htmlElement) {
@@ -110,4 +120,26 @@ export default async function scrapeTextNode(page: puppeteer.Page, selector: str
   const htmlElementTextNode = await htmlElement.getProperty("textContent");
   const text: string | undefined = await htmlElementTextNode?.jsonValue();
   return text;
+}
+
+interface ExamplePercentages {
+  Commits: 73;
+  Issues: 16;
+  "Pull requests": 6;
+  "Code review": 5;
+}
+
+export async function getCodeStyle(page: Page): Promise<ExamplePercentages | null> {
+  const selector = `data-percentages`;
+  const percentages = await page.evaluate(`document.querySelector("[${selector}]").getAttribute("${selector}")`);
+  try {
+    return JSON.parse(percentages);
+  } catch (error) {
+    return null;
+  }
+}
+
+export function getPercent(_of: keyof ExamplePercentages, codeStyle: ExamplePercentages | null) {
+  if (!codeStyle) return null;
+  return String(codeStyle[_of]);
 }
