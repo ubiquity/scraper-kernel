@@ -70,16 +70,7 @@ if (!supabaseKey?.length) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function scrapePersonalProfile(page, contributions) {
-  // const profile = {
-  //   username: await getUserName(page),
-  //   name: await getUserFullName(page),
-  //   contributions: contributions,
-  //   twitter: await getTwitter(page),
-  //   bio: await getBio(page),
-  // };
-
   const codeStyle = await getCodeStyle(page);
-  // {"Commits":73,"Issues":16,"Pull requests":6,"Code review":5}
 
   const profile = {
     login: await getLogin(page),
@@ -143,7 +134,9 @@ async function scrapePersonalProfile(page, contributions) {
 
   // const response = await supabase.from("GitHub User").insert(profile);
   const response = await supabase.from("GitHub User").upsert(profile, { onConflict: "login" });
-
-  console.log(response); // { data, error }
+  if (response.error) {
+    throw new Error(JSON.stringify(response.error));
+  }
+  // console.log(response); // { data, error }
   return profile;
 }

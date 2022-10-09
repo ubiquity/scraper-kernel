@@ -131,12 +131,17 @@ interface ExamplePercentages {
 
 export async function getCodeStyle(page: Page): Promise<ExamplePercentages | null> {
   const selector = `data-percentages`;
-  const percentages = await page.evaluate(`document.querySelector("[${selector}]").getAttribute("${selector}")`);
-  try {
-    return JSON.parse(percentages);
-  } catch (error) {
-    return null;
+  const element = await page.$(`[${selector}]`);
+  let percentages;
+  if (element) {
+    percentages = await element.evaluate((el, $) => el.getAttribute($), selector);
+    try {
+      return JSON.parse(percentages);
+    } catch (error) {
+      void 0;
+    }
   }
+  return null;
 }
 
 export function getPercent(_of: keyof ExamplePercentages, codeStyle: ExamplePercentages | null) {
