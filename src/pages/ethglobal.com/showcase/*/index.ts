@@ -16,7 +16,8 @@ export default async function projectViewController(browser: puppeteer.Browser, 
 }
 
 export async function scrapeGit(page: Page, githubSelector: string) {
-  const button = await page.$(githubSelector).catch((error) => error && log.error(`Couldn't find GitHub link at ${page.url()}`));
+  // const button = await page.$(githubSelector).catch((error) => error && log.error(`Couldn't find GitHub link at ${page.url()}`));
+  const button = await page.waitForSelector(githubSelector).catch((error) => error && log.error(`Couldn't find GitHub link at ${page.url()}`));
 
   if (button) {
     const githubUrl = await getProperty(button, "href");
