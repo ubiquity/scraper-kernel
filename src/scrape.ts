@@ -64,7 +64,6 @@ export async function _scrapeSingle(url: string, browser: Browser): Promise<JobR
   console.log(`>>`, url); // useful to follow headless page navigation
   const { page, response } = await newTabToURL(browser, url);
   if (response.status() >= 300) {
-    // this is silent, i think; but will not hang at `await scrapeJob` if there is an unexpected response
     return new Error(`<< [ ${url} ] HTTP status code ${response.status()}`);
   }
   const results = await scrapeJob;

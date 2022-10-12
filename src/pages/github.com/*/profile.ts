@@ -94,7 +94,7 @@ export async function getContributions(page) {
   return null;
 }
 
-async function extractTextFrom(page: Page, selector: string) {
+export async function extractTextFrom(page: Page, selector: string) {
   const text = await scrapeTextNode(page, selector);
   return trimmedOrNull(text);
 }
