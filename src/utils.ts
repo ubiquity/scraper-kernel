@@ -1,6 +1,5 @@
 import { ElementHandle, Page, Browser } from "puppeteer";
-import { VERBOSE } from "./cli";
-
+import cliArgs from "./cli-args";
 export const getSourcedDate = () => new Date().toLocaleDateString();
 
 export const scrollToBottom = async (page: Page) => await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
@@ -62,22 +61,22 @@ export function colorizeText(text: string, color: keyof typeof colors): string {
 
 export const log = {
   error: function errorLog(message: string) {
-    if (VERBOSE && VERBOSE >= 1) {
+    if (cliArgs?.verbose && cliArgs?.verbose >= 1) {
       console.error(colorizeText(`\t⚠ ${message}`, "fgRed"));
     }
   },
   ok: function okLog(message: string) {
-    if (VERBOSE && VERBOSE >= 2) {
+    if (cliArgs?.verbose && cliArgs?.verbose >= 2) {
       console.log(colorizeText(`\t⚠ ${message}`, "fgGreen"));
     }
   },
   warn: function warnLog(message: string) {
-    if (VERBOSE && VERBOSE >= 3) {
+    if (cliArgs?.verbose && cliArgs?.verbose >= 3) {
       console.warn(colorizeText(`\t⚠ ${message}`, "fgYellow"));
     }
   },
   info: function infoLog(message: string) {
-    if (VERBOSE && VERBOSE >= 4) {
+    if (cliArgs?.verbose && cliArgs?.verbose >= 4) {
       console.info(colorizeText(`\t⚠ ${message}`, "fgWhite"));
     }
   },

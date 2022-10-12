@@ -10,12 +10,11 @@ export const browserOnTargetChangedHandler = (_browser: Browser) => async (targe
     return;
   }
   await disableCosmetics(page);
-  try {
-    await page.waitForNavigation({ waitUntil: "networkidle2" });
-    // .catch((error) => eventEmitter.emit("logicfailed", error));
-  } catch (error) {
-    eventEmitter.emit("logicfailed", error);
-  }
+  // try {
+  await page.waitForNavigation({ waitUntil: "networkidle2" }).catch((error) => eventEmitter.emit("logicfailed", error));
+  // } catch (error) {
+  // eventEmitter.emit("logicfailed", error);
+  // }
 
   const scrapeCompletedCallback = new Promise((resolve, reject) => {
     eventEmitter.emit("logicloaded", logicLoadedCallback(page, resolve, reject));
