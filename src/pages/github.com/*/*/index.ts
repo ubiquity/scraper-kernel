@@ -4,6 +4,7 @@ import { log, scrapeHrefsFromAnchors } from "../../../../utils";
 import { extractTextFrom } from "../profile";
 import fs from "fs";
 import path from "path";
+import { disableCosmetics } from "../../../../boot/events/browserOnTargetChanged";
 // this is likely to be dynamically loaded when looking at a specific repository, due to the nesting of the url
 // e.g. https://github.com/ubiquity/dollar
 
@@ -14,6 +15,7 @@ const selectors = {
 };
 
 export default async function gitHubRepoView(browser: Browser, page: Page) {
+  await disableCosmetics(page);
   log.warn(`this is a repository`);
 
   const contributorURLsUnique = await getContributorsFromList(page);

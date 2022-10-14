@@ -11,13 +11,13 @@ export default async (browser: puppeteer.Browser) => {
   return results;
 };
 
-async function debugLogging(page: puppeteer.Page) {
-  await page.setRequestInterception(true);
+// async function debugLogging(page: puppeteer.Page) {
+//   await page.setRequestInterception(true);
 
-  page.on("request", (request) => {
-    console.log(">>", request.method(), request.url());
-    request.continue();
-  });
+//   page.on("request", (request) => {
+//     console.log(">>", request.method(), request.url());
+//     request.continue();
+//   });
 
-  page.on("response", (response) => console.log("<<", response.status(), response.url()));
-}
+//   page.on("response", (response) => console.log("<<", response.status(), response.url()));
+// }

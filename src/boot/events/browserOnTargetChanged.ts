@@ -9,7 +9,6 @@ export const browserOnTargetChangedHandler = (_browser: Browser) => async (targe
   if (!page) {
     return;
   }
-  await disableCosmetics(page);
   // try {
   await page.waitForNavigation({ waitUntil: "networkidle2" }).catch((error) => eventEmitter.emit("logicfailed", error));
   // } catch (error) {
@@ -23,7 +22,7 @@ export const browserOnTargetChangedHandler = (_browser: Browser) => async (targe
   eventEmitter.emit("scrapecomplete", scrapeCompletedCallback);
 };
 
-async function disableCosmetics(page: Page) {
+export async function disableCosmetics(page: Page) {
   await page.setRequestInterception(true);
 
   page.on("request", (request) => {

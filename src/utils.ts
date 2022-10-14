@@ -66,6 +66,7 @@ export const log = {
     }
   },
   ok: function okLog(message: string) {
+    console.trace({ cliArgs });
     if (cliArgs?.verbose && cliArgs?.verbose >= 2) {
       console.log(colorizeText(`\t⚠ ${message}`, "fgGreen"));
     }
@@ -83,6 +84,7 @@ export const log = {
 };
 
 export async function scrapeHrefsFromAnchors(page: Page, selectors: string): Promise<string[]> {
+  console.trace();
   const anchors = (await page.$$(selectors)) as ElementHandle<HTMLAnchorElement>[] | null;
   if (!anchors) {
     throw new Error(`could not find the anchors`);

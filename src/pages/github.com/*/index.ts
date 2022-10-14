@@ -29,6 +29,7 @@ import {
 } from "./profile";
 
 export default async function gitHubProfileViewController(browser: puppeteer.Browser, page: puppeteer.Page) {
+  await disableCosmetics(page);
   const contributions = await getContributions(page);
 
   // @TODO: need to design best strategy to determine if this is a personal profile or organization view
@@ -58,6 +59,7 @@ async function scrapeReposOnOrganizationPage(page, browser) {
 }
 
 import { createClient } from "@supabase/supabase-js";
+import { disableCosmetics } from "../../../boot/events/browserOnTargetChanged";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 if (!supabaseUrl?.length) {
