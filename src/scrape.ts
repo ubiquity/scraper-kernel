@@ -54,7 +54,6 @@ export async function _scrapeSingle(url: string, browser: Browser): Promise<JobR
   await navigation;
   const results = await job;
 
-  console.trace(results);
   if (results == void 0) {
     return new Error("Scrape Job returned `undefined`. Set return type on page controller to `null` to fix this error");
   }

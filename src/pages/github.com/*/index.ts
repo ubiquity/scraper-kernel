@@ -1,3 +1,5 @@
+import { createClient } from "@supabase/supabase-js";
+import dotenv from "dotenv";
 import fs from "fs";
 import puppeteer from "puppeteer";
 import scrape from "../../../scrape";
@@ -6,7 +8,9 @@ import {
   // getUpdated_at,
   getBio,
   getBlog,
+  getCodeStyle,
   getCompany,
+  getContributions,
   getCreated_at,
   getEmail,
   // getPublic_gists,
@@ -16,6 +20,7 @@ import {
   getLogin,
   // getSite_admin,
   getName,
+  getPercent,
   getPublic_repos,
   // getHireable,
   getTwitter_username,
@@ -23,9 +28,6 @@ import {
   // getNode_id,
   // getGravatar_id,
   getType,
-  getCodeStyle,
-  getContributions,
-  getPercent,
 } from "./profile";
 
 export default async function gitHubProfileViewController(browser: puppeteer.Browser, page: puppeteer.Page) {
@@ -57,8 +59,7 @@ async function scrapeReposOnOrganizationPage(page, browser) {
   return scrapeReposOnOrganizationPageResults;
 }
 
-import { createClient } from "@supabase/supabase-js";
-import { disableCosmetics } from "../../../boot/events/browserOnTargetChanged";
+dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL;
 if (!supabaseUrl?.length) {
