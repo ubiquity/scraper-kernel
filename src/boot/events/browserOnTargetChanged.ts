@@ -1,23 +1,17 @@
 import path from "path";
 import { Browser, Page, Target } from "puppeteer";
-import scrape, { eventEmitter } from "../../scrape";
-import { colorizeText, log } from "../../utils/common";
+import { eventEmitter } from "../../scrape";
 import { searchForImport } from "./search-for-import";
-import getCurrentLine from "get-current-line";
 
-import readCommandLineArgs from "../../cli-args";
-const DISABLE_COSMETICS = readCommandLineArgs?.cosmetics;
-
-export const browserOnTargetChangedHandler = (browser: Browser) => async (target: Target) => {
+export const browserOnTargetChangedHandler = (blocker, browser: Browser) => async (target: Target) => {
   const page = await target.page();
   if (!page) {
     return;
+  } else {
+    await blocker.enableBlockingInPage(page);
   }
-  try {
-    DISABLE_COSMETICS ?? (await disableCosmetics(page));
-    // const navigation = page.waitForNavigation({ waitUntil: "networkidle2", timeout: 60000 });
-    // await page.waitForNavigation({ waitUntil: "load" });
 
+  try {
     eventEmitter.emit(
       "scrapecomplete",
       new Promise((resolve, reject) => {
@@ -27,8 +21,6 @@ export const browserOnTargetChangedHandler = (browser: Browser) => async (target
   } catch (error) {
     eventEmitter.emit("logicfailed", error);
     eventEmitter.emit("breakdown", page);
-    // FIXME: temporary fallback address. Should go to next in scrape queue.
-    // await scrape("https://api.inventum.digital/headers", browser);
   }
 };
 
