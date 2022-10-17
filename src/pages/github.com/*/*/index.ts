@@ -1,6 +1,6 @@
 import { Browser, Page } from "puppeteer";
 import scrape from "../../../../scrape";
-import { log, scrapeHrefsFromAnchors } from "../../../../utils";
+import { log, scrapeHREFsFromSelectors } from "../../../../utils/common";
 import { extractTextFrom } from "../profile";
 import fs from "fs";
 import path from "path";
@@ -15,7 +15,6 @@ const selectors = {
 };
 
 export default async function gitHubRepoView(browser: Browser, page: Page) {
-  await disableCosmetics(page);
   log.warn(`this is a repository`);
 
   const contributorURLsUnique = await getContributorsFromList(page);
@@ -50,7 +49,7 @@ export default async function gitHubRepoView(browser: Browser, page: Page) {
 // 3. click on the latest commit username's avatar ?
 
 async function getContributorsFromList(page: Page) {
-  const contributorURLs = await scrapeHrefsFromAnchors(page, selectors.contributors);
+  const contributorURLs = await scrapeHREFsFromSelectors(page, selectors.contributors);
   const contributorURLsUnique = [...new Set(contributorURLs)];
   log.info(`contributors: ${contributorURLsUnique.length}`);
   return contributorURLsUnique;
@@ -63,7 +62,7 @@ async function getLatestCommitUserName(page: Page) {
 async function clickLatestCommitAvatar(page: Page) {
   // const soleContributor = await page.waitForSelector(selectors.soleContributor);
   // const href = await soleContributor?.evaluate((element) => (element as HTMLAnchorElement).href);
-  const soleContributor = await scrapeHrefsFromAnchors(page, selectors.soleContributor);
+  const soleContributor = await scrapeHREFsFromSelectors(page, selectors.soleContributor);
   const href = soleContributor?.shift();
   if (href) {
     log.info(`soleContributors: ${href}`);

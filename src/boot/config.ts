@@ -1,8 +1,6 @@
-import dotenv from "dotenv";
 import { BrowserConnectOptions } from "puppeteer";
 import readCommandLineArgs from "../cli-args";
-import { log } from "../utils";
-dotenv.config();
+// import { log } from "../utils";
 
 const headful = readCommandLineArgs?.headful;
 
@@ -14,6 +12,6 @@ const config = {
   cache: "../cache",
 } as BrowserConnectOptions;
 
-log.ok(JSON.stringify(config, null, "\t"));
+// log.ok(JSON.stringify(config, null, "\t"));
 
 export default config;

@@ -6,7 +6,6 @@ import scrape from "../../../../scrape";
 // Just navigate a page up to
 // https://github.com/orgs/*
 export default async (browser: Browser, page: Page) => {
-  await disableCosmetics(page);
   const url = page.url() as string;
   const parts = url.split("/");
   parts.pop(); // remove last part of url

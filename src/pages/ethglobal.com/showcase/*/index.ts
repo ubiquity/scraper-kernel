@@ -2,7 +2,7 @@ import fs from "fs";
 import puppeteer, { Page } from "puppeteer";
 import { disableCosmetics } from "../../../../boot/events/browserOnTargetChanged";
 import scrape from "../../../../scrape";
-import { getProperty, log } from "../../../../utils";
+import { getProperty, log } from "../../../../utils/common";
 // /Users/nv/repos/ubiquity/scraper/src/pages/ethglobal.com/showcase/*/index.ts
 // project view default logic
 
@@ -17,7 +17,6 @@ export default async function projectViewController(browser: puppeteer.Browser, 
 }
 
 export async function scrapeGit(page: Page, githubSelector: string) {
-  await disableCosmetics(page);
   // const button = await page.$(githubSelector).catch((error) => error && log.error(`Couldn't find GitHub link at ${page.url()}`));
   const button = await page.waitForSelector(githubSelector).catch((error) => error && log.error(`Couldn't find GitHub link at ${page.url()}`));
 

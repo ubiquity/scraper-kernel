@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-import { scrollToBottom } from "../../../../utils";
+import { scrollToBottom } from "../../../../utils/common";
 
 export async function scrollToBottomOfFirstTab(browser: puppeteer.Browser) {
   const pages = await browser.pages();

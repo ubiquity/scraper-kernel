@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-import { getAttribute } from "../../../../utils";
+import { getAttribute } from "../../../../utils/common";
 
 export async function getCurrenciesPageURLs(page: puppeteer.Page) {
   const currencies = await page.$$(`td:nth-child(3) a[href^="/currencies/"]`);

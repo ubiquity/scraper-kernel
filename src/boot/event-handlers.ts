@@ -1,8 +1,8 @@
-import { Browser, Page } from "puppeteer";
-import { JobResult } from "../scrape";
-import { log } from "../utils";
+import getCurrentLine from "get-current-line";
+import { Browser, Page, Target } from "puppeteer";
+import { eventEmitter, JobResult } from "../scrape";
+import { log } from "../utils/common";
 import { browserOnTargetChangedHandler } from "./events/browserOnTargetChanged";
-import getCurrentLine, { Location } from "get-current-line";
 
 export type PageLogic = (browser: Browser, page: Page) => Promise<string[]>;
 
@@ -27,7 +27,7 @@ export const eventHandlers = {
   logicFailed: function logicFailedHandler(): CurryFunction {
     return function _logicFailedHandler(error: Error) {
       log.error(`logicFailedError at: ${getThisLine()}`);
-      throw error;
+      // throw error;
     };
 
     function makeCurrentLine(diagnostics) {
@@ -60,5 +60,12 @@ export const eventHandlers = {
    * @param browser the browser instance
    */
   browserOnTargetChanged: browserOnTargetChangedHandler,
+  breakdown: function breakdownJobHandler(browser: Browser) {
+    // close tab etc
+    return async function _breakdownJobHandler(page: Page) {
+      log.warn(`breaking down ${page.url()}`);
+      await page.close(); // save memory
+    };
+  },
 };
 export default eventHandlers;

@@ -1,5 +1,5 @@
 import scrape from "../../../scrape";
-import { log } from "../../../utils";
+import { log } from "../../../utils/common";
 import { scrapeGit } from "../../ethglobal.com/showcase/*";
 // /Users/nv/repos/ubiquity/scraper/src/pages/showcase.ethglobal.com/*/index.ts
 

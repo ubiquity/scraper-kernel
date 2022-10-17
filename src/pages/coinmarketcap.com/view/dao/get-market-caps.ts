@@ -1,5 +1,5 @@
 import puppeteer from "puppeteer";
-import { getAttribute } from "../../../../utils";
+import { getAttribute } from "../../../../utils/common";
 
 async function getMarketCaps(page: puppeteer.Page) {
   const marketCaps = await page.$$(`td:nth-child(7) span:last-child`);

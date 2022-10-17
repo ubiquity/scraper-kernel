@@ -1,7 +1,7 @@
 import fs from "fs";
 import puppeteer from "puppeteer";
 import scrape from "../../../scrape";
-import { log, scrapeHrefsFromAnchors } from "../../../utils";
+import { log, scrapeHREFsFromSelectors } from "../../../utils/common";
 import {
   // getUpdated_at,
   getBio,
@@ -29,7 +29,6 @@ import {
 } from "./profile";
 
 export default async function gitHubProfileViewController(browser: puppeteer.Browser, page: puppeteer.Page) {
-  await disableCosmetics(page);
   const contributions = await getContributions(page);
 
   // @TODO: need to design best strategy to determine if this is a personal profile or organization view
@@ -45,7 +44,7 @@ export default async function gitHubProfileViewController(browser: puppeteer.Bro
 }
 
 async function scrapeReposOnOrganizationPage(page, browser) {
-  const repos = await scrapeHrefsFromAnchors(page, `#org-repositories a[data-hovercard-type="repository"]`);
+  const repos = await scrapeHREFsFromSelectors(page, `#org-repositories a[data-hovercard-type="repository"]`);
   const results = (await scrape(repos, browser)) as unknown; // @FIXME: standardize page scraper controller return data type
   if (typeof results != "string") {
     // results are probably scraped data

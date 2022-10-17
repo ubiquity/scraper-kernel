@@ -1,5 +1,5 @@
 import puppeteer, { ElementHandle } from "puppeteer";
-import { getProperty } from "../../../../utils";
+import { getProperty } from "../../../../utils/common";
 import PageProps from "../../@types/page-props";
 
 export async function projectScrape(page: puppeteer.Page, timeout: number) {

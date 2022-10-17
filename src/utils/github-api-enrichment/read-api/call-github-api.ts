@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import { https } from "follow-redirects";
-import { log } from "../../../utils";
+import { log } from "../../common";
 
 dotenv.config();
 

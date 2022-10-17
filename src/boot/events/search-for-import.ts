@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { log } from "../../utils";
+import { log } from "../../utils/common";
 import { PageLogic } from "../event-handlers";
 
 export type DestinationStrategy = (destination: string) => string;

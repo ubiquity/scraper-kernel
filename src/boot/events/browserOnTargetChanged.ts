@@ -1,31 +1,35 @@
 import path from "path";
 import { Browser, Page, Target } from "puppeteer";
-import { eventEmitter } from "../../scrape";
-import { colorizeText, log } from "../../utils";
+import scrape, { eventEmitter } from "../../scrape";
+import { colorizeText, log } from "../../utils/common";
 import { searchForImport } from "./search-for-import";
 import getCurrentLine from "get-current-line";
 
-export const browserOnTargetChangedHandler = (_browser: Browser) => async (target: Target) => {
+import readCommandLineArgs from "../../cli-args";
+const DISABLE_COSMETICS = readCommandLineArgs?.cosmetics;
+
+export const browserOnTargetChangedHandler = (browser: Browser) => async (target: Target) => {
   const page = await target.page();
   if (!page) {
     return;
   }
-
-  console.trace(page.url());
   try {
-    // load domcontentloaded networkidle0 networkidle2
-    await page.waitForNavigation({ waitUntil: "networkidle2", timeout: 5000 }); // .catch((error) => eventEmitter.emit("logicfailed", error));
-    // console.trace("page navigated");
+    DISABLE_COSMETICS ?? (await disableCosmetics(page));
+    // const navigation = page.waitForNavigation({ waitUntil: "networkidle2", timeout: 60000 });
+    // await page.waitForNavigation({ waitUntil: "load" });
+
+    eventEmitter.emit(
+      "scrapecomplete",
+      new Promise((resolve, reject) => {
+        eventEmitter.emit("logicloaded", logicLoadedCallback(page, resolve, reject));
+      })
+    );
   } catch (error) {
-    // console.trace("page error");
-    return eventEmitter.emit("logicfailed", error);
+    eventEmitter.emit("logicfailed", error);
+    eventEmitter.emit("breakdown", page);
+    // FIXME: temporary fallback address. Should go to next in scrape queue.
+    // await scrape("https://api.inventum.digital/headers", browser);
   }
-
-  const scrapeCompletedCallback = new Promise((resolve, reject) => {
-    eventEmitter.emit("logicloaded", logicLoadedCallback(page, resolve, reject));
-  }).catch((error: Error) => error && console.error(error));
-
-  eventEmitter.emit("scrapecomplete", scrapeCompletedCallback);
 };
 
 export async function disableCosmetics(page: Page) {
@@ -65,16 +69,8 @@ function logicLoadedCallback(page: Page, resolve, reject) {
     }
     importing = path.resolve(process.cwd(), "dist", "pages", importing); // initialize
 
-    const logic = await searchForImport(importing as string)
-      // ERROR HANDLE
-      .catch(function _logicLoadedCallbackErrorCatch(error) {
-        eventEmitter.emit("logicfailed", error);
-        return async function _logicLoadedCallbackErrorCatch_(error) {
-          reject(error);
-          throw error;
-        };
-      });
-    // ERROR HANDLE
+    const logic = await searchForImport(importing as string);
+
     const results = logic(browser, page);
 
     return resolve(results);
