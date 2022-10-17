@@ -2,6 +2,7 @@ import { Browser, Page } from "puppeteer";
 import { JobResult } from "../scrape";
 import { log } from "../utils";
 import { browserOnTargetChangedHandler } from "./events/browserOnTargetChanged";
+import getCurrentLine, { Location } from "get-current-line";
 
 export type PageLogic = (browser: Browser, page: Page) => Promise<string[]>;
 
@@ -25,15 +26,25 @@ export const eventHandlers = {
   },
   logicFailed: function logicFailedHandler(): CurryFunction {
     return function _logicFailedHandler(error: Error) {
-      log.error(`logicFailed: "${error.message}"`);
+      log.error(`logicFailedError at: ${getThisLine()}`);
       throw error;
     };
+
+    function makeCurrentLine(diagnostics) {
+      return [
+        diagnostics.file,
+        ":",
+        diagnostics.line,
+        // , ":", diagnostics.char
+      ].join("");
+    }
+    function getThisLine() {
+      return makeCurrentLine(getCurrentLine({ frames: 4 }));
+    }
   },
 
   scrapeComplete: function scrapeCompleteHandler(resolve, reject) {
-    console.trace();
     return async function _scrapeCompleteHandler(results: JobResult) {
-      console.trace();
       if (!results) {
         reject("no results");
       }

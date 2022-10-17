@@ -7,7 +7,7 @@ export default async function newTabToURL(browser: Browser, url: string) {
   }
   const page = await browser.newPage();
 
-  const response = await page.goto(destination.href, { waitUntil: "networkidle2" });
+  const response = await page.goto(destination.href);
 
   return { page, response };
 }

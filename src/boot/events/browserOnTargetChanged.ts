@@ -1,27 +1,29 @@
 import path from "path";
 import { Browser, Page, Target } from "puppeteer";
 import { eventEmitter } from "../../scrape";
-import { colorizeText } from "../../utils";
+import { colorizeText, log } from "../../utils";
 import { searchForImport } from "./search-for-import";
+import getCurrentLine from "get-current-line";
 
 export const browserOnTargetChangedHandler = (_browser: Browser) => async (target: Target) => {
   const page = await target.page();
   if (!page) {
     return;
   }
+
+  console.trace(page.url());
   try {
-    const response = await page.waitForNavigation({ waitUntil: "networkidle2" }); // .catch((error) => eventEmitter.emit("logicfailed", error));
-    console.trace("page navigated");
+    // load domcontentloaded networkidle0 networkidle2
+    await page.waitForNavigation({ waitUntil: "networkidle2", timeout: 5000 }); // .catch((error) => eventEmitter.emit("logicfailed", error));
+    // console.trace("page navigated");
   } catch (error) {
-    console.trace("page error");
+    // console.trace("page error");
     return eventEmitter.emit("logicfailed", error);
   }
 
   const scrapeCompletedCallback = new Promise((resolve, reject) => {
     eventEmitter.emit("logicloaded", logicLoadedCallback(page, resolve, reject));
   }).catch((error: Error) => error && console.error(error));
-
-  console.trace();
 
   eventEmitter.emit("scrapecomplete", scrapeCompletedCallback);
 };

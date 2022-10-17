@@ -12,5 +12,5 @@ export default async (browser: Browser, page: Page) => {
   parts.pop(); // remove last part of url
   const pageUp = parts.join("/");
   return await scrape(pageUp, browser);
-  // console.trace();
+  //
 };

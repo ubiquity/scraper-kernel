@@ -64,6 +64,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-tsc": "^2.0.0",
     "follow-redirects": "^1.15.2",
+    "get-current-line": "^6.6.0",
     "got": "^11.8.2",
     "husky": "^7.0.2",
     "jimp": "^0.16.1",
