@@ -132,8 +132,8 @@ async function scrapePersonalProfile(page, contributions) {
 
   fs.appendFile(`buffer.csv`, [new Date(), ...row].join(",").concat("\n"), (error) => error && console.error(error));
 
-  // const response = await supabase.from("GitHub User").insert(profile);
-  const response = await supabase.from("GitHub User").upsert(profile, { onConflict: "login" });
+  // const response = await supabase.from("CoinGecko GitHubs").insert(profile);
+  const response = await supabase.from("CoinGecko GitHubs").upsert(profile, { onConflict: "login" });
   if (response.error) {
     throw new Error(JSON.stringify(response.error));
   }

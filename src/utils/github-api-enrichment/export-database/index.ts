@@ -2,7 +2,7 @@ import grab from "./fetch-from-supabase";
 import writeCsvToDisk from "./json2csv";
 import path from "path";
 
-const tableName = "GitHub User";
+const tableName = "CoinGecko GitHubs";
 
 async function _wrapper() {
   const data = await grab(tableName, "*");
