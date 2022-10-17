@@ -7,6 +7,7 @@ import config from "./boot/config";
 import { eventHandlers } from "./boot/event-handlers";
 import { attachEvents } from "./boot/events/attachEvents";
 import newTabToURL from "./boot/new-tab-to-url";
+import { log } from "./utils";
 
 export const eventEmitter = new EventEmitter();
 export type JobResult = Error | string | null; // definitely string, but not sure if `void` or `null` is correct to signal no results found
@@ -66,7 +67,8 @@ export async function _scrapeSingle(url: string, browser: Browser): Promise<JobR
   if (response.status() >= 300) {
     return new Error(`<< [ ${url} ] HTTP status code ${response.status()}`);
   }
-  const results = await scrapeJob;
+  const results = await scrapeJob.catch((error) => error && log.error(error.message));
+  console.trace(results);
   if (results == void 0) {
     return new Error("Scrape Job returned `undefined`. Set return type on page controller to `null` to fix this error");
   }
@@ -77,7 +79,7 @@ export async function _scrapeSingle(url: string, browser: Browser): Promise<JobR
 async function attachEventsOnFirstRun(browser?: Browser) {
   if (!browser) {
     browser = await browserSetup(config);
-    attachEvents(browser);
+    return attachEvents(browser);
   }
   return browser;
 }

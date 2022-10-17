@@ -13,6 +13,7 @@ export async function searchForImport(importing: string, startPosition?: string)
 }
 
 async function _searchForImport(importing: string, startPosition: string) {
+  console.trace();
   if (importing.endsWith(path.sep)) {
     // normalize requested path name to remove trailing slash
     importing = importing.slice(0, -1);

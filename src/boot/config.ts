@@ -5,13 +5,6 @@ import { log } from "../utils";
 dotenv.config();
 
 const headful = readCommandLineArgs?.headful;
-// const DEBUG_HEADFUL = process.env.DEBUG_HEADFUL as "true" | "false" | undefined;
-
-// let _headful = false;
-// if (DEBUG_HEADFUL) {
-//   _headful = JSON.parse(DEBUG_HEADFUL) as true | false;
-// }
-console.log({ headful });
 
 const config = {
   devtools: false,

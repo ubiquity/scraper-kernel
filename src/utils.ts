@@ -66,7 +66,7 @@ export const log = {
     }
   },
   ok: function okLog(message: string) {
-    console.trace({ cliArgs });
+    // console.trace({ cliArgs });
     if (cliArgs?.verbose && cliArgs?.verbose >= 2) {
       console.log(colorizeText(`\t⚠ ${message}`, "fgGreen"));
     }

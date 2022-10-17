@@ -9,15 +9,19 @@ export const browserOnTargetChangedHandler = (_browser: Browser) => async (targe
   if (!page) {
     return;
   }
-  // try {
-  await page.waitForNavigation({ waitUntil: "networkidle2" }).catch((error) => eventEmitter.emit("logicfailed", error));
-  // } catch (error) {
-  // eventEmitter.emit("logicfailed", error);
-  // }
+  try {
+    const response = await page.waitForNavigation({ waitUntil: "networkidle2" }); // .catch((error) => eventEmitter.emit("logicfailed", error));
+    console.trace("page navigated");
+  } catch (error) {
+    console.trace("page error");
+    return eventEmitter.emit("logicfailed", error);
+  }
 
   const scrapeCompletedCallback = new Promise((resolve, reject) => {
     eventEmitter.emit("logicloaded", logicLoadedCallback(page, resolve, reject));
   }).catch((error: Error) => error && console.error(error));
+
+  console.trace();
 
   eventEmitter.emit("scrapecomplete", scrapeCompletedCallback);
 };
