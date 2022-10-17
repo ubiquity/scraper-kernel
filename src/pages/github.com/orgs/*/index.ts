@@ -1,5 +1,5 @@
 import { Browser, Page } from "puppeteer";
-import { disableCosmetics } from "../../../../boot/events/browserOnTargetChanged";
+
 import scrape from "../../../../scrape";
 
 // https://github.com/orgs/*/repositories

@@ -48,9 +48,12 @@
   "devDependencies": {
     "@types/command-line-args": "^5.2.0",
     "@types/follow-redirects": "^1.14.1",
+    "@types/node-fetch": "^2.6.2",
     "@types/source-map-support": "^0.5.4"
   },
   "dependencies": {
+    "@cliqz/adblocker-puppeteer": "^1.25.1",
+    "@cliqz/adblocker-webextension": "^1.25.1",
     "@supabase/supabase-js": "^1.35.7",
     "@types/node": "^16.10.8",
     "@types/p-all": "^2.0.0",

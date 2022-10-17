@@ -58,7 +58,6 @@ async function scrapeReposOnOrganizationPage(page, browser) {
 }
 
 import { createClient } from "@supabase/supabase-js";
-import { disableCosmetics } from "../../../boot/events/browserOnTargetChanged";
 
 const supabaseUrl = process.env.SUPABASE_URL;
 if (!supabaseUrl?.length) {

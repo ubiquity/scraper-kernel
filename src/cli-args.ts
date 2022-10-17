@@ -1,5 +1,4 @@
 import commandLineArgs from "command-line-args";
-import { log } from "./utils/common";
 
 export function readCommandLineArgs() {
   const options = commandLineArgs([

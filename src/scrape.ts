@@ -64,8 +64,8 @@ export async function _scrapeSingle(url: string, browser: Browser): Promise<JobR
 
 async function attachEventsOnFirstRun(browser?: Browser) {
   if (!browser) {
-    browser = await browserSetup(config);
-    return attachEvents(browser);
+    const { blocker, browser } = await browserSetup(config);
+    return attachEvents(blocker, browser);
   }
   return browser;
 }

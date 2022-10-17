@@ -1,5 +1,4 @@
 import puppeteer from "puppeteer";
-import { disableCosmetics } from "../../../../../boot/events/browserOnTargetChanged";
 import scrape from "../../../../../scrape";
 import { scrapeHREFsFromSelectors } from "../../../../../utils/common";
 // gallery view default logic

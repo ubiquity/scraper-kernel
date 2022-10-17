@@ -1,4 +1,4 @@
-import { ElementHandle, Page, Browser } from "puppeteer";
+import { Browser, ElementHandle, Page } from "puppeteer";
 import cliArgs from "../cli-args";
 export const getSourcedDate = () => new Date().toLocaleDateString();
 
@@ -86,10 +86,10 @@ export const log = {
 
 export async function scrapeHREFsFromSelectors(page: Page, selectors: string): Promise<string[]> {
   const anchors = (await page.$$(selectors)) as ElementHandle<HTMLAnchorElement>[] | null;
+  console.trace({ anchors });
   if (!anchors) {
     throw new Error(`could not find the anchors`);
   }
-
   const destinations = [] as string[];
   for (const anchor of anchors) {
     const href = await anchor.evaluate((element) => (element as HTMLAnchorElement).href);

@@ -1,6 +1,6 @@
 import fs from "fs";
 import puppeteer, { Page } from "puppeteer";
-import { disableCosmetics } from "../../../../boot/events/browserOnTargetChanged";
+
 import scrape from "../../../../scrape";
 import { getProperty, log } from "../../../../utils/common";
 // /Users/nv/repos/ubiquity/scraper/src/pages/ethglobal.com/showcase/*/index.ts

@@ -7,16 +7,31 @@ import getCurrentLine from "get-current-line";
 
 import readCommandLineArgs from "../../cli-args";
 const DISABLE_COSMETICS = readCommandLineArgs?.cosmetics;
-
-export const browserOnTargetChangedHandler = (browser: Browser) => async (target: Target) => {
+// console.log({ DISABLE_COSMETICS });
+export const browserOnTargetChangedHandler = (browser: Browser, blocker) => async (target: Target) => {
   const page = await target.page();
   if (!page) {
     return;
   }
+
+  // if ("about:blank" == page.url()) {
+  //   await page.waitForNavigation({ waitUntil: "load" });
+  //   console.trace(page.url());
+  // debugger;
+  // eventEmitter.emit("logicfailed", error);
+  // eventEmitter.emit("breakdown", page);
+  // await page.close();
+  // return null;
+  // }
+
   try {
-    DISABLE_COSMETICS ?? (await disableCosmetics(page));
     // const navigation = page.waitForNavigation({ waitUntil: "networkidle2", timeout: 60000 });
     // await page.waitForNavigation({ waitUntil: "load" });
+    if (DISABLE_COSMETICS) {
+      await disableCosmetics(page);
+    } else {
+      await blocker.enableBlockingInPage(page);
+    }
 
     eventEmitter.emit(
       "scrapecomplete",
@@ -33,6 +48,7 @@ export const browserOnTargetChangedHandler = (browser: Browser) => async (target
 };
 
 export async function disableCosmetics(page: Page) {
+  // console.trace(`disabling cosmetics`);
   await page.setRequestInterception(true);
 
   page.on("request", (request) => {
@@ -40,6 +56,7 @@ export async function disableCosmetics(page: Page) {
       case "document":
       case "script":
       case "fetch":
+      case "xhr":
         request.continue();
         break;
       case "stylesheet":
@@ -47,7 +64,6 @@ export async function disableCosmetics(page: Page) {
       case "media":
       case "font":
       case "texttrack":
-      case "xhr":
       case "eventsource":
       case "websocket":
       case "manifest":
