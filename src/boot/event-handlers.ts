@@ -1,5 +1,6 @@
 import { Browser, Page } from "puppeteer";
 import { JobResult } from "../scrape";
+import { log } from "../utils";
 import { browserOnTargetChangedHandler } from "./events/browserOnTargetChanged";
 
 export type PageLogic = (browser: Browser, page: Page) => Promise<string[]>;
@@ -17,7 +18,7 @@ export const eventHandlers = {
   },
   logicFailed: function logicFailedHandler(browser: Browser): (...args: any[]) => void {
     return function _logicFailedHandler(error: Error) {
-      throw error;
+      log.error(error.message);
     };
   },
 
