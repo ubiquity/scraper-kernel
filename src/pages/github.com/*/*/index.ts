@@ -4,6 +4,7 @@ import { log, scrapeHrefsFromAnchors } from "../../../../utils";
 import { extractTextFrom } from "../profile";
 import fs from "fs";
 import path from "path";
+import { resolveProjectPath } from "../../../../boot/events/search-for-import";
 // this is likely to be dynamically loaded when looking at a specific repository, due to the nesting of the url
 // e.g. https://github.com/ubiquity/dollar
 
@@ -38,7 +39,7 @@ export default async function gitHubRepoView(browser: Browser, page: Page) {
 
   const errorMessage = `no contributors found on repo view?`;
   log.error(errorMessage);
-  fs.appendFileSync(path.join(process.cwd(), "error.log"), `[ ${page.url()} ]: ${errorMessage}`);
+  fs.appendFileSync(path.join(resolveProjectPath(), "error.log"), `[ ${page.url()} ]: ${errorMessage}`);
   throw new Error(errorMessage);
 }
 

@@ -2,7 +2,7 @@ import path from "path";
 import { Browser, Page, Target } from "puppeteer";
 import { eventEmitter } from "../../scrape";
 import { colorizeText } from "../../utils";
-import { searchForImport } from "./search-for-import";
+import { resolveProjectPath, searchForImport } from "./search-for-import";
 
 export const browserOnTargetChangedHandler = (_browser: Browser) => async (target: Target) => {
   const page = await target.page();
@@ -58,7 +58,8 @@ function logicLoadedCallback(page: Page, resolve, reject) {
     if (!importing) {
       throw new Error("Page URL parse error");
     }
-    importing = path.resolve(process.cwd(), "dist", "pages", importing); // initialize
+
+    importing = path.resolve(resolveProjectPath(), "dist", "pages", importing); // initialize
 
     const logic = await searchForImport(importing as string)
       // ERROR HANDLE

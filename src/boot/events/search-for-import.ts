@@ -5,8 +5,16 @@ import { PageLogic } from "../event-handlers";
 
 export type DestinationStrategy = (destination: string) => string;
 
-const cwd = process.cwd();
-const cwdParentName = path.basename(path.join(cwd, ".."));
+export function resolveProjectPath() {
+  const projectPath = path.resolve(require.main?.filename as string, "..", "..");
+  if (!projectPath) {
+    throw new Error("no project path resolved")
+  }
+  return projectPath
+}
+
+const cwd = resolveProjectPath();
+const cwdParentName = path.join(cwd, "..");
 
 export async function searchForImport(importing: string, startPosition?: string): Promise<PageLogic> {
   return await _searchForImport(importing, startPosition ? startPosition : importing);
@@ -64,11 +72,11 @@ async function checkModifier(importing: string, modifier: string) {
     // console.log(colorizeText(`\t⚠ [${importingDestination}] found looking for [default]`, "fgWhite"));
     logic = (await import(importingDestination))?.default;
     if (logic) {
-      log.ok(`[${importingDestination.slice(process.cwd().length)}] module loaded successfully`);
+      log.ok(`[${importingDestination}] module loaded successfully`);
       return logic as PageLogic;
     }
   } else {
-    log.info(`[${importingDestination.slice(process.cwd().length)}] not found`);
+    log.info(`[${importingDestination}] not found`);
     return null;
   }
 }
