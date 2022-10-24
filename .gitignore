@@ -47,3 +47,4 @@ tsconfig.tsbuildinfo
 *.png
 *.csv
 *.json
+.yarn
