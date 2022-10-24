@@ -51,7 +51,7 @@ describe the pattern:
 
  */
 
-async function test(paths) {
+async function test(paths: string[]) {
   for (const path of paths) {
     console.log(`>> ${path}`);
     await searchForImport(path);

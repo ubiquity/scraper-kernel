@@ -51,7 +51,7 @@ async function disableCosmetics(page: Page) {
   });
 }
 
-function logicLoadedCallback(page: Page, resolve, reject) {
+function logicLoadedCallback(page: Page, resolve: Function, reject: Function) {
   return async function _logicLoadedCallback(browser: Browser) {
     const url = page.url();
     let importing = url.split("://").pop();
@@ -64,7 +64,7 @@ function logicLoadedCallback(page: Page, resolve, reject) {
       // ERROR HANDLE
       .catch(function _logicLoadedCallbackErrorCatch(error) {
         eventEmitter.emit("logicfailed", error);
-        return async function _logicLoadedCallbackErrorCatch_(error) {
+        return async function _logicLoadedCallbackErrorCatch_(error: unknown) {
           reject(error);
           throw error;
         };

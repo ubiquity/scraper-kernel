@@ -7,7 +7,7 @@ export async function getLogin(page: Page) {
 // export async function getId(page: Page) {}
 // export async function getNode_id(page: Page) {}
 // export async function getGravatar_id(page: Page) {}
-export async function getType(page: Page, contributions: number) {
+export async function getType(page: Page, contributions: string) {
   return contributions ? "User" : "Organization"; // Only Users have "contributions"
 }
 // export async function getSite_admin(page: Page) {}

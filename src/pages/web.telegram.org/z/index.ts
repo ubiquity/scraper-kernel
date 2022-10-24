@@ -1,9 +1,9 @@
 import puppeteer from "puppeteer";
 import ss from "./crop-and-screenshot";
 import jimp from "./jimp";
-export default async (browser: puppeteer.Browser) => {
-  const pages = await browser.pages();
-  const page = pages[pages.length - 1];
+export default async (browser: puppeteer.Browser, page: puppeteer.Page) => {
+  // const pages = await browser.pages();
+  // const page = pages[pages.length - 1];
   if (!page) {
     throw new Error("No page found");
   }

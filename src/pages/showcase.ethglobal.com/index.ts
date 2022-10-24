@@ -2,8 +2,8 @@ import puppeteer from "puppeteer";
 import scrape from "../../scrape";
 import { getActiveTab, scrapeHrefsFromAnchors } from "../../utils";
 
-export default async (browser: puppeteer.Browser) => {
-  const page = await getActiveTab(browser);
+export default async (browser: puppeteer.Browser, page: puppeteer.Page) => {
+  // const page = await getActiveTab(browser);
   // await debugLogging(page);
   const hackathonUrls = await scrapeHrefsFromAnchors(page, `#event > div > a`);
   const results = await scrape(hackathonUrls, browser);

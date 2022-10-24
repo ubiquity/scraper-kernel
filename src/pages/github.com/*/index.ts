@@ -1,5 +1,5 @@
 import fs from "fs";
-import puppeteer from "puppeteer";
+import puppeteer, { Page } from "puppeteer";
 import scrape from "../../../scrape";
 import { log, scrapeHrefsFromAnchors } from "../../../utils";
 import scrapeTextNode, {
@@ -40,7 +40,7 @@ export default async function gitHubProfileViewController(browser: puppeteer.Bro
   }
 }
 
-async function scrapeReposOnOrganizationPage(page, browser) {
+async function scrapeReposOnOrganizationPage(page: puppeteer.Page, browser: puppeteer.Browser | undefined) {
   const repos = await scrapeHrefsFromAnchors(page, `#org-repositories a[data-hovercard-type="repository"]`);
   const results = (await scrape(repos, browser)) as unknown; // @FIXME: standardize page scraper controller return data type
   if (typeof results != "string") {
@@ -54,7 +54,7 @@ async function scrapeReposOnOrganizationPage(page, browser) {
   return scrapeReposOnOrganizationPageResults;
 }
 
-async function scrapePersonalProfile(page, contributions) {
+async function scrapePersonalProfile(page: puppeteer.Page, contributions: string) {
   // const profile = {
   //   username: await getUserName(page),
   //   name: await getUserFullName(page),
@@ -118,7 +118,7 @@ async function scrapePersonalProfile(page, contributions) {
   return profile;
 }
 
-export async function getContributions(page) {
+export async function getContributions(page: Page) {
   let contributions = await scrapeTextNode(page, `div.js-yearly-contributions h2`);
   const matched = contributions?.match(/[0-9]*/gim);
   if (matched) {
