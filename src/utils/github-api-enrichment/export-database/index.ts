@@ -1,9 +1,16 @@
-import grab from "./fetch-from-supabase";
-import writeCsvToDisk from "./json2csv";
 import path from "path";
 import { resolveProjectPath } from "../../../boot/events/search-for-import";
+import commandLineArgs from "../../../cli-args";
+import { log } from "../../../utils";
+import grab from "./fetch-from-supabase";
+import writeCsvToDisk from "./json2csv";
 
-const tableName = "CoinGecko GitHubs";
+let tableName = "GitHub User"; // default
+
+if (commandLineArgs.table?.length) {
+  log.info(`writing to database table ${commandLineArgs.table}`);
+  tableName = commandLineArgs.table;
+}
 
 async function _wrapper() {
   const data = await grab(tableName, "*");

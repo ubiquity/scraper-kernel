@@ -1,7 +1,27 @@
+import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
 import puppeteer from "puppeteer";
 import scrape from "../../../scrape";
 import { log, scrapeHrefsFromAnchors } from "../../../utils";
+
+let tableName = "GitHub User"; // default
+import commandLineArgs from "../../../cli-args";
+
+if (commandLineArgs.table?.length) {
+  log.info(`writing to database table ${commandLineArgs.table}`);
+  tableName = commandLineArgs.table;
+}
+
+const supabaseUrl = process.env.SUPABASE_URL;
+if (!supabaseUrl?.length) {
+  throw new Error("no supabase url found");
+}
+const supabaseKey = process.env.SUPABASE_KEY;
+if (!supabaseKey?.length) {
+  throw new Error("no supabase key found");
+}
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 import {
   // getUpdated_at,
   getBio,
@@ -57,18 +77,6 @@ async function scrapeReposOnOrganizationPage(page, browser) {
   return scrapeReposOnOrganizationPageResults;
 }
 
-import { createClient } from "@supabase/supabase-js";
-
-const supabaseUrl = process.env.SUPABASE_URL;
-if (!supabaseUrl?.length) {
-  throw new Error("no supabase url found");
-}
-const supabaseKey = process.env.SUPABASE_KEY;
-if (!supabaseKey?.length) {
-  throw new Error("no supabase key found");
-}
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 async function scrapePersonalProfile(page, contributions) {
   const codeStyle = await getCodeStyle(page);
 
@@ -107,6 +115,7 @@ async function scrapePersonalProfile(page, contributions) {
     percent_issues: getPercent("Issues", codeStyle),
     percent_pull_requests: getPercent("Pull requests", codeStyle),
     percent_code_reviews: getPercent("Code review", codeStyle),
+    recruited_by: (commandLineArgs.recruiter ?? null) as string | null,
   };
 
   const bufferExists = fs.existsSync(`buffer.csv`);
@@ -132,8 +141,7 @@ async function scrapePersonalProfile(page, contributions) {
 
   fs.appendFile(`buffer.csv`, [new Date(), ...row].join(",").concat("\n"), (error) => error && console.error(error));
 
-  // const response = await supabase.from("CoinGecko GitHubs").insert(profile);
-  const response = await supabase.from("CoinGecko GitHubs").upsert(profile, { onConflict: "login" });
+  const response = await supabase.from(tableName).upsert(profile, { onConflict: "login" });
   if (response.error) {
     throw new Error(JSON.stringify(response.error));
   }
