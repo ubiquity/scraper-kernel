@@ -1,5 +1,4 @@
 import { EventEmitter } from "events";
-import pMap from "p-map";
 import { Browser } from "puppeteer";
 import "source-map-support/register";
 import browserSetup from "./boot/browser-setup";
