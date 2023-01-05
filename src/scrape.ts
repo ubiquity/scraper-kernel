@@ -3,7 +3,7 @@ import { Browser } from "puppeteer";
 import "source-map-support/register";
 import browserSetup from "./boot/browser-setup";
 import config from "./boot/config";
-import { eventHandlers } from "./boot/event-handlers";
+import renderEventHandlers from "./boot/event-handlers";
 import { attachEvents } from "./boot/events/attachEvents";
 import newTabToURL from "./boot/new-tab-to-url";
 
@@ -12,13 +12,18 @@ export type JobResult = Error | string | null; // definitely string, but not sur
 
 export default async function scrape(
   urls: string[] | string,
-  browser?: Browser
+  browser?: Browser,
+  PAGES_PATH?: string // page logic directory path
   // , concurrency?: number
 ): Promise<JobResult | JobResult[]> {
+  if (!PAGES_PATH) {
+    throw new Error("Need page logic path");
+  }
+
   browser = await attachEventsOnFirstRun(browser);
 
   if (typeof urls === "string") {
-    const singleResult = await _scrapeSingle(urls, browser);
+    const singleResult = await _scrapeSingle(urls, browser, PAGES_PATH);
     // console.trace({ urls, singleResult });
     return singleResult;
   } else if (Array.isArray(urls)) {
@@ -27,7 +32,7 @@ export default async function scrape(
     //   // console.trace({ urls, concurrentResults });
     //   throw concurrentResults; // @FIXME: should return when this doesn't throw an error
     // } else {
-    const seriesResults = await _scrapeSeries(urls, browser);
+    const seriesResults = await _scrapeSeries(urls, browser, PAGES_PATH);
     // console.trace({ urls, seriesResults });
     return seriesResults;
     // }
@@ -36,10 +41,10 @@ export default async function scrape(
   }
 }
 
-export async function _scrapeSeries(urls: string[], browser: Browser): Promise<JobResult[]> {
+export async function _scrapeSeries(urls: string[], browser: Browser, PAGES_PATH: string): Promise<JobResult[]> {
   const completedScrapes = [] as JobResult[];
   for (const url of urls) {
-    completedScrapes.push(await _scrapeSingle(url, browser));
+    completedScrapes.push(await _scrapeSingle(url, browser, PAGES_PATH));
   }
   return completedScrapes;
 }
@@ -55,10 +60,10 @@ export async function _scrapeConcurrently(urls: string[], browser: Browser, conc
   // return map;
 }
 
-export async function _scrapeSingle(url: string, browser: Browser): Promise<JobResult | Error> {
-  type ResolveFunction = (results: string) => void;
+type ResolveFunction = (results: string) => void;
+export async function _scrapeSingle(url: string, browser: Browser, PAGES_PATH: string): Promise<JobResult | Error> {
   const scrapeJob = new Promise(function addCallbackEvent(resolve: ResolveFunction, reject): void {
-    eventEmitter.once("scrapecomplete", eventHandlers.scrapeComplete(resolve, reject));
+    eventEmitter.once("scrapecomplete", renderEventHandlers(PAGES_PATH).scrapeComplete(resolve, reject));
   });
   console.log(`>>`, url); // useful to follow headless page navigation
   const { page, response } = await newTabToURL(browser, url);

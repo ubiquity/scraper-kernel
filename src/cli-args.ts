@@ -12,6 +12,7 @@ const optionDefinitions = [
   { name: "verbose", type: Number, alias: "v", description: "Pass in a number for verbose level. Max verbosity is level 5." },
   { name: "headful", type: Boolean, alias: "h", description: "Headless or headful scraping." },
   { name: "urls", type: String, alias: "u", multiple: true, defaultOption: true, description: "The URLs for the scraper to process. Can be multiple." },
+  { name: "pages", type: String, alias: "p", description: "The directory that has the page logic for the scraper" }, // could also be logic
   // { name: "concurrency",
   // type: Number,
   // alias: "c" ,

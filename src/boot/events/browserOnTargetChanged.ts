@@ -4,7 +4,7 @@ import { eventEmitter } from "../../scrape";
 import { colorizeText } from "../../utils";
 import { resolveProjectPath, searchForImport } from "./search-for-import";
 
-export const browserOnTargetChangedHandler = (_browser: Browser) => async (target: Target) => {
+export const browserOnTargetChangedHandler = (_browser: Browser, PAGES_PATH: string) => async (target: Target) => {
   const page = await target.page();
   if (!page) {
     return;
@@ -17,7 +17,7 @@ export const browserOnTargetChangedHandler = (_browser: Browser) => async (targe
   // }
 
   const scrapeCompletedCallback = new Promise((resolve, reject) => {
-    eventEmitter.emit("logicloaded", logicLoadedCallback(page, resolve, reject));
+    eventEmitter.emit("logicloaded", logicLoadedCallback(page, resolve, reject, PAGES_PATH));
   }).catch((error: Error) => error && console.error(error));
 
   eventEmitter.emit("scrapecomplete", scrapeCompletedCallback);
@@ -51,7 +51,7 @@ async function disableCosmetics(page: Page) {
   });
 }
 
-function logicLoadedCallback(page: Page, resolve, reject) {
+function logicLoadedCallback(page: Page, resolve, reject, PAGES_PATH: string) {
   return async function _logicLoadedCallback(browser: Browser) {
     const url = page.url();
     let importing = url.split("://").pop();
@@ -59,7 +59,9 @@ function logicLoadedCallback(page: Page, resolve, reject) {
       throw new Error("Page URL parse error");
     }
 
-    importing = path.resolve(resolveProjectPath(), "dist", "pages", importing); // initialize
+    // if (!PAGES_PATH) (PAGES_PATH = resolveProjectPath()), "dist", "pages"; // remove me later
+
+    importing = path.resolve(PAGES_PATH, importing); // initialize
 
     const logic = await searchForImport(importing as string)
       // ERROR HANDLE
