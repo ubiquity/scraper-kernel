@@ -8,9 +8,8 @@
   "module": "dist/cli.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "ci": "node dist/cli.js https://github.com/pavlovcik https://github.com/transitive-bullshit",
+    "ci:test": "node dist/cli.js https://github.com/pavlovcik https://github.com/transitive-bullshit",
     "utils:database-export": "node ./dist/utils/github-api-enrichment",
-    "_start": "node dist/cli.js",
     "_watch:telegram": "nodemon dist https://web.telegram.org/z/",
     "_watch:scrape:dao": "nodemon dist https://coinmarketcap.com/view/dao/",
     "_scrape:dao": "node dist https://coinmarketcap.com/view/dao/",
