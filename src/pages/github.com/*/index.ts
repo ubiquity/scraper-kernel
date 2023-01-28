@@ -4,13 +4,13 @@ import puppeteer from "puppeteer";
 import scrape from "../../../scrape";
 import { log, scrapeHrefsFromAnchors } from "../../../utils";
 
-let tableName = "GitHub User"; // default
+// let tableName; //  = "GitHub User"; // default
 import commandLineArgs from "../../../cli-args";
 
-if (commandLineArgs.table?.length) {
-  log.info(`writing to database table ${commandLineArgs.table}`);
-  tableName = commandLineArgs.table;
-}
+// if (commandLineArgs.table?.length) {
+log.info(`writing to database table ${commandLineArgs.table}`);
+const tableName = commandLineArgs.table;
+// }
 
 const supabaseUrl = process.env.SUPABASE_URL;
 if (!supabaseUrl?.length) {

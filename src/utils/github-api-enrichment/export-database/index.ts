@@ -5,12 +5,12 @@ import { log } from "../../../utils";
 import grab from "./fetch-from-supabase";
 import writeCsvToDisk from "./json2csv";
 
-let tableName = "GitHub User"; // default
+// let tableName; // = "GitHub User"; // default
 
-if (commandLineArgs.table?.length) {
-  log.info(`writing to database table ${commandLineArgs.table}`);
-  tableName = commandLineArgs.table;
-}
+// if (commandLineArgs.table?.length) {
+log.info(`writing to database table ${commandLineArgs.table}`);
+const tableName = commandLineArgs.table;
+// }
 
 async function _wrapper() {
   const data = await grab(tableName, "*");
