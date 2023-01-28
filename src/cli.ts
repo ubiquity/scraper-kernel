@@ -21,7 +21,6 @@ if (!readCommandLineArgs.table) {
   }
 } else {
   // a table has been specified
-
   // save the table name to state.json
   const state = { table: readCommandLineArgs.table };
   fs.writeFileSync("./state.json", JSON.stringify(state));

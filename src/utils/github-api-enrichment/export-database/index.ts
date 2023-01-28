@@ -9,7 +9,7 @@ import writeCsvToDisk from "./json2csv";
 
 // if (commandLineArgs.table?.length) {
 log.info(`writing to database table ${commandLineArgs.table}`);
-const tableName = commandLineArgs.table;
+const tableName = commandLineArgs.table as string;
 // }
 
 async function _wrapper() {

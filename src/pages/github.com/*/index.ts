@@ -9,7 +9,7 @@ import commandLineArgs from "../../../cli-args";
 
 // if (commandLineArgs.table?.length) {
 log.info(`writing to database table ${commandLineArgs.table}`);
-const tableName = commandLineArgs.table;
+const tableName = commandLineArgs.table as string;
 // }
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -142,9 +142,13 @@ async function scrapePersonalProfile(page, contributions) {
   fs.appendFile(`buffer.csv`, [new Date(), ...row].join(",").concat("\n"), (error) => error && console.error(error));
 
   const response = await supabase.from(tableName).upsert(profile, { onConflict: "login" });
+
   if (response.error) {
-    throw new Error(JSON.stringify(response.error));
+    console.log(`response.error`);
+    console.error(response);
+    console.log(`response.error stringified`);
+    console.error(JSON.stringify(response));
+    throw new Error(`Supabase error!`);
   }
-  // console.log(response); // { data, error }
   return profile;
 }
