@@ -8,7 +8,7 @@
   "module": "dist/cli.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "ci": "node dist/cli.js https://github.com/pavlovcik https://github.com/transitive-bullshit",
+    "ci": "node dist/cli.js https://github.com/pavlovcik https://github.com/transitive-bullshit --table sandbox",
     "utils:database-export": "node ./dist/utils/github-api-enrichment",
     "_start": "node dist/cli.js",
     "_watch:telegram": "nodemon dist https://web.telegram.org/z/",
