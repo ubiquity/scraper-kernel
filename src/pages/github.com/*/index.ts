@@ -140,7 +140,7 @@ async function scrapePersonalProfile(page, contributions) {
   ];
 
   fs.appendFile(`buffer.csv`, [new Date(), ...row].join(",").concat("\n"), (error) => error && console.error(error));
-
+  console.log({ tableName });
   const response = await supabase.from(tableName).upsert(profile, { onConflict: "login" });
 
   if (response.error) {
