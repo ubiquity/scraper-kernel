@@ -17,7 +17,7 @@ export default (buffer: Buffer) => {
       const qrcode = new qrCode();
       qrcode.callback = function (err: any, value: { result: any }) {
         if (err) {
-          reject(err);
+          return reject(err);
         }
         resolve(value.result);
       };

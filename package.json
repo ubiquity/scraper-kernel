@@ -40,12 +40,12 @@
   },
   "devDependencies": {
     "@types/command-line-args": "^5.2.0",
-    "@types/follow-redirects": "^1.14.1",
-    "@types/source-map-support": "^0.5.4",
     "@types/command-line-usage": "^5.0.2",
-    "@types/node": "^16.10.8",
+    "@types/follow-redirects": "^1.14.1",
+    "@types/node": "^18.11.18",
     "@types/p-all": "^2.0.0",
-    "@types/puppeteer": "^5.4.4"
+    "@types/puppeteer": "^5.4.4",
+    "@types/source-map-support": "^0.5.4"
   },
   "dependencies": {
     "@supabase/supabase-js": "^1.35.7",

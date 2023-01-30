@@ -1,4 +1,3 @@
-import fs from "fs";
 import puppeteer, { Page } from "puppeteer";
 import scrape from "../../../../scrape";
 import { getProperty, log } from "../../../../utils";

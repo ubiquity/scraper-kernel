@@ -104,7 +104,7 @@ function trimmedOrNull(value: string | null | undefined) {
     return null;
   }
   const trimmed = value.trim();
-  if (trimmed?.length) {
+  if (trimmed.length) {
     return trimmed;
   }
   return null;
