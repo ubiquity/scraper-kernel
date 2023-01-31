@@ -7,6 +7,7 @@
   "main": "dist/cli.js",
   "module": "dist/cli.js",
   "types": "dist/index.d.ts",
+  "version": "1.0.0",
   "scripts": {
     "test:ci": "node dist/cli.js https://github.com/pavlovcik https://github.com/transitive-bullshit --table sandbox",
     "utils:database-export": "node dist/utils/github-api-enrichment/export-database",
