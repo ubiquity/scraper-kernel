@@ -14,14 +14,14 @@ export default (buffer: Buffer) => {
       if (err) {
         reject(err);
       }
-      const qrcode = new qrCode();
-      qrcode.callback = function (err: any, value: { result: any }) {
+      const QRCode = new qrCode();
+      QRCode.callback = function (err: any, value: { result: any }) {
         if (err) {
           return reject(err);
         }
         resolve(value.result);
       };
-      qrcode.decode(image.bitmap);
+      QRCode.decode(image.bitmap);
     }
   });
 };
