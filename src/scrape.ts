@@ -17,6 +17,7 @@ export interface UserSettings {
 }
 
 export default async function scrape(settings: UserSettings, browser?: Browser): Promise<JobResult | JobResult[]> {
+  // console.log({ settings });
   const { pagesDirectory, urls } = settings;
 
   if (!pagesDirectory) {
@@ -25,7 +26,7 @@ export default async function scrape(settings: UserSettings, browser?: Browser):
 
   if (!browser) {
     browser = (await browserSetup(config)) as Browser;
-    attachEvents(browser, pagesDirectory);
+    attachEvents(browser, settings);
   }
 
   if (typeof urls === "string") {

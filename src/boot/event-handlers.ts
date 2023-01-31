@@ -37,6 +37,6 @@ export const eventHandlers = {
    * @param browser the browser instance
    */
   // browserOnTargetChanged: browserOnTargetChangedHandler,
-  setupBrowserOnTargetChanged: (browser, pagesDirectory) => browserOnTargetChangedHandler(browser, pagesDirectory),
+  setupBrowserOnTargetChanged: (browser, settings) => browserOnTargetChangedHandler(browser, settings),
 };
 export default eventHandlers;

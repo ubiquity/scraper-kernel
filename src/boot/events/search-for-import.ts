@@ -17,6 +17,7 @@ const cwd = resolveProjectPath();
 const cwdParentName = path.join(cwd, "..");
 
 export async function searchForImport(importing: string, verbose?: number, startPosition?: string): Promise<PageLogic> {
+
   return await _searchForImport(importing, startPosition ? startPosition : importing, verbose);
 }
 
@@ -65,13 +66,12 @@ export function renameLastPartOfPathToWildCard(query: string) {
 }
 
 async function checkModifier(importing: string, modifier: string, verbose?: number) {
-  let logic;
   const importingDestination = path.resolve(importing, modifier);
   // console.log(colorizeText(`\t⚠ trying ${importingDestination}`, "fgWhite"));
   // console.trace(importingDestination);
   if (fs.existsSync(importingDestination)) {
     // console.log(colorizeText(`\t⚠ [${importingDestination}] found looking for [default]`, "fgWhite"));
-    logic = (await import(importingDestination))?.default;
+    const logic = (await import(importingDestination))?.default;
     if (logic) {
       console.log(`[${importingDestination}] module loaded successfully`, verbose);
       // log.ok(`[${importingDestination}] module loaded successfully`, verbose);

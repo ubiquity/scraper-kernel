@@ -1,9 +1,9 @@
 import { Browser } from "puppeteer";
-import { eventEmitter } from "../../scrape";
+import { eventEmitter, UserSettings } from "../../scrape";
 import { eventHandlers } from "../event-handlers";
 
-export function attachEvents(browser: Browser, pagesDirectory: string) {
-  const browserOnTargetChanged = eventHandlers.setupBrowserOnTargetChanged(browser, pagesDirectory);
+export function attachEvents(browser: Browser, settings: UserSettings) {
+  const browserOnTargetChanged = eventHandlers.setupBrowserOnTargetChanged(browser, settings);
 
   browser.on("targetchanged", browserOnTargetChanged);
   eventEmitter.on("proxytimeout", eventHandlers.proxyTimeout());
