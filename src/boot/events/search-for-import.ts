@@ -58,6 +58,8 @@ export function renameLastPartOfPathToWildCard(query: string) {
   if (!resolvedPath.includes(cwdParentName)) {
     // @TODO: `cwdParentName` check could be implemented better, but for now, it works.
     // THE REQUESTED IMPORT PATH IS OUTSIDE OF THE PROJECT DIRECTORY, WHICH IS INVALID
+    console.error(`requested: ${resolvedPath}`);
+    console.error(`directory: ${cwdParentName}`);
     throw new Error("the requested page logic import path is outside of the project directory, which is invalid");
   }
 
@@ -69,16 +71,16 @@ async function checkModifier(importing: string, modifier: string, verbose?: numb
   // console.log(colorizeText(`\t⚠ trying ${importingDestination}`, "fgWhite"));
   // console.trace(importingDestination);
   if (fs.existsSync(importingDestination)) {
-    // console.log(colorizeText(`\t⚠ [${importingDestination}] found looking for [default]`, "fgWhite"));
+    // console.log(colorizeText(`\t⚠ "${importingDestination}" found looking for [default]`, "fgWhite"));
     const logic = (await import(importingDestination))?.default;
     if (logic) {
-      console.log(`[${importingDestination}] module loaded successfully`, verbose);
-      // log.ok(`[${importingDestination}] module loaded successfully`, verbose);
+      console.log(`"${importingDestination}" module loaded successfully`, verbose);
+      // log.ok(`"${importingDestination}" module loaded successfully`, verbose);
       return logic as PageLogic;
     }
   } else {
-    console.info(`[${importingDestination}] not found`, verbose);
-    // log.info(`[${importingDestination}] not found`, verbose);
+    console.info(`"${importingDestination}" not found`, verbose);
+    // log.info(`"${importingDestination}" not found`, verbose);
     return null;
   }
 }

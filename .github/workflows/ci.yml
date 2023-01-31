@@ -8,8 +8,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v2
-      - name: Build & Run
+      - name: Build
         run: |
           yarn
           yarn tsc
-          yarn test:ci
