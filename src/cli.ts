@@ -1,6 +1,30 @@
 import "source-map-support/register";
 import readCommandLineArgs from "./cli-args";
 import scrape from "./scrape";
+import fs from "fs";
+
+if (!readCommandLineArgs.table) {
+  // no table has been specified
+
+  // check if the table name has already been specified and saved to state.json
+  // if not, then exit the process with an error
+
+  if (fs.existsSync("./state.json")) {
+    const state = JSON.parse(fs.readFileSync("./state.json", "utf8"));
+    if (state.table) {
+      readCommandLineArgs.table = state.table;
+      console.log(`Using table "${state.table}" from state.json`);
+    }
+  } else {
+    console.error(`No table specified. Example usage: \`--table "GitHub User"\``);
+    process.exit(1);
+  }
+} else {
+  // a table has been specified
+  // save the table name to state.json
+  const state = { table: readCommandLineArgs.table };
+  fs.writeFileSync("./state.json", JSON.stringify(state));
+}
 
 // CLI ADAPTER
 scrape(readCommandLineArgs.urls, readCommandLineArgs.pages)

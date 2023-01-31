@@ -8,9 +8,9 @@ export type DestinationStrategy = (destination: string) => string;
 export function resolveProjectPath() {
   const projectPath = path.resolve(require.main?.filename as string, "..", "..");
   if (!projectPath) {
-    throw new Error("no project path resolved")
+    throw new Error("no project path resolved");
   }
-  return projectPath
+  return projectPath;
 }
 
 const cwd = resolveProjectPath();

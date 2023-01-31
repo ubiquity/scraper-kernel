@@ -1,7 +1,6 @@
 import path from "path";
 import { Browser, Page, Target } from "puppeteer";
 import { eventEmitter } from "../../scrape";
-import { colorizeText } from "../../utils";
 import { resolveProjectPath, searchForImport } from "./search-for-import";
 
 export const browserOnTargetChangedHandler = (_browser: Browser, pagesDirectory: string) => async (target: Target) => {

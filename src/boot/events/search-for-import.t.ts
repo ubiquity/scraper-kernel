@@ -1,5 +1,4 @@
-import { log } from "../../utils";
-import { renameLastPartOfPathToWildCard, searchForImport } from "./search-for-import";
+import { searchForImport } from "./search-for-import";
 
 // test
 const paths = [
