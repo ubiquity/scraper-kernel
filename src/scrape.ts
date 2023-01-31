@@ -10,22 +10,29 @@ import newTabToURL from "./boot/new-tab-to-url";
 export const eventEmitter = new EventEmitter();
 export type JobResult = Error | string | null;
 
-export default async function scrape(
-  urls: string[] | string,
-  pagesDirectory: string, // page logic directory path
-  browser?: Browser
-): Promise<JobResult | JobResult[]> {
+export interface UserSettings {
+  urls: string[] | string;
+  pagesDirectory: string; // page logic directory path
+  verbose?: number;
+}
+
+export default async function scrape(settings: UserSettings, browser: undefined | Browser): Promise<JobResult | JobResult[]> {
+  const { pagesDirectory, urls } = settings;
+
   if (!pagesDirectory) {
     throw new Error("Need page logic path");
   }
 
-  browser = await attachEventsOnFirstRun(pagesDirectory, browser);
+  if (!browser) {
+    browser = await browserSetup(config) as Browser;
+    attachEvents(browser, pagesDirectory);
+  }
 
   if (typeof urls === "string") {
-    const singleResult = await _scrapeSingle(urls, browser);
+    const singleResult = await _scrapeSingle(urls, browser as Browser);
     return singleResult;
   } else if (Array.isArray(urls)) {
-    const seriesResults = await _scrapeSeries(urls, browser);
+    const seriesResults = await _scrapeSeries(urls, browser as Browser);
     return seriesResults;
   } else {
     throw new Error("`urls` must be of types `string[] | string` ");
@@ -47,7 +54,7 @@ export async function _scrapeSingle(url: string, browser: Browser): Promise<JobR
   });
   console.log(`>>`, url); // useful to follow headless page navigation
   const { page, response } = await newTabToURL(browser, url);
-  if (response.status() >= 300) {
+  if (response && response.status() >= 300) {
     return new Error(`<< [ ${url} ] HTTP status code ${response.status()}`);
   }
   const results = await scrapeJob;
@@ -56,12 +63,4 @@ export async function _scrapeSingle(url: string, browser: Browser): Promise<JobR
   }
   await page.close(); // save memory
   return results;
-}
-
-async function attachEventsOnFirstRun(pagesDirectory: string, browser?: Browser) {
-  if (!browser) {
-    browser = await browserSetup(config);
-    attachEvents(browser, pagesDirectory);
-  }
-  return browser;
 }

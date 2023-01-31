@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 
 import { BrowserConnectOptions } from "puppeteer";
-import readCommandLineArgs from "../cli-args";
 dotenv.config();
 
 export default {
@@ -12,10 +11,9 @@ export default {
   cache: "../cache",
 } as BrowserConnectOptions;
 
-function isHeadless() {
+function isHeadless(headful?: boolean) {
   // the default settings are that the browser is headless (aka headful is false)
   // first we should check the command line arguments. if the user has passed in the --headful flag, then we should set headless to false (aka headful is true)
-  const headful = readCommandLineArgs?.headful;
   if (headful) {
     return false;
   }

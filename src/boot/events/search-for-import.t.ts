@@ -53,7 +53,7 @@ describe the pattern:
 async function test(paths) {
   for (const path of paths) {
     console.log(`>> ${path}`);
-    await searchForImport(path);
+    await searchForImport(path, 5);
     console.log();
     // log.warn(`${renameLastPartOfPathToWildCard(path)}`);
     // console.log();

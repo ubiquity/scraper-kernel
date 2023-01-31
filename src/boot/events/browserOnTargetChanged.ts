@@ -1,9 +1,9 @@
 import path from "path";
 import { Browser, Page, Target } from "puppeteer";
-import { eventEmitter } from "../../scrape";
-import { resolveProjectPath, searchForImport } from "./search-for-import";
+import { eventEmitter, UserSettings } from "../../scrape";
+import { searchForImport } from "./search-for-import";
 
-export const browserOnTargetChangedHandler = (_browser: Browser, pagesDirectory: string) => async (target: Target) => {
+export const browserOnTargetChangedHandler = (_browser: Browser, settings: UserSettings) => async (target: Target) => {
   const page = await target.page();
   if (!page) {
     return;
@@ -16,7 +16,7 @@ export const browserOnTargetChangedHandler = (_browser: Browser, pagesDirectory:
   // }
 
   const scrapeCompletedCallback = new Promise((resolve, reject) => {
-    eventEmitter.emit("logicloaded", logicLoadedCallback(page, resolve, reject, pagesDirectory));
+    eventEmitter.emit("logicloaded", logicLoadedCallback(page, resolve, reject, settings));
   }).catch((error: Error) => error && console.error(error));
 
   eventEmitter.emit("scrapecomplete", scrapeCompletedCallback);
@@ -50,7 +50,8 @@ async function disableCosmetics(page: Page) {
   });
 }
 
-function logicLoadedCallback(page: Page, resolve, reject, pagesDirectory: string) {
+function logicLoadedCallback(page: Page, resolve, reject, settings: UserSettings) {
+  const { pagesDirectory, verbose } = settings;
   return async function _logicLoadedCallback(browser: Browser) {
     const url = page.url();
     let importing = url.split("://").pop();
@@ -58,11 +59,9 @@ function logicLoadedCallback(page: Page, resolve, reject, pagesDirectory: string
       throw new Error("Page URL parse error");
     }
 
-    // if (!pagesDirectory) (pagesDirectory = resolveProjectPath()), "dist", "pages"; // remove me later
-
     importing = path.resolve(pagesDirectory, importing); // initialize
 
-    const logic = await searchForImport(importing as string)
+    const logic = await searchForImport(importing as string, verbose)
       // ERROR HANDLE
       .catch(function _logicLoadedCallbackErrorCatch(error) {
         eventEmitter.emit("logicfailed", error);
