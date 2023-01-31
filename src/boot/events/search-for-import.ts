@@ -17,7 +17,6 @@ const cwd = resolveProjectPath();
 const cwdParentName = path.join(cwd, "..");
 
 export async function searchForImport(importing: string, verbose?: number, startPosition?: string): Promise<PageLogic> {
-
   return await _searchForImport(importing, startPosition ? startPosition : importing, verbose);
 }
 
