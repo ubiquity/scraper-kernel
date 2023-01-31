@@ -12,58 +12,39 @@ export type JobResult = Error | string | null; // definitely string, but not sur
 
 export default async function scrape(
   urls: string[] | string,
-  browser?: Browser,
-  PAGES_PATH?: string // page logic directory path
+  pagesDirectory: string, // page logic directory path
+  browser?: Browser
   // , concurrency?: number
 ): Promise<JobResult | JobResult[]> {
-  if (!PAGES_PATH) {
+  if (!pagesDirectory) {
     throw new Error("Need page logic path");
   }
 
   browser = await attachEventsOnFirstRun(browser);
 
   if (typeof urls === "string") {
-    const singleResult = await _scrapeSingle(urls, browser, PAGES_PATH);
-    // console.trace({ urls, singleResult });
+    const singleResult = await _scrapeSingle(urls, browser, pagesDirectory);
     return singleResult;
   } else if (Array.isArray(urls)) {
-    // if (concurrency) {
-    //   const concurrentResults = await _scrapeConcurrently(urls, browser, concurrency);
-    //   // console.trace({ urls, concurrentResults });
-    //   throw concurrentResults; // @FIXME: should return when this doesn't throw an error
-    // } else {
-    const seriesResults = await _scrapeSeries(urls, browser, PAGES_PATH);
-    // console.trace({ urls, seriesResults });
+    const seriesResults = await _scrapeSeries(urls, browser, pagesDirectory);
     return seriesResults;
-    // }
   } else {
     throw new Error("`urls` must be of types `string[] | string` ");
   }
 }
 
-export async function _scrapeSeries(urls: string[], browser: Browser, PAGES_PATH: string): Promise<JobResult[]> {
+export async function _scrapeSeries(urls: string[], browser: Browser, pagesDirectory: string): Promise<JobResult[]> {
   const completedScrapes = [] as JobResult[];
   for (const url of urls) {
-    completedScrapes.push(await _scrapeSingle(url, browser, PAGES_PATH));
+    completedScrapes.push(await _scrapeSingle(url, browser, pagesDirectory));
   }
   return completedScrapes;
 }
 
-export async function _scrapeConcurrently(urls: string[], browser: Browser, concurrency: number) {
-  // : Promise<JobResult[]>
-  return new Error("function _scrapeConcurrently isn't implemented correctly");
-  // const input: AsyncIterable<unknown> | Iterable<unknown> = urls;
-  // const mapper = async (site) => await _scrapeSingle(site, browser);
-  // const options = { concurrency };
-  // const map = await pMap(input, mapper, options).catch((error) => error && console.trace(error));
-  // // debugger;
-  // return map;
-}
-
 type ResolveFunction = (results: string) => void;
-export async function _scrapeSingle(url: string, browser: Browser, PAGES_PATH: string): Promise<JobResult | Error> {
+export async function _scrapeSingle(url: string, browser: Browser, pagesDirectory: string): Promise<JobResult | Error> {
   const scrapeJob = new Promise(function addCallbackEvent(resolve: ResolveFunction, reject): void {
-    eventEmitter.once("scrapecomplete", renderEventHandlers(PAGES_PATH).scrapeComplete(resolve, reject));
+    eventEmitter.once("scrapecomplete", renderEventHandlers(pagesDirectory).scrapeComplete(resolve, reject));
   });
   console.log(`>>`, url); // useful to follow headless page navigation
   const { page, response } = await newTabToURL(browser, url);

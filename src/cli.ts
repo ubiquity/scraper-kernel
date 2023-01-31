@@ -3,7 +3,7 @@ import readCommandLineArgs from "./cli-args";
 import scrape from "./scrape";
 
 // CLI ADAPTER
-scrape(readCommandLineArgs.urls, undefined, readCommandLineArgs.pages)
+scrape(readCommandLineArgs.urls, readCommandLineArgs.pages)
   .then((data) => {
     console.log(`<<`, data);
     process.exit(0);

@@ -5,7 +5,7 @@ import { browserOnTargetChangedHandler } from "./events/browserOnTargetChanged";
 
 export type PageLogic = (browser: Browser, page: Page) => Promise<string[]>;
 
-export default function renderEventHandlers(PAGES_PATH: string) {
+export default function renderEventHandlers(pagesDirectory: string) {
   return {
     proxyTimeout: function proxyTimeoutHandler(_browser: Browser): (...args: any[]) => void {
       return function setupProxies(callback) {
@@ -39,7 +39,7 @@ export default function renderEventHandlers(PAGES_PATH: string) {
      * It will load the logic for the page and then call the logic.
      * @param browser the browser instance
      */
-    browserOnTargetChanged: (browser: Browser) => browserOnTargetChangedHandler(browser, PAGES_PATH),
+    browserOnTargetChanged: (browser: Browser) => browserOnTargetChangedHandler(browser, pagesDirectory),
   };
 }
 
