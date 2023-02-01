@@ -1,23 +1,22 @@
 {
-  "name": "@ubiquity/scraper",
+  "name": "@ubiquity/scraper-kernel",
   "license": "MIT",
   "author": {
     "name": "アレクサンダー.eth"
   },
-  "main": "dist/cli.js",
-  "module": "dist/cli.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/scrape.js",
+  "module": "dist/scrape.js",
+  "types": "dist/scrape.d.ts",
   "version": "0.1.0",
   "scripts": {
     "utils:database-export": "node dist/utils/github-api-enrichment/export-database",
     "prepare": "husky install",
     "prebuild": "run-s clean",
     "build": "tsc --watch",
-    "clean": "rimraf dist tsconfig.tsbuildinfo",
+    "clean": "rimraf dist tsconfig.tsbuildinfo node_modules",
     "format": "run-s format:*",
     "format:prettier": "prettier --write .",
-    "format:eslint": "eslint . --ext .ts --fix",
-    "test:series": "node . --verbose 5 --urls https://github.com/finnovateinc/iwns-demo https://github.com/mbcse/web3me-ethonline.git https://github.com/txme/doTransfer https://github.com/apoorvlathey/uni-feeswap https://github.com/pikachua7/DigiOffice-v2.0 https://github.com/Dasika-Vaishnavi/Oceano_Eth https://github.com/Ajand/Coursalize https://github.com/knrdrbn/m1n75n1p3r/ https://github.com/orgs/surfDB/repositories https://github.com/xcryptoshadow/BoxShare https://github.com/zerpajose/PostIt-Backend-and-Contracts https://github.com/goldzulu/myprecious.git https://github.com/emmajane1313/inarisynth https://github.com/Siddesh7/eth-split1 https://github.com/itsanishjain/W3commerce https://github.com/Ptodoroff/NFT-Metaverse"
+    "format:eslint": "eslint . --ext .ts --fix"
   },
   "lint-staged": {
     "*.{ts}": "eslint --fix"
