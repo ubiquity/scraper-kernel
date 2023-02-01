@@ -5,11 +5,13 @@ import { browserOnTargetChangedHandler } from "./events/browserOnTargetChanged";
 export type PageLogic = (browser: Browser, page: Page) => Promise<string[]>;
 
 export const eventHandlers = {
-  proxyTimeout: function proxyTimeoutHandler() {
-    return function setupProxies(callback) {
-      callback();
-    };
-  },
+  /**
+   * This is the main handler that will be called when the browser navigates to any new page.
+   * It will load the logic for the page and then call the logic.
+   * @param browser the browser instance
+   */
+  setupBrowserOnTargetChanged: (browser, settings) => browserOnTargetChangedHandler(browser, settings),
+
   logicLoaded: function logicLoadedHandler(browser: Browser) {
     return async function _logicLoadedHandler(logic: PageLogic, page: Page) {
       return await logic(browser, page);
@@ -17,7 +19,6 @@ export const eventHandlers = {
   },
   logicFailed: function logicFailedHandler() {
     return function _logicFailedHandler(error: Error) {
-      // log.error(error.message);
       throw error;
     };
   },
@@ -31,12 +32,10 @@ export const eventHandlers = {
     };
   },
 
-  /**
-   * This is the main handler that will be called when the browser navigates to any new page.
-   * It will load the logic for the page and then call the logic.
-   * @param browser the browser instance
-   */
-  // browserOnTargetChanged: browserOnTargetChangedHandler,
-  setupBrowserOnTargetChanged: (browser, settings) => browserOnTargetChangedHandler(browser, settings),
+  // proxyTimeout: function proxyTimeoutHandler() {
+  //   return function setupProxies(callback) {
+  //     callback();
+  //   };
+  // },
 };
 export default eventHandlers;
