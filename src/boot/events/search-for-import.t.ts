@@ -54,7 +54,7 @@ describe the pattern:
 async function test(paths) {
   for (const path of paths) {
     console.log(`>> ${path}`);
-    const handler = await searchForImport(path, 5);
+    await searchForImport(path, 5);
     console.log();
   }
 }
