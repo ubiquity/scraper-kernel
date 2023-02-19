@@ -6,21 +6,20 @@ import config from "./boot/config";
 import { eventHandlers } from "./boot/event-handlers";
 import { attachEvents } from "./boot/events/attachEvents";
 import newTabToURL from "./boot/new-tab-to-url";
+import { log } from "./logging";
 
-export const eventEmitter = new EventEmitter();
+export const events = new EventEmitter();
 export type JobResult = Error | string | null;
 
 export interface UserSettings {
   urls: string[] | string;
-  pagesDirectory: string; // page logic directory path
-  verbose?: number;
+  pages: string; // page logic directory path
 }
 
 export default async function scrape(settings: UserSettings, browser?: Browser): Promise<JobResult | JobResult[]> {
-  // console.log({ settings });
-  const { pagesDirectory, urls } = settings;
+  const { pages, urls } = settings;
 
-  if (!pagesDirectory) {
+  if (!pages) {
     throw new Error("Need page logic path");
   }
 
@@ -42,18 +41,31 @@ export default async function scrape(settings: UserSettings, browser?: Browser):
 
 export async function _scrapeSeries(urls: string[], browser: Browser): Promise<JobResult[]> {
   const completedScrapes = [] as JobResult[];
-  for (const url of urls) {
-    completedScrapes.push(await _scrapeSingle(url, browser));
+
+  if (urls.length > 127) {
+    // This was added because the VPS was running out of memory and crashing the process
+    // This is a best guess for what could be contributing to the memory leak.
+    log.warn(`You are attempting to scrape ${urls.length} pages. This may cause your browser to crash. Consider using a smaller batch size.`);
+    log.warn(`This will not collect the batch results in memory (in order to save memory.) Your page logic must handle saving the data elsewhere!`);
+    for (const url of urls) {
+      await _scrapeSingle(url, browser);
+    }
+    return completedScrapes;
+  } else {
+    // Normal buffer behavior to console.log all of the results at the end cleanly and in order
+    for (const url of urls) {
+      completedScrapes.push(await _scrapeSingle(url, browser));
+    }
+    return completedScrapes;
   }
-  return completedScrapes;
 }
 
 type ResolveFunction = (results: string) => void;
 export async function _scrapeSingle(url: string, browser: Browser): Promise<JobResult | Error> {
-  const scrapeJob = new Promise(function addCallbackEvent(resolve: ResolveFunction, reject): void {
-    eventEmitter.once("scrapecomplete", eventHandlers.scrapeComplete(resolve, reject));
+  const scrapeJob = new Promise(function addCallbackEvent(resolve: ResolveFunction, reject) {
+    events.once("scrapecomplete", eventHandlers.scrapeComplete(resolve, reject));
   });
-  console.log(`>>`, url); // useful to follow headless page navigation
+  console.log(`>>`, url); // useful to follow page navigation
   const { page, response } = await newTabToURL(browser, url);
   if (response && response.status() >= 300) {
     return new Error(`<< [ ${url} ] HTTP status code ${response.status()}`);

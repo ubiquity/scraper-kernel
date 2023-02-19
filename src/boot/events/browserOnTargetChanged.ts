@@ -1,6 +1,6 @@
 import path from "path";
 import { Browser, Page, Target } from "puppeteer";
-import { eventEmitter, UserSettings } from "../../scrape";
+import { events, UserSettings } from "../../scrape";
 import { searchForImport } from "./search-for-import";
 
 export const browserOnTargetChangedHandler = (_browser: Browser, settings: UserSettings) => async (target: Target) => {
@@ -10,16 +10,16 @@ export const browserOnTargetChangedHandler = (_browser: Browser, settings: UserS
   }
   await disableCosmetics(page);
   // try {
-  await page.waitForNavigation({ waitUntil: "networkidle2" }).catch((error) => eventEmitter.emit("logicfailed", error));
+  await page.waitForNavigation({ waitUntil: "networkidle2" }).catch((error) => events.emit("logicfailed", error));
   // } catch (error) {
   // eventEmitter.emit("logicfailed", error);
   // }
 
   const scrapeCompletedCallback = new Promise((resolve, reject) => {
-    eventEmitter.emit("logicloaded", logicLoadedCallback(page, resolve, reject, settings));
+    events.emit("logicloaded", logicLoadedCallback(page, resolve, reject, settings));
   }).catch((error: Error) => error && console.error(error));
 
-  eventEmitter.emit("scrapecomplete", scrapeCompletedCallback);
+  events.emit("scrapecomplete", scrapeCompletedCallback);
 };
 
 async function disableCosmetics(page: Page) {
@@ -51,7 +51,7 @@ async function disableCosmetics(page: Page) {
 }
 
 function logicLoadedCallback(page: Page, resolve, reject, settings: UserSettings) {
-  const { pagesDirectory, verbose } = settings;
+  const { pages } = settings;
   return async function _logicLoadedCallback(browser: Browser) {
     const url = page.url();
     let importing = url.split("://").pop();
@@ -59,12 +59,12 @@ function logicLoadedCallback(page: Page, resolve, reject, settings: UserSettings
       throw new Error("Page URL parse error");
     }
 
-    importing = path.resolve(pagesDirectory, importing); // initialize
+    importing = path.resolve(pages, importing); // initialize
 
-    const logic = await searchForImport(importing as string, verbose)
+    const logic = await searchForImport(importing as string)
       // ERROR HANDLE
       .catch(function _logicLoadedCallbackErrorCatch(error) {
-        eventEmitter.emit("logicfailed", error);
+        events.emit("logicfailed", error);
         return async function _logicLoadedCallbackErrorCatch_(error) {
           reject(error);
           throw error;

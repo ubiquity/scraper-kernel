@@ -1,3 +1,16 @@
 {
-  "words": ["hackathon", "hackathons", "HEADFUL", "pavlovcik", "scrapecomplete", "Spys", "supabase"]
+  "words": [
+    "hackathon",
+    "hackathons",
+    "HEADFUL",
+    "logicfailed",
+    "logicloaded",
+    "networkidle",
+    "pavlovcik",
+    "proxytimeout",
+    "scrapecomplete",
+    "Spys",
+    "supabase",
+    "targetchanged"
+  ]
 }

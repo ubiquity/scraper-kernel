@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { PageLogic } from "../event-handlers";
 // import { log } from '../../../../utils';
+import { log } from "../../logging";
 
 export type DestinationStrategy = (destination: string) => string;
 
@@ -16,24 +17,22 @@ export function resolveProjectPath() {
 const cwd = resolveProjectPath();
 const cwdParentName = path.join(cwd, "..");
 
-export async function searchForImport(importing: string, verbose?: number, startPosition?: string): Promise<PageLogic> {
-
-  return await _searchForImport(importing, startPosition ? startPosition : importing, verbose);
+export async function searchForImport(importing: string, startPosition?: string): Promise<PageLogic> {
+  return await _searchForImport(importing, startPosition ? startPosition : importing);
 }
 
-async function _searchForImport(importing: string, startPosition: string, verbose?: number) {
+async function _searchForImport(importing: string, startPosition: string) {
   if (importing.endsWith(path.sep)) {
     // normalize requested path name to remove trailing slash
     importing = importing.slice(0, -1);
   }
 
   if (!importing.includes(cwd)) {
-    console.error(`out of bounds`, verbose);
-    // log.error(`out of bounds`, verbose);
+    log.error(`out of bounds`);
     importing = startPosition = path.resolve(startPosition, ".."); // go up one directory from `startPosition`
   }
 
-  const logic = (await checkModifier(importing, "index.js", verbose)) || (await checkModifier(importing, "*", verbose));
+  const logic = (await checkModifier(importing, "index.ts")) || (await checkModifier(importing, "*"));
 
   if (logic) {
     return logic;
@@ -59,27 +58,24 @@ export function renameLastPartOfPathToWildCard(query: string) {
   if (!resolvedPath.includes(cwdParentName)) {
     // @TODO: `cwdParentName` check could be implemented better, but for now, it works.
     // THE REQUESTED IMPORT PATH IS OUTSIDE OF THE PROJECT DIRECTORY, WHICH IS INVALID
+    log.error(`requested: ${resolvedPath}`);
+    log.error(`directory: ${cwdParentName}`);
     throw new Error("the requested page logic import path is outside of the project directory, which is invalid");
   }
 
   return resolvedPath;
 }
 
-async function checkModifier(importing: string, modifier: string, verbose?: number) {
+async function checkModifier(importing: string, modifier: string) {
   const importingDestination = path.resolve(importing, modifier);
-  // console.log(colorizeText(`\t⚠ trying ${importingDestination}`, "fgWhite"));
-  // console.trace(importingDestination);
   if (fs.existsSync(importingDestination)) {
-    // console.log(colorizeText(`\t⚠ [${importingDestination}] found looking for [default]`, "fgWhite"));
     const logic = (await import(importingDestination))?.default;
     if (logic) {
-      console.log(`[${importingDestination}] module loaded successfully`, verbose);
-      // log.ok(`[${importingDestination}] module loaded successfully`, verbose);
+      log.ok(`"${importingDestination}" module loaded successfully`);
       return logic as PageLogic;
     }
   } else {
-    console.info(`[${importingDestination}] not found`, verbose);
-    // log.info(`[${importingDestination}] not found`, verbose);
+    log.info(`"${importingDestination}" not found`);
     return null;
   }
 }
