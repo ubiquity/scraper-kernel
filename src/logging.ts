@@ -1,4 +1,19 @@
-export const colors = {
+export const log = {
+  error: function errorLog(message: string) {
+    console.error(colorizeText(`\t⚠ ${message}`, "fgRed"));
+  },
+  ok: function okLog(message: string) {
+    console.log(colorizeText(`\t⚠ ${message}`, "fgGreen"));
+  },
+  warn: function warnLog(message: string) {
+    console.warn(colorizeText(`\t⚠ ${message}`, "fgYellow"));
+  },
+  info: function infoLog(message: string) {
+    console.info(colorizeText(`\t⚠ ${message}`, "fgWhite"));
+  },
+};
+
+const colors = {
   reset: "\x1b[0m",
   bright: "\x1b[1m",
   dim: "\x1b[2m",
@@ -28,26 +43,3 @@ export const colors = {
 function colorizeText(text: string, color: keyof typeof colors): string {
   return colors[color].concat(text).concat(colors.reset);
 }
-
-export const log = {
-  error: function errorLog(message: string, verbose?: number) {
-    if (verbose && verbose >= 1) {
-      console.error(colorizeText(`\t⚠ ${message}`, "fgRed"));
-    }
-  },
-  ok: function okLog(message: string, verbose?: number) {
-    if (verbose && verbose >= 2) {
-      console.log(colorizeText(`\t⚠ ${message}`, "fgGreen"));
-    }
-  },
-  warn: function warnLog(message: string, verbose?: number) {
-    if (verbose && verbose >= 3) {
-      console.warn(colorizeText(`\t⚠ ${message}`, "fgYellow"));
-    }
-  },
-  info: function infoLog(message: string, verbose?: number) {
-    if (verbose && verbose >= 4) {
-      console.info(colorizeText(`\t⚠ ${message}`, "fgWhite"));
-    }
-  },
-};
