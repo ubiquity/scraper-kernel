@@ -51,7 +51,7 @@ async function disableCosmetics(page: Page) {
 }
 
 function logicLoadedCallback(page: Page, resolve, reject, settings: UserSettings) {
-  const { pagesDirectory, verbose } = settings;
+  const { pages } = settings;
   return async function _logicLoadedCallback(browser: Browser) {
     const url = page.url();
     let importing = url.split("://").pop();
@@ -59,9 +59,9 @@ function logicLoadedCallback(page: Page, resolve, reject, settings: UserSettings
       throw new Error("Page URL parse error");
     }
 
-    importing = path.resolve(pagesDirectory, importing); // initialize
+    importing = path.resolve(pages, importing); // initialize
 
-    const logic = await searchForImport(importing as string, verbose)
+    const logic = await searchForImport(importing as string)
       // ERROR HANDLE
       .catch(function _logicLoadedCallbackErrorCatch(error) {
         events.emit("logicfailed", error);

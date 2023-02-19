@@ -13,14 +13,13 @@ export type JobResult = Error | string | null;
 
 export interface UserSettings {
   urls: string[] | string;
-  pagesDirectory: string; // page logic directory path
-  verbose?: number;
+  pages: string; // page logic directory path
 }
 
 export default async function scrape(settings: UserSettings, browser?: Browser): Promise<JobResult | JobResult[]> {
-  const { pagesDirectory, urls } = settings;
+  const { pages, urls } = settings;
 
-  if (!pagesDirectory) {
+  if (!pages) {
     throw new Error("Need page logic path");
   }
 

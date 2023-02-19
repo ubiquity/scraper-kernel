@@ -1,3 +1,4 @@
+import { log } from "../../logging";
 import { searchForImport } from "./search-for-import";
 
 // test
@@ -53,9 +54,9 @@ describe the pattern:
 
 async function test(paths) {
   for (const path of paths) {
-    console.log(`>> ${path}`);
-    const handler = await searchForImport(path, 5);
-    console.log();
+    log.info(`>> ${path}`);
+    const handler = await searchForImport(path);
+    console.log(handler);
   }
 }
 test(paths);
