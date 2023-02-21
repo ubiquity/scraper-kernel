@@ -2,18 +2,20 @@ import { EventEmitter } from "events";
 import { Browser } from "puppeteer";
 import "source-map-support/register";
 import browserSetup from "./boot/browser-setup";
-import config from "./boot/config";
+import { setupConfig } from "./boot/config";
 import { eventHandlers } from "./boot/event-handlers";
 import { attachEvents } from "./boot/events/attachEvents";
 import newTabToURL from "./boot/new-tab-to-url";
 import { log } from "./logging";
+// import readCommandLineArgs from "../../cli-args";
 
 export const events = new EventEmitter();
 export type JobResult = Error | string | null;
-
+// type ReadCommandLineArgs = typeof readCommandLineArgs;
 export interface UserSettings {
   urls: string[] | string;
   pages: string; // page logic directory path
+  chromium?: string[];
 }
 
 export default async function scrape(settings: UserSettings, browser?: Browser): Promise<JobResult | JobResult[]> {
@@ -24,6 +26,7 @@ export default async function scrape(settings: UserSettings, browser?: Browser):
   }
 
   if (!browser) {
+    const config = setupConfig(settings);
     browser = (await browserSetup(config)) as Browser;
     attachEvents(browser, settings);
   }
@@ -39,7 +42,7 @@ export default async function scrape(settings: UserSettings, browser?: Browser):
   }
 }
 
-export async function _scrapeSeries(urls: string[], browser: Browser): Promise<JobResult[]> {
+async function _scrapeSeries(urls: string[], browser: Browser): Promise<JobResult[]> {
   const completedScrapes = [] as JobResult[];
 
   if (urls.length > 127) {
@@ -61,7 +64,7 @@ export async function _scrapeSeries(urls: string[], browser: Browser): Promise<J
 }
 
 type ResolveFunction = (results: string) => void;
-export async function _scrapeSingle(url: string, browser: Browser): Promise<JobResult | Error> {
+async function _scrapeSingle(url: string, browser: Browser): Promise<JobResult | Error> {
   const scrapeJob = new Promise(function addCallbackEvent(resolve: ResolveFunction, reject) {
     events.once("scrapecomplete", eventHandlers.scrapeComplete(resolve, reject));
   });
