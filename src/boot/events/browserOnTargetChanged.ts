@@ -1,5 +1,6 @@
 import path from "path";
 import { Browser, Page, Target } from "puppeteer";
+import { log } from "../../logging";
 import { events, UserSettings } from "../../scrape";
 import { searchForImport } from "./search-for-import";
 
@@ -9,7 +10,11 @@ export const browserOnTargetChangedHandler = (_browser: Browser, settings: UserS
     return;
   }
   // await disableCosmetics(page);
-  await page.waitForNavigation({ waitUntil: "networkidle2" }).catch((error) => events.emit("logicfailed", error));
+  try {
+    await page.waitForNavigation({ waitUntil: "networkidle2" });
+  } catch (error) {
+    events.emit("logicfailed", error);
+  }
 
   const scrapeCompletedCallback = new Promise((resolve, reject) => {
     events.emit("logicloaded", logicLoadedCallback(page, resolve, reject, settings));
@@ -18,6 +23,7 @@ export const browserOnTargetChangedHandler = (_browser: Browser, settings: UserS
   events.emit("scrapecomplete", scrapeCompletedCallback);
 };
 
+// this breaks opening up metamask extension
 async function disableCosmetics(page: Page) {
   await page.setRequestInterception(true);
 
