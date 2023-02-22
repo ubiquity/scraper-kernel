@@ -7,11 +7,9 @@ import { eventHandlers } from "./boot/event-handlers";
 import { attachEvents } from "./boot/events/attachEvents";
 import newTabToURL from "./boot/new-tab-to-url";
 import { log } from "./logging";
-// import readCommandLineArgs from "../../cli-args";
 
 export const events = new EventEmitter();
 export type JobResult = Error | string | null;
-// type ReadCommandLineArgs = typeof readCommandLineArgs;
 export interface UserSettings {
   urls: string[] | string;
   pages: string; // page logic directory path
