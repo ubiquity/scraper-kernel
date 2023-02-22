@@ -1,5 +1,6 @@
 import path from "path";
 import { Browser, Page, Target } from "puppeteer";
+import { log } from "../../logging";
 import { events, UserSettings } from "../../scrape";
 import { searchForImport } from "./search-for-import";
 
@@ -8,12 +9,12 @@ export const browserOnTargetChangedHandler = (_browser: Browser, settings: UserS
   if (!page) {
     return;
   }
-  await disableCosmetics(page);
-  // try {
-  await page.waitForNavigation({ waitUntil: "networkidle2" }).catch((error) => events.emit("logicfailed", error));
-  // } catch (error) {
-  // eventEmitter.emit("logicfailed", error);
-  // }
+  // await disableCosmetics(page);
+  try {
+    await page.waitForNavigation({ waitUntil: "networkidle2" });
+  } catch (error) {
+    events.emit("logicfailed", error);
+  }
 
   const scrapeCompletedCallback = new Promise((resolve, reject) => {
     events.emit("logicloaded", logicLoadedCallback(page, resolve, reject, settings));
@@ -22,6 +23,7 @@ export const browserOnTargetChangedHandler = (_browser: Browser, settings: UserS
   events.emit("scrapecomplete", scrapeCompletedCallback);
 };
 
+// this breaks opening up metamask extension
 async function disableCosmetics(page: Page) {
   await page.setRequestInterception(true);
 
@@ -32,18 +34,18 @@ async function disableCosmetics(page: Page) {
       case "fetch":
         request.continue();
         break;
-      case "stylesheet":
-      case "image":
-      case "media":
-      case "font":
-      case "texttrack":
-      case "xhr":
-      case "eventsource":
-      case "websocket":
-      case "manifest":
-      case "other":
-        request.abort();
-        break;
+      // case "stylesheet":
+      // case "image":
+      // case "media":
+      // case "font":
+      // case "texttrack":
+      // case "xhr":
+      // case "eventsource":
+      // case "websocket":
+      // case "manifest":
+      // case "other":
+      //   request.abort();
+      //   break;
       default:
         request.abort();
     }
