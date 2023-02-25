@@ -9,7 +9,7 @@ export const log = {
     console.warn(colorizeText(`\t⚠ ${message}`, "fgYellow"));
   },
   info: function infoLog(message: string) {
-    console.info(colorizeText(`\t⚠ ${message}`, "fgWhite"));
+    console.info(colorizeText(`\t⚠ ${message}`, "dim"));
   },
 };
 
