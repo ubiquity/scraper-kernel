@@ -1,7 +1,7 @@
 import { BrowserLaunchArgumentOptions } from "puppeteer";
 import dotenv from "dotenv";
 dotenv.config();
-const executablePath = process.env.PUPPETEER_EXEC_PATH;
+const executablePath = "/home/runner/work/scraper-parent-test/scraper-parent-test/chrome-linux/chrome";
 
 console.log({ executablePath });
 
