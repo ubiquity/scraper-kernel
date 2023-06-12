@@ -20,4 +20,5 @@ function isHeadless(args) {
   if (args.headful) {
     return !args.headful;
   }
+  return "new";
 }

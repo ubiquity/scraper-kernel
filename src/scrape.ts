@@ -1,12 +1,13 @@
 import { EventEmitter } from "events";
 import { Browser } from "puppeteer";
-import "source-map-support/register";
+// import "source-map-support/register";
 import browserSetup from "./boot/browser-setup";
 import { setupConfig } from "./boot/config";
 import { eventHandlers } from "./boot/event-handlers";
 import { attachEvents } from "./boot/events/attachEvents";
 import newTabToURL from "./boot/new-tab-to-url";
 import { log } from "./logging";
+import puppeteer from "puppeteer";
 
 export const events = new EventEmitter();
 export type JobResult = Error | string | null;
@@ -14,6 +15,7 @@ export interface UserSettings {
   urls: string[] | string;
   pages: string; // page logic directory path
   chromium?: string[];
+  headful?: boolean;
 }
 
 export default async function scrape(settings: UserSettings, browser?: Browser): Promise<JobResult | JobResult[]> {
@@ -25,7 +27,7 @@ export default async function scrape(settings: UserSettings, browser?: Browser):
 
   if (!browser) {
     const config = setupConfig(settings);
-    browser = (await browserSetup(config)) as Browser;
+    browser = (await puppeteer.launch(config)) as Browser;
     attachEvents(browser, settings);
   }
 
