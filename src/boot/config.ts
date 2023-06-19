@@ -2,10 +2,11 @@ import { BrowserLaunchArgumentOptions } from "puppeteer";
 
 export function setupConfig(args) {
   const config = {
+    executablePath: "/bin/google-chrome",
     devtools: false,
     headless: isHeadless(args),
     defaultViewport: null,
-    args: ["--lang=en-US,en;q=0.9"] as string[],
+    args: ["--lang=en-US,en;q=0.9", "--no-sandbox"] as string[],
     cache: "../cache",
   } as BrowserLaunchArgumentOptions;
 
