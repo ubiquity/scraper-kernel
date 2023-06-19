@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
 import { Browser } from "puppeteer";
 // import "source-map-support/register";
-import browserSetup from "./boot/browser-setup";
+//mport browserSetup from "./boot/browser-setup";
 import { setupConfig } from "./boot/config";
 import { eventHandlers } from "./boot/event-handlers";
 import { attachEvents } from "./boot/events/attachEvents";
