@@ -56,7 +56,7 @@ async function test(paths) {
   for (const path of paths) {
     log.info(`>> ${path}`);
     const handler = await searchForImport(path);
-    console.log(handler);
+    log.info(handler);
   }
 }
 test(paths);

@@ -18,7 +18,7 @@ export const browserOnTargetChangedHandler = (_browser: Browser, settings: UserS
 
   const scrapeCompletedCallback = new Promise((resolve, reject) => {
     events.emit("logicloaded", logicLoadedCallback(page, resolve, reject, settings));
-  }).catch((error: Error) => error && console.error(error));
+  }).catch((error: Error) => error && log.error(error));
 
   events.emit("scrapecomplete", scrapeCompletedCallback);
 };
