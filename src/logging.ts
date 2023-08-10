@@ -13,46 +13,52 @@ export const log = {
     _log("info", ...args);
   },
 };
-const colorMap = {
-  error: ["trace", "fgRed"],
-  ok: ["log", "fgGreen"],
-  warn: ["warn", "fgYellow"],
-  info: ["info", "dim"],
-};
+
 function _log(type: "error" | "ok" | "warn" | "info", ...args: unknown[]) {
-  const prefixSymbolMap = {
-    error: "×",
-    ok: "✓",
-    warn: "⚠",
-    info: "  ",
+  const defaultSymbols = {
+    error: '×',
+    ok: '✓',
+    warn: '⚠',
+    info: ' ',
   };
 
-  const prefixSymbol = `\t${prefixSymbolMap[type]} `;
-  const indentationSymbol = "\t   ";
+  // Extracting the optional symbol from the arguments
+  let symbol = defaultSymbols[type];
+  let messageArgs = args;
 
-  let isFirstLine = true;
+  if (args.length > 1 && typeof args[0] === 'string') {
+    symbol = args[0];
+    messageArgs = args.slice(1);
+  }
 
-  const processArg = (arg: unknown): string => {
-    const processLine = (line: string) => {
-      const prefix = isFirstLine ? prefixSymbol : indentationSymbol;
-      isFirstLine = false;
-      return prefix + line;
-    };
-
-    if (typeof arg === "string") {
-      return arg.split('\n').map(processLine).join('\n');
-    } else if (typeof arg === "object") {
-      const jsonStr = JSON.stringify(arg, null, 2);
-      const lines = jsonStr.split('\n');
-      return lines.map(processLine).join('\n');
+  // Formatting the message
+  const message = messageArgs.map((arg) => {
+    if (typeof arg === 'string') {
+      return arg;
     } else {
-      return processLine(util.inspect(arg, { showHidden: false, depth: null }));
+      return JSON.stringify(arg, null, '  ');
     }
+  }).join(' ');
+
+// Constructing the full log string with the prefix symbol
+const lines = message.split('\n');
+const logString = lines.map((line, index) => {
+  // Add the symbol only to the first line and keep the indentation for the rest
+  const prefix = index === 0 ? `\t${symbol}` : `\t${' '.repeat(symbol.length)}`;
+  return `${prefix} ${line}`;
+}).join('\n');
+
+
+  const colorMap = {
+    error: ["trace", "fgRed"],
+    ok: ["log", "fgGreen"],
+    warn: ["warn", "fgYellow"],
+    info: ["info", "dim"],
   };
 
-  const message = args.map(processArg).join(" ");
-  console[colorMap[type][0]](colorizeText(message, colorMap[type][1] as keyof typeof colors));
+  console[colorMap[type][0]](colorizeText(logString, colorMap[type][1] as keyof typeof colors));
 }
+
 
 
 const colors = {
