@@ -14,6 +14,13 @@ export const log = {
   },
 };
 function _log(type: "error" | "ok" | "warn" | "info", ...args: unknown[]) {
+  const symbolsMap = {
+    error: "⚠",
+    ok: "✓",
+    warn: "⚠",
+    info: " ",
+  };
+
   const colorMap = {
     error: ["trace", "fgRed"],
     ok: ["log", "fgGreen"],
@@ -21,19 +28,36 @@ function _log(type: "error" | "ok" | "warn" | "info", ...args: unknown[]) {
     info: ["info", "dim"],
   };
 
-  // turn all args into strings
-  const message = args
-    .map((arg) => {
-      if (typeof arg == "string") {
-        return arg;
-      } else {
-        return util.inspect(arg, { showHidden: false, depth: null });
-        // return JSON.stringify(arg, null, "\t");
-      }
-    })
-    .join(" ");
+  //
+  //  =============
+  //
 
-  console[colorMap[type][0]](colorizeText(`\t⚠ ${message}`, colorMap[type][1] as keyof typeof colors));
+  const indentationSymbol = "\t ";
+  const prefixSymbol = `\t${symbolsMap[type]} `;
+
+  let isFirstLine = true;
+
+  const processArg = (arg: unknown) => {
+    const processLine = (line: string) => {
+      const prefix = isFirstLine ? prefixSymbol : indentationSymbol;
+      isFirstLine = false;
+      return prefix + line;
+    };
+
+    if (typeof arg === "string") {
+      return arg.split("\n").map(processLine).join("\n");
+    } else if (typeof arg === "object") {
+      const jsonStr = JSON.stringify(arg, null, 2);
+      const lines = jsonStr.split("\n");
+      return lines.map(processLine).join("\n");
+    } else {
+      return processLine(util.inspect(arg, { showHidden: false, depth: null }));
+    }
+  };
+
+  const message = args.map((arg) => processArg(arg)).join(" ");
+
+  console[colorMap[type][0]](colorizeText(message, colorMap[type][1] as keyof typeof colors));
 }
 
 const colors = {

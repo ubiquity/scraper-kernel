@@ -20,7 +20,8 @@ export const eventHandlers = {
   },
   logicFailed: function logicFailedHandler() {
     return function _logicFailedHandler(error: Error) {
-      log.error(`Logic failed. See _logicFailedHandler()`);
+      // log.warn(`Logic failed. See _logicFailedHandler()`);
+      log.error(error);
       // throw error;
     };
   },
