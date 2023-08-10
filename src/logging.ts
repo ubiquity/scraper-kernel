@@ -13,31 +13,26 @@ export const log = {
     _log("info", ...args);
   },
 };
+const colorMap = {
+  error: ["trace", "fgRed"],
+  ok: ["log", "fgGreen"],
+  warn: ["warn", "fgYellow"],
+  info: ["info", "dim"],
+};
 function _log(type: "error" | "ok" | "warn" | "info", ...args: unknown[]) {
-  const symbolsMap = {
-    error: "⚠",
+  const prefixSymbolMap = {
+    error: "×",
     ok: "✓",
     warn: "⚠",
-    info: " ",
+    info: "  ",
   };
 
-  const colorMap = {
-    error: ["trace", "fgRed"],
-    ok: ["log", "fgGreen"],
-    warn: ["warn", "fgYellow"],
-    info: ["info", "dim"],
-  };
-
-  //
-  //  =============
-  //
-
-  const indentationSymbol = "\t ";
-  const prefixSymbol = `\t${symbolsMap[type]} `;
+  const prefixSymbol = `\t${prefixSymbolMap[type]} `;
+  const indentationSymbol = "\t   ";
 
   let isFirstLine = true;
 
-  const processArg = (arg: unknown) => {
+  const processArg = (arg: unknown): string => {
     const processLine = (line: string) => {
       const prefix = isFirstLine ? prefixSymbol : indentationSymbol;
       isFirstLine = false;
@@ -45,20 +40,20 @@ function _log(type: "error" | "ok" | "warn" | "info", ...args: unknown[]) {
     };
 
     if (typeof arg === "string") {
-      return arg.split("\n").map(processLine).join("\n");
+      return arg.split('\n').map(processLine).join('\n');
     } else if (typeof arg === "object") {
       const jsonStr = JSON.stringify(arg, null, 2);
-      const lines = jsonStr.split("\n");
-      return lines.map(processLine).join("\n");
+      const lines = jsonStr.split('\n');
+      return lines.map(processLine).join('\n');
     } else {
       return processLine(util.inspect(arg, { showHidden: false, depth: null }));
     }
   };
 
-  const message = args.map((arg) => processArg(arg)).join(" ");
-
+  const message = args.map(processArg).join(" ");
   console[colorMap[type][0]](colorizeText(message, colorMap[type][1] as keyof typeof colors));
 }
+
 
 const colors = {
   reset: "\x1b[0m",
