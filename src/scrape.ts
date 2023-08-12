@@ -1,7 +1,5 @@
 import { EventEmitter } from "events";
 import { Browser } from "puppeteer";
-// import "source-map-support/register";
-// import browserSetup from "./boot/browser-setup";
 import { setupConfig } from "./boot/config";
 import { eventHandlers } from "./boot/event-handlers";
 import { attachEvents } from "./boot/events/attachEvents";
@@ -55,7 +53,7 @@ async function _scrapeSeries(urls: string[], browser: Browser): Promise<JobResul
     }
     return completedScrapes;
   } else {
-    // Normal buffer behavior to console.log all of the results at the end cleanly and in order
+    // Normal buffer behavior to log.info all of the results at the end cleanly and in order
     for (const url of urls) {
       completedScrapes.push(await _scrapeSingle(url, browser));
     }
@@ -68,7 +66,7 @@ async function _scrapeSingle(url: string, browser: Browser): Promise<JobResult |
   const scrapeJob = new Promise(function addCallbackEvent(resolve: ResolveFunction, reject) {
     events.once("scrapecomplete", eventHandlers.scrapeComplete(resolve, reject));
   });
-  console.log(`>>`, url); // useful to follow page navigation
+  log.info(`>>`, url); // useful to follow page navigation
   const { page, response } = await newTabToURL(browser, url);
   if (response && response.status() >= 300) {
     return new Error(`<< [ ${url} ] HTTP status code ${response.status()}`);

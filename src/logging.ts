@@ -1,17 +1,40 @@
+import util from "util";
 export const log = {
-  error: function errorLog(message: string) {
-    console.error(colorizeText(`\t⚠ ${message}`, "fgRed"));
+  error: function errorLog(...args: unknown[]) {
+    _log("error", ...args);
   },
-  ok: function okLog(message: string) {
-    console.log(colorizeText(`\t⚠ ${message}`, "fgGreen"));
+  ok: function okLog(...args: unknown[]) {
+    _log("ok", ...args);
   },
-  warn: function warnLog(message: string) {
-    console.warn(colorizeText(`\t⚠ ${message}`, "fgYellow"));
+  warn: function warnLog(...args: unknown[]) {
+    _log("warn", ...args);
   },
-  info: function infoLog(message: string) {
-    console.info(colorizeText(`\t⚠ ${message}`, "dim"));
+  info: function infoLog(...args: unknown[]) {
+    _log("info", ...args);
   },
 };
+function _log(type: "error" | "ok" | "warn" | "info", ...args: unknown[]) {
+  const colorMap = {
+    error: ["trace", "fgRed"],
+    ok: ["log", "fgGreen"],
+    warn: ["warn", "fgYellow"],
+    info: ["info", "dim"],
+  };
+
+  // turn all args into strings
+  const message = args
+    .map((arg) => {
+      if (typeof arg == "string") {
+        return arg;
+      } else {
+        return util.inspect(arg, { showHidden: false, depth: null });
+        // return JSON.stringify(arg, null, "\t");
+      }
+    })
+    .join(" ");
+
+  console[colorMap[type][0]](colorizeText(`\t⚠ ${message}`, colorMap[type][1] as keyof typeof colors));
+}
 
 const colors = {
   reset: "\x1b[0m",
