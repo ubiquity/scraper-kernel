@@ -1,36 +1,38 @@
 import path from "path";
 import { Browser, Page, Target } from "puppeteer";
 import { log } from "../../logging";
-import { events, UserSettings } from "../../scrape";
+import { events } from "../../scrape";
 import { searchForImport } from "./search-for-import";
 import { PAGES_PATH } from "../../PAGES_PATH";
 
-export const browserOnTargetChangedHandler = (_browser: Browser, settings: UserSettings) => async (target: Target) => {
-  const page = await target.page();
-  if (!page) {
-    return;
-  }
-  // await disableCosmetics(page);
-  try {
-    // log.info(`>> ${page.url()}`);
-    await page.waitForNavigation({ waitUntil: "networkidle2" });
-  } catch (error) {
-    events.emit("logicfailed", error);
-    return;
-  }
-
-  const scrapeCompletedCallback = new Promise(function scrapeCompleted(resolve, reject) {
-    events.emit("logicloaded", logicLoadedCallback(page, resolve, reject));
-  }).catch(function logicLoadedCallbackError(error: Error) {
-    if (error) {
-      log.error(error);
-    } else {
-      log.error("Unknown error");
+export function browserOnTargetChangedHandler() {
+  return async function _browserOnTargetChangedHandler(target: Target) {
+    const page = await target.page();
+    if (!page) {
+      return;
     }
-  });
+    // await disableCosmetics(page);
+    try {
+      // log.info(`>> ${page.url()}`);
+      await page.waitForNavigation({ waitUntil: "networkidle2" });
+    } catch (error) {
+      events.emit("logicfailed", error);
+      return;
+    }
 
-  events.emit("scrapecomplete", scrapeCompletedCallback);
-};
+    const scrapeCompletedCallback = new Promise(function scrapeCompleted(resolve, reject) {
+      events.emit("logicloaded", logicLoadedCallback(page, resolve, reject));
+    }).catch(function logicLoadedCallbackError(error: Error) {
+      if (error) {
+        log.error(error);
+      } else {
+        log.error("Unknown error");
+      }
+    });
+
+    events.emit("scrapecomplete", scrapeCompletedCallback);
+  };
+}
 
 // this breaks opening up metamask extension
 // async function disableCosmetics(page: Page) {

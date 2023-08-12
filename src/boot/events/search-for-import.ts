@@ -2,9 +2,9 @@ import fs from "fs";
 import path from "path";
 import { PageLogic } from "../event-handlers";
 import { log } from "../../logging";
-import dotenv from "dotenv";
+
 import { PAGES_PATH } from "../../PAGES_PATH";
-dotenv.config();
+
 export type DestinationStrategy = (destination: string) => string;
 
 export function resolvePagesPath() {
@@ -56,10 +56,8 @@ export function renameLastPartOfPathToWildCard(query: string) {
   }
   const resolvedPath = pathParts.join(path.sep);
   if (!resolvedPath.includes(pagesPath)) {
-    // @TODO: `cwdParentName` check could be implemented better, but for now, it works.
-    // THE REQUESTED IMPORT PATH IS OUTSIDE OF THE PROJECT DIRECTORY, WHICH IS INVALID
-    log.error(`requested: ${resolvedPath}`);
-    log.error(`directory: ${pagesPath}`);
+    log.warn(`requested: ${resolvedPath}`);
+    log.warn(`directory: ${pagesPath}`);
     throw new Error("the requested page logic import path is outside of the project directory, which is invalid");
   }
 

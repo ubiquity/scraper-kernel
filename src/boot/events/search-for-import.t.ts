@@ -1,14 +1,8 @@
 import { log } from "../../logging";
-import { searchForImport } from "./search-for-import";
+import { searchForImport } from "./search-for-import-2";
 
 // test
-const paths = [
-  "/Users/nv/repos/ubiquity/scraper-parent-test/src/pages/github.com/pavlovcik",
-  // "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/ubiquity/",
-  // "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/pavlovcik",
-  // "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/ubiquity/ubiquity-dollar",
-  // "/Users/nv/repos/ubiquity/scraper/dist/pages/github.com/ubiquity/ubiquity-dollar/",
-];
+const paths = ["/Users/nv/repos/pavlovcik/scraper-parent-test/src/pages/github.com/hyperlane-xyz/fuel-contracts/pull/90"];
 
 /**
 
@@ -21,32 +15,32 @@ describe the pattern:
   a. if out of bounds, restart loop from saved position, checking its parent directory for index.js
   b. if not out of bounds, replace parent directory with *
 
-      \dist\pages\github.com\pavlovcik\test-repo\index.js
+      \dist\pages\github.com\pavlovcik\test-repo\index.ts
       \dist\pages\github.com\pavlovcik\test-repo\*
       \dist\pages\github.com\pavlovcik\*\*
       \dist\pages\github.com\*\*\*
       \dist\pages\*\*\*\*
       \dist\*\*\*\*\*
       \*\*\*\*\*\*
-      \dist\pages\github.com\pavlovcik\index.js
+      \dist\pages\github.com\pavlovcik\index.ts
       \dist\pages\github.com\pavlovcik\*
       \dist\pages\github.com\*\*
       \dist\pages\*\*\*
       \dist\*\*\*\*
       \*\*\*\*\*
-      \dist\pages\github.com\index.js
+      \dist\pages\github.com\index.ts
       \dist\pages\github.com\*
       \dist\pages\*\*
       \dist\*\*\*
       \*\*\*\*
-      \dist\pages\index.js
+      \dist\pages\index.ts
       \dist\pages\*
       \dist\*\*
       \*\*\*
-      \dist\index.js
+      \dist\index.ts
       \dist\*
       \*\*
-      \index.js
+      \index.ts
       \*
 
  */
@@ -55,7 +49,7 @@ async function test(paths) {
   for (const path of paths) {
     log.info(`>> ${path}`);
     const handler = await searchForImport(path);
-    log.info(handler);
+    log.ok(handler);
   }
 }
 test(paths);
