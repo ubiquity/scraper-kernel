@@ -3,13 +3,9 @@ import path from "path";
 import { PageLogic } from "../event-handlers";
 import { log } from "../../logging";
 import dotenv from "dotenv";
+import { PAGES_PATH } from "../../PAGES_PATH";
 dotenv.config();
 export type DestinationStrategy = (destination: string) => string;
-
-const PAGES_PATH = process.env.PAGES_PATH as string;
-if (!PAGES_PATH) {
-  throw new Error("process.env.PAGES_PATH not set");
-}
 
 export function resolvePagesPath() {
   const projectPath = PAGES_PATH;
