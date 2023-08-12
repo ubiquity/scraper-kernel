@@ -1,4 +1,3 @@
-import util from "util";
 export const log = {
   error: function errorLog(...args: unknown[]) {
     _log("error", ...args);

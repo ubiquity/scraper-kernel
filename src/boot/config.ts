@@ -12,7 +12,7 @@ export function setupConfig(args) {
     defaultViewport: null,
     args: ["--lang=en-US,en;q=0.9"] as string[],
     cache: "../cache",
-    // executablePath: selectedExecutablePath,
+    executablePath: selectedExecutablePath,
   } as BrowserLaunchArgumentOptions;
 
   if (selectedExecutablePath) {
