@@ -17,41 +17,47 @@ export const browserOnTargetChangedHandler = (_browser: Browser, settings: UserS
     events.emit("logicfailed", error);
   }
 
-  const scrapeCompletedCallback = new Promise((resolve, reject) => {
+  const scrapeCompletedCallback = new Promise(function scrapeCompleted(resolve, reject) {
     events.emit("logicloaded", logicLoadedCallback(page, resolve, reject, settings));
-  }).catch((error: Error) => error && log.error(error));
+  }).catch(function logicLoadedCallbackError(error: Error) {
+    if (error) {
+      log.error(error);
+    } else {
+      log.error("Unknown error");
+    }
+  });
 
   events.emit("scrapecomplete", scrapeCompletedCallback);
 };
 
 // this breaks opening up metamask extension
-async function disableCosmetics(page: Page) {
-  await page.setRequestInterception(true);
+// async function disableCosmetics(page: Page) {
+//   await page.setRequestInterception(true);
 
-  page.on("request", (request) => {
-    switch (request.resourceType()) {
-      case "document":
-      case "script":
-      case "fetch":
-        request.continue();
-        break;
-      // case "stylesheet":
-      // case "image":
-      // case "media":
-      // case "font":
-      // case "texttrack":
-      // case "xhr":
-      // case "eventsource":
-      // case "websocket":
-      // case "manifest":
-      // case "other":
-      //   request.abort();
-      //   break;
-      default:
-        request.abort();
-    }
-  });
-}
+//   page.on("request", (request) => {
+//     switch (request.resourceType()) {
+//       case "document":
+//       case "script":
+//       case "fetch":
+//         request.continue();
+//         break;
+//       // case "stylesheet":
+//       // case "image":
+//       // case "media":
+//       // case "font":
+//       // case "texttrack":
+//       // case "xhr":
+//       // case "eventsource":
+//       // case "websocket":
+//       // case "manifest":
+//       // case "other":
+//       //   request.abort();
+//       //   break;
+//       default:
+//         request.abort();
+//     }
+//   });
+// }
 
 function logicLoadedCallback(page: Page, resolve, reject, settings: UserSettings) {
   const { pages } = settings;

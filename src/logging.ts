@@ -1,4 +1,3 @@
-import util from "util";
 export const log = {
   error: function errorLog(...args: unknown[]) {
     _log("error", ...args);
@@ -13,7 +12,45 @@ export const log = {
     _log("info", ...args);
   },
 };
+
 function _log(type: "error" | "ok" | "warn" | "info", ...args: unknown[]) {
+  const defaultSymbols = {
+    error: "×",
+    ok: "✓",
+    warn: "⚠",
+    info: " ",
+  };
+
+  // Extracting the optional symbol from the arguments
+  let symbol = defaultSymbols[type];
+  let messageArgs = args;
+
+  if (args.length > 1 && typeof args[0] === "string") {
+    symbol = args[0];
+    messageArgs = args.slice(1);
+  }
+
+  // Formatting the message
+  const message = messageArgs
+    .map((arg) => {
+      if (typeof arg === "string") {
+        return arg;
+      } else {
+        return JSON.stringify(arg, null, "  ");
+      }
+    })
+    .join(" ");
+
+  // Constructing the full log string with the prefix symbol
+  const lines = message.split("\n");
+  const logString = lines
+    .map((line, index) => {
+      // Add the symbol only to the first line and keep the indentation for the rest
+      const prefix = index === 0 ? `\t${symbol}` : `\t${" ".repeat(symbol.length)}`;
+      return `${prefix} ${line}`;
+    })
+    .join("\n");
+
   const colorMap = {
     error: ["trace", "fgRed"],
     ok: ["log", "fgGreen"],
@@ -21,19 +58,7 @@ function _log(type: "error" | "ok" | "warn" | "info", ...args: unknown[]) {
     info: ["info", "dim"],
   };
 
-  // turn all args into strings
-  const message = args
-    .map((arg) => {
-      if (typeof arg == "string") {
-        return arg;
-      } else {
-        return util.inspect(arg, { showHidden: false, depth: null });
-        // return JSON.stringify(arg, null, "\t");
-      }
-    })
-    .join(" ");
-
-  console[colorMap[type][0]](colorizeText(`\t⚠ ${message}`, colorMap[type][1] as keyof typeof colors));
+  console[colorMap[type][0]](colorizeText(logString, colorMap[type][1] as keyof typeof colors));
 }
 
 const colors = {

@@ -18,10 +18,10 @@ export const eventHandlers = {
       return await logic(browser, page);
     };
   },
+
   logicFailed: function logicFailedHandler() {
     return function _logicFailedHandler(error: Error) {
-      log.error(`Logic failed. See _logicFailedHandler()`);
-      console.error(error);
+      log.error(error);
     };
   },
 
