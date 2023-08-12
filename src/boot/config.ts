@@ -1,11 +1,10 @@
 import { BrowserLaunchArgumentOptions } from "puppeteer";
 import dotenv from "dotenv";
-import { log } from "../logging";
 dotenv.config();
 
 export function setupConfig(args) {
-  const selectedExecutablePath = args.executablePath || process.env.PUPPETEER_EXECUTABLE_PATH || "/bin/google-chrome";
-  log.info({ selectedExecutablePath });
+  const selectedExecutablePath = args.executablePath || process.env.PUPPETEER_EXECUTABLE_PATH; // || "/bin/google-chrome";
+
   let config = {
     devtools: false,
     headless: isHeadless(args),

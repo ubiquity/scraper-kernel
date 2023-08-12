@@ -1,5 +1,11 @@
 export const log = {
   error: function errorLog(...args: unknown[]) {
+    // if the first arg is an instance of an error then just log the error
+    if (args[0] instanceof Error) {
+      console.error(args[0]);
+      return;
+    }
+
     _log("error", ...args);
   },
   ok: function okLog(...args: unknown[]) {
