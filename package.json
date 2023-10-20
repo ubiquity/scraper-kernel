@@ -4,8 +4,29 @@
   "author": {
     "name": "アレクサンダー.eth"
   },
-  "version": "0.1.0",
+  "version": "0.2.0",
+  "tsup": {
+    "entry": ["src/scrape.ts"],
+    "splitting": false,
+    "sourcemap": true,
+    "clean": true,
+    "dts": true,
+    "format": "esm"
+  },
+  "main": "dist/scrape.mjs",
+  "files": [
+    "dist/*"
+  ],
+  "types": "dist/scrape.d.mts",
+  "exports": {
+    "main": {
+      "types": "./dist/scrape.d.mts",
+      "require": "./dist/scrape.mjs",
+      "import": "./dist/scrape.mjs"
+    }
+  },
   "scripts": {
+    "build": "tsup",
     "prepare": "husky install",
     "format": "run-s format:*",
     "format:prettier": "prettier --write .",
@@ -25,7 +46,8 @@
     "@types/source-map-support": "^0.5.6",
     "jest": "^29.5.0",
     "ts-jest": "^29.1.0",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "tsup": "^7.2.0"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.8.0",
