@@ -4,25 +4,41 @@
   "author": {
     "name": "アレクサンダー.eth"
   },
+  "type": "module",
   "version": "0.2.0",
   "tsup": {
-    "entry": ["src/scrape.ts"],
+    "entry": [
+      "src/scrape.ts",
+      "src/logging.ts"
+    ],
     "splitting": false,
     "sourcemap": true,
     "clean": true,
     "dts": true,
     "format": "esm"
   },
-  "main": "dist/scrape.mjs",
   "files": [
     "dist/*"
   ],
-  "types": "dist/scrape.d.mts",
+  "main": "./dist/scrape.js",
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/scrape.d.ts"
+      ],
+      "logging": [
+        "./dist/logging.d.ts"
+      ]
+    }
+  },
   "exports": {
-    "main": {
-      "types": "./dist/scrape.d.mts",
-      "require": "./dist/scrape.mjs",
-      "import": "./dist/scrape.mjs"
+    ".": {
+      "types": "./dist/scrape.d.ts",
+      "default": "./dist/scrape.js"
+    },
+    "./logging": {
+      "types": "./dist/logging.d.ts",
+      "default": "./dist/logging.js"
     }
   },
   "scripts": {

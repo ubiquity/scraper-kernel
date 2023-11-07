@@ -1,4 +1,4 @@
-export const log = {
+const log = {
   error: function errorLog(...args: unknown[]) {
     // if the first arg is an instance of an error then just log the error
     if (args[0] instanceof Error) {
@@ -94,6 +94,8 @@ const colors = {
   bgCyan: "\x1b[46m",
   bgWhite: "\x1b[47m",
 };
-export function colorizeText(text: string, color: keyof typeof colors): string {
+function colorizeText(text: string, color: keyof typeof colors): string {
   return colors[color].concat(text).concat(colors.reset);
 }
+
+export { log, colorizeText };
