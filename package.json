@@ -4,8 +4,45 @@
   "author": {
     "name": "アレクサンダー.eth"
   },
-  "version": "0.1.0",
+  "type": "module",
+  "version": "0.2.0",
+  "tsup": {
+    "entry": [
+      "src/scrape.ts",
+      "src/logging.ts"
+    ],
+    "splitting": false,
+    "sourcemap": true,
+    "clean": true,
+    "dts": true,
+    "format": "esm"
+  },
+  "files": [
+    "dist/*"
+  ],
+  "main": "./dist/scrape.js",
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/scrape.d.ts"
+      ],
+      "logging": [
+        "./dist/logging.d.ts"
+      ]
+    }
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/scrape.d.ts",
+      "default": "./dist/scrape.js"
+    },
+    "./logging": {
+      "types": "./dist/logging.d.ts",
+      "default": "./dist/logging.js"
+    }
+  },
   "scripts": {
+    "build": "tsup",
     "prepare": "husky install",
     "format": "run-s format:*",
     "format:prettier": "prettier --write .",
@@ -25,7 +62,8 @@
     "@types/source-map-support": "^0.5.6",
     "jest": "^29.5.0",
     "ts-jest": "^29.1.0",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "tsup": "^7.2.0"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.8.0",

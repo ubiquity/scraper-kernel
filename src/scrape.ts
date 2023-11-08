@@ -9,14 +9,15 @@ import puppeteer from "puppeteer";
 
 export const events = new EventEmitter();
 export type JobResult = Error | string | null;
-export interface UserSettings {
+
+interface UserSettings {
   urls: string[] | string;
   pages: string; // page logic directory path
   chromium?: string[];
   headful?: boolean;
 }
 
-export default async function scrape(settings: UserSettings, browser?: Browser): Promise<JobResult | JobResult[]> {
+async function scrape(settings: UserSettings, browser?: Browser): Promise<JobResult | JobResult[]> {
   const { pages, urls } = settings;
 
   if (!pages) {
@@ -85,3 +86,6 @@ async function _scrapeSingle(url: string, browser: Browser): Promise<JobResult |
   await page.close(); // save memory
   return results;
 }
+
+export { UserSettings };
+export default scrape;
