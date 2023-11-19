@@ -21,7 +21,7 @@ export async function searchForImport(importing: string, startPosition?: string)
   return await _searchForImport(importing, startPosition ? startPosition : importing);
 }
 
-async function _searchForImport(importing: string, startPosition: string) {
+async function _searchForImport(importing: string, startPosition: string, checkIndex = true) {
   if (importing.endsWith(path.sep)) {
     // normalize requested path name to remove trailing slash
     importing = importing.slice(0, -1);
@@ -32,13 +32,14 @@ async function _searchForImport(importing: string, startPosition: string) {
     importing = startPosition = path.resolve(startPosition, ".."); // go up one directory from `startPosition`
   }
 
-  const logic = (await checkModifier(importing, "index.ts")) || (await checkModifier(importing, "*"));
+  const modifier = checkIndex ? "index.ts" : "*";
+  const logic = await checkModifier(importing, modifier);
 
   if (logic) {
     return logic;
   } else {
     const wildCardPath = renameLastPartOfPathToWildCard(importing); // pathname ends with */*
-    return await _searchForImport(wildCardPath, startPosition);
+    return await _searchForImport(wildCardPath, startPosition, !checkIndex); // Alternate between checking for directory and index.ts
   }
 }
 

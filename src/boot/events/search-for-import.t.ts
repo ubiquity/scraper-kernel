@@ -1,8 +1,11 @@
 import { log } from "../../logging";
-import { searchForImport } from "./search-for-import-2";
+import { searchForImport } from "./search-for-import";
 
 // test
-const paths = ["/Users/nv/repos/pavlovcik/scraper-parent-test/src/pages/github.com/hyperlane-xyz/fuel-contracts/pull/90"];
+const paths = [
+  "/Users/nv/repos/pavlovcik/scraper-parent-test/src/pages/github.com/NoahMarconi/ethwaterloo-2023/blob/aa010e8a8788e8ff18fd82111a866f4448102f49/examples/printers/univ2/contracts/UniswapV2Factory.sol-UniswapV2FactorycreatePairaddressaddress.png",
+  // "/Users/nv/repos/pavlovcik/scraper-parent-test/src/pages/github.com/hyperlane-xyz/fuel-contracts/pull/90"
+];
 
 /**
 
