@@ -25,14 +25,10 @@ export const eventHandlers = {
     };
   },
 
-  scrapeComplete: function scrapeCompleteHandler(resolve, reject) {
+  scrapeComplete: function scrapeCompleteHandler(resolve) {
     return async function _scrapeCompleteHandler(resultsPromise: Promise<JobResult>) {
       const results = await resultsPromise;
-      if (results) {
-        return resolve(results);
-      } else {
-        return reject("no results");
-      }
+      return resolve(results);
     };
   },
 

@@ -68,8 +68,8 @@ async function _scrapeSeries(urls: string[], browser: Browser): Promise<JobResul
 
 type ResolveFunction = (results: string) => void;
 async function _scrapeSingle(url: string, browser: Browser): Promise<JobResult | Error> {
-  const scrapeJob = new Promise(function addCallbackEvent(resolve: ResolveFunction, reject) {
-    events.once("scrapecomplete", eventHandlers.scrapeComplete(resolve, reject));
+  const scrapeJob = new Promise(function addCallbackEvent(resolve: ResolveFunction) {
+    events.once("scrapecomplete", eventHandlers.scrapeComplete(resolve));
   });
 
   log.info(`>>`, url); // useful to follow page navigation
