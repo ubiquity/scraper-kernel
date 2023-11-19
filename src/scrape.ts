@@ -1,11 +1,10 @@
 import { EventEmitter } from "events";
-import { Browser } from "puppeteer";
+import puppeteer, { Browser } from "puppeteer";
 import { setupConfig } from "./boot/config";
 import { eventHandlers } from "./boot/event-handlers";
 import { attachEvents } from "./boot/events/attachEvents";
 import newTabToURL from "./boot/new-tab-to-url";
 import { log } from "./logging";
-import puppeteer from "puppeteer";
 
 export const events = new EventEmitter();
 export type JobResult = Error | string | null;
@@ -80,7 +79,7 @@ async function _scrapeSingle(url: string, browser: Browser): Promise<JobResult |
   }
 
   const results = await scrapeJob;
-  if (results == void 0) {
+  if (results === void 0) {
     return new Error("Scrape Job returned `undefined`. Set return type on page controller to `null` to fix this error");
   }
   await page.close(); // save memory

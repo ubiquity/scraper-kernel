@@ -26,11 +26,13 @@ export const eventHandlers = {
   },
 
   scrapeComplete: function scrapeCompleteHandler(resolve, reject) {
-    return async function _scrapeCompleteHandler(results: JobResult) {
-      if (!results) {
+    return async function _scrapeCompleteHandler(resultsPromise: Promise<JobResult>) {
+      const results = await resultsPromise;
+      if (results) {
+        return resolve(results);
+      } else {
         return reject("no results");
       }
-      return resolve(results);
     };
   },
 
