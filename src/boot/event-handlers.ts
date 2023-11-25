@@ -21,6 +21,7 @@ export const eventHandlers = {
 
   logicFailed: function logicFailedHandler() {
     return function _logicFailedHandler(error: Error) {
+      console.trace(`Logic failed: ${error}`);
       log.error(error);
     };
   },
