@@ -25,7 +25,7 @@ async function scrape(settings: UserSettings, browser?: Browser): Promise<JobRes
 
   if (!browser) {
     const config = setupConfig(settings);
-    browser = (await puppeteer.launch(config)) as Browser;
+    browser = (await puppeteer.launch(config).catch((error) => log.error(error))) as Browser;
     browser = attachEvents(browser, settings);
   }
 
